@@ -1,6 +1,6 @@
 import configparser
 import time
-
+from loguru import logger
 import openai
 from telethon.sync import TelegramClient
 
@@ -14,7 +14,7 @@ def read_config():
 
 def connect_telegram_account(api_id, api_hash):
     """Подключение к аккаунту Telegram"""
-    client = TelegramClient('session_name', api_id, api_hash)
+    client = TelegramClient('accounts/session_name', api_id, api_hash)
     client.connect()
     return client
 
@@ -40,6 +40,7 @@ class TelegramCommentator:
                 continue
 
             messages = self.client.get_messages(channel_entity, limit=1)
+            print(messages)
             if messages:
                 for post in messages:
                     if post.id != last_message_ids[name]:
@@ -57,9 +58,7 @@ class TelegramCommentator:
                         try:
                             time.sleep(25)
                             self.client.send_message(entity=name, message=output, comment_to=post.id)
-                            self.client.send_message(f'{self.owner_id}',
-                                                     f'Комментарий отправлен!\nОпубликовать ссылку: <a href="https://t.me/{name}/{post.id}">{name}</a>\nPost: {post.raw_text[:90]}\nНаш комментарий: {output}',
-                                                     parse_mode="html")
+                            self.client.send_message(f'{self.owner_id}', f'Комментарий отправлен!\nОпубликовать ссылку: <a href="https://t.me/{name}/{post.id}">{name}</a>\nPost: {post.raw_text[:90]}\nНаш комментарий: {output}', parse_mode="html")
                             print('Комментарий успешно отправлен, пожалуйста, проверьте свои сообщения')
                         except Exception:
                             print('Ошибка, пожалуйста, проверьте свои сообщения')
@@ -78,8 +77,13 @@ class TelegramCommentator:
 
 
 if __name__ == "__main__":
-    config = read_config()
-    channels = ['energynewz', 'militaryZmediaa', 'novosti_ru_24', 'voenacher', 'rusich_army',
+    logger.add("log/log.log", rotation="1 MB", compression="zip")  # Логирование программы
+    try:
+        config = read_config()
+        channels = ['energynewz', 'militaryZmediaa', 'novosti_ru_24', 'voenacher', 'rusich_army',
                 'RVvoenkor', 'donbass_medi', 'boris_rozhin', 'readovkanews', 'osetin20', 'rusich_army']
-    telegram_commentator = TelegramCommentator(config)
-    telegram_commentator.run(channels)
+        telegram_commentator = TelegramCommentator(config)
+        telegram_commentator.run(channels)
+    except Exception as e:
+        logger.exception(e)
+        print("[bold red][!] Произошла ошибка, для подробного изучения проблемы просмотрите файл log.log")
