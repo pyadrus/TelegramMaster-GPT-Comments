@@ -1,8 +1,9 @@
-from telethon.sync import TelegramClient
-import openai
-import os
-import time
 import configparser
+import time
+
+import openai
+from telethon.sync import TelegramClient
+
 
 def read_config():
     """Считывание данных с config файла"""
@@ -20,21 +21,21 @@ def connect_telegram_account(api_id, api_hash):
 
 class TelegramCommentator:
     """Инициализация комментатора Telegram"""
-    def __init__(self, config):
+
+    def __init__(self, config) -> None:
         self.config = config
-        openai.api_key = os.getenv("OpenAI_token")  # ChatGPT токен
-        self.owner_id = os.getenv('Owner_id')
+        openai_api_key = self.config.get("openai_api_key", "openai_api_key")
+        openai.api_key = openai_api_key  # ChatGPT токен
         self.client = None
 
-    # Write comments in Telegram channels
-    def write_comments_in_telegram(self, channels):
+    def write_comments_in_telegram(self, channels) -> None:
+        """Пишите комментарии в Telegram-каналах"""
         last_message_ids = {name: 0 for name in channels}
 
         for name in channels:
             try:
                 channel_entity = self.client.get_entity(name)
-            except ValueError as e:
-                self.client.send_message(f'{self.owner_id}', f"Ошибка получения информации о канале '{name}': {e}")
+            except ValueError:
                 print("Ошибка, пожалуйста, проверьте свои сообщения!")
                 continue
 
@@ -44,17 +45,15 @@ class TelegramCommentator:
                     if post.id != last_message_ids[name]:
                         last_message_ids[name] = post.id
 
-                        prompt = "Вы патриотичный человек и женщина. Напишите содержательный и яркий комментарий менее чем в 11 словах к следующему посту:" + post.raw_text
+                        prompt = "Вы патриотичный человек Росийской Федерации и женщина. Напишите содержательный и яркий комментарий менее чем в 11 словах к следующему посту:" + post.raw_text
                         output = openai.Completion.create(engine='text-davinci-003', prompt=prompt, max_tokens=170,
                                                           temperature=0.4, n=1, stop=None)
-
                         if output.choices:
                             output = output.choices[0].text.strip()
                             if output == "":
                                 output = "Не знаю, что сказать..."
                         else:
                             output = "Не знаю, что сказать..."
-
                         try:
                             time.sleep(25)
                             self.client.send_message(entity=name, message=output, comment_to=post.id)
@@ -62,26 +61,25 @@ class TelegramCommentator:
                                                      f'Комментарий отправлен!\nОпубликовать ссылку: <a href="https://t.me/{name}/{post.id}">{name}</a>\nPost: {post.raw_text[:90]}\nНаш комментарий: {output}',
                                                      parse_mode="html")
                             print('Комментарий успешно отправлен, пожалуйста, проверьте свои сообщения')
-                        except Exception as e:
-                            self.client.send_message(f'{self.owner_id}',
-                                                     f"Ошибка отправки комментария на канал.'{name}': {e}")
+                        except Exception:
                             print('Ошибка, пожалуйста, проверьте свои сообщения')
+                            continue
                         finally:
                             time.sleep(25)
 
-    def start_telegram_client(self):
+    def start_telegram_client(self) -> None:
         self.client = connect_telegram_account(self.config.get("telegram_settings", "id"),
                                                self.config.get("telegram_settings", "hash"))
 
-    def run(self, channels):
+    def run(self, channels) -> None:
         self.start_telegram_client()
         while True:
             self.write_comments_in_telegram(channels)
 
 
-# Main program
 if __name__ == "__main__":
     config = read_config()
-    channels = ['energynewz', 'militaryZmediaa', 'novosti_ru_24', 'voenacher']
+    channels = ['energynewz', 'militaryZmediaa', 'novosti_ru_24', 'voenacher', 'rusich_army',
+                'RVvoenkor', 'donbass_medi', 'boris_rozhin', 'readovkanews', 'osetin20', 'rusich_army']
     telegram_commentator = TelegramCommentator(config)
     telegram_commentator.run(channels)
