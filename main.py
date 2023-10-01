@@ -1,7 +1,8 @@
 import configparser
+import sqlite3
 import time
-from loguru import logger
 import openai
+from loguru import logger
 from telethon.sync import TelegramClient
 
 
@@ -45,7 +46,6 @@ class TelegramCommentator:
                 for post in messages:
                     if post.id != last_message_ids[name]:
                         last_message_ids[name] = post.id
-
                         prompt = "Вы патриотичный человек Росийской Федерации и женщина. Напишите содержательный и яркий комментарий менее чем в 11 словах к следующему посту:" + post.raw_text
                         output = openai.Completion.create(engine='text-davinci-003', prompt=prompt, max_tokens=170,
                                                           temperature=0.4, n=1, stop=None)
@@ -58,7 +58,9 @@ class TelegramCommentator:
                         try:
                             time.sleep(25)
                             self.client.send_message(entity=name, message=output, comment_to=post.id)
-                            self.client.send_message(f'{self.owner_id}', f'Комментарий отправлен!\nОпубликовать ссылку: <a href="https://t.me/{name}/{post.id}">{name}</a>\nPost: {post.raw_text[:90]}\nНаш комментарий: {output}', parse_mode="html")
+                            self.client.send_message(f'{self.owner_id}',
+                                                     f'Комментарий отправлен!\nОпубликовать ссылку: <a href="https://t.me/{name}/{post.id}">{name}</a>\nPost: {post.raw_text[:90]}\nНаш комментарий: {output}',
+                                                     parse_mode="html")
                             print('Комментарий успешно отправлен, пожалуйста, проверьте свои сообщения')
                         except Exception:
                             print('Ошибка, пожалуйста, проверьте свои сообщения')
@@ -76,14 +78,52 @@ class TelegramCommentator:
             self.write_comments_in_telegram(channels)
 
 
+# Путь к файлу базы данных SQLite
+db_path = 'channels.db'
+
+
+def main(client):
+    # Авторизуемся в Telegram
+    # client.start()
+    # Получаем список диалогов (каналов, групп и т. д.)
+    dialogs = client.get_dialogs()
+    # Создаем или подключаемся к базе данных SQLite
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    # Создаем таблицу для хранения каналов, если ее еще нет
+    cursor.execute('''CREATE TABLE IF NOT EXISTS channels (id INTEGER PRIMARY KEY, title TEXT, username TEXT)''')
+    # Проходим по диалогам и записываем информацию о каналах в базу данных
+    for dialog in dialogs:
+        if dialog.is_channel:
+            title = dialog.title
+            username = dialog.entity.username if dialog.entity.username else ''
+            print(username)
+            # Вставляем данные в базу данных
+            cursor.execute('INSERT INTO channels (title, username) VALUES (?, ?)', (title, username))
+    # Сохраняем изменения и закрываем соединение
+    conn.commit()
+    conn.close()
+    # Завершаем работу клиента
+    client.disconnect()
+
+
 if __name__ == "__main__":
     logger.add("log/log.log", rotation="1 MB", compression="zip")  # Логирование программы
-    try:
-        config = read_config()
-        channels = ['energynewz', 'militaryZmediaa', 'novosti_ru_24', 'voenacher', 'rusich_army',
-                'RVvoenkor', 'donbass_medi', 'boris_rozhin', 'readovkanews', 'osetin20', 'rusich_army']
-        telegram_commentator = TelegramCommentator(config)
-        telegram_commentator.run(channels)
-    except Exception as e:
-        logger.exception(e)
-        print("[bold red][!] Произошла ошибка, для подробного изучения проблемы просмотрите файл log.log")
+    config = read_config()
+    print("[1] - Получение списка каналов")
+    print("[2] - Отправка комментариев")
+    user_input = input("Ваш выбор: ")
+    if user_input == "1":
+        client = connect_telegram_account(config.get("telegram_settings", "id"),
+                                          config.get("telegram_settings", "hash"))
+        main(client)
+    elif user_input == "2":
+        try:
+            # Каналы с комментариями
+            channels = ['energynewz', 'militaryZmediaa', 'novosti_ru_24', 'voenacher', 'rusich_army',
+                        'RVvoenkor', 'donbass_medi', 'boris_rozhin', 'readovkanews', 'osetin20', 'rusich_army']
+            telegram_commentator = TelegramCommentator(config)
+            telegram_commentator.run(channels)
+        except Exception as e:
+            logger.exception(e)
+            print("[bold red][!] Произошла ошибка, для подробного изучения проблемы просмотрите файл log.log")
