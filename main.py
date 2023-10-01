@@ -32,7 +32,6 @@ class TelegramCommentator:
     def write_comments_in_telegram(self, channels) -> None:
         """Пишите комментарии в Telegram-каналах"""
         last_message_ids = {name: 0 for name in channels}
-
         for name in channels:
             try:
                 channel_entity = self.client.get_entity(name)
@@ -55,18 +54,10 @@ class TelegramCommentator:
                                 output = "Не знаю, что сказать..."
                         else:
                             output = "Не знаю, что сказать..."
-                        try:
-                            time.sleep(25)
-                            self.client.send_message(entity=name, message=output, comment_to=post.id)
-                            self.client.send_message(f'{self.owner_id}',
-                                                     f'Комментарий отправлен!\nОпубликовать ссылку: <a href="https://t.me/{name}/{post.id}">{name}</a>\nPost: {post.raw_text[:90]}\nНаш комментарий: {output}',
-                                                     parse_mode="html")
-                            print('Комментарий успешно отправлен, пожалуйста, проверьте свои сообщения')
-                        except Exception:
-                            print('Ошибка, пожалуйста, проверьте свои сообщения')
-                            continue
-                        finally:
-                            time.sleep(25)
+                        time.sleep(25)
+                        self.client.send_message(entity=name, message=output, comment_to=post.id)
+                        print(f'Наш комментарий: {output}')
+                        time.sleep(25)
 
     def start_telegram_client(self) -> None:
         self.client = connect_telegram_account(self.config.get("telegram_settings", "id"),
@@ -83,8 +74,6 @@ db_path = 'channels.db'
 
 
 def main(client):
-    # Авторизуемся в Telegram
-    # client.start()
     # Получаем список диалогов (каналов, групп и т. д.)
     dialogs = client.get_dialogs()
     # Создаем или подключаемся к базе данных SQLite
@@ -119,11 +108,25 @@ if __name__ == "__main__":
         main(client)
     elif user_input == "2":
         try:
+            # Путь к файлу базы данных SQLite
+            db_path = 'channels.db'
+            # Создаем подключение к базе данных
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            # Выполняем SQL-запрос для извлечения username из таблицы channels
+            cursor.execute('SELECT username FROM channels')
+            # Получаем все строки результата запроса
+            results = cursor.fetchall()
+            # Закрываем соединение с базой данных
+            conn.close()
+            # Преобразуем результат в словарь
+            usernames = [row[0] for row in results]
+            # channels = {'usernames': usernames}
+            # Выводим полученный словарь
+            print(usernames)
             # Каналы с комментариями
-            channels = ['energynewz', 'militaryZmediaa', 'novosti_ru_24', 'voenacher', 'rusich_army',
-                        'RVvoenkor', 'donbass_medi', 'boris_rozhin', 'readovkanews', 'osetin20', 'rusich_army']
             telegram_commentator = TelegramCommentator(config)
-            telegram_commentator.run(channels)
+            telegram_commentator.run(usernames)
         except Exception as e:
             logger.exception(e)
             print("[bold red][!] Произошла ошибка, для подробного изучения проблемы просмотрите файл log.log")
