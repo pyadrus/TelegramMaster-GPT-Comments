@@ -33,19 +33,14 @@ class TelegramCommentator:
         """Пишите комментарии в Telegram-каналах"""
         last_message_ids = {name: 0 for name in channels}
         for name in channels:
-            try:
-                channel_entity = self.client.get_entity(name)
-            except ValueError:
-                print("Ошибка, пожалуйста, проверьте свои сообщения!")
-                continue
-
+            channel_entity = self.client.get_entity(name)
             messages = self.client.get_messages(channel_entity, limit=1)
             print(messages)
             if messages:
                 for post in messages:
                     if post.id != last_message_ids[name]:
                         last_message_ids[name] = post.id
-                        prompt = "Вы патриотичный человек Росийской Федерации и женщина. Напишите содержательный и яркий комментарий менее чем в 11 словах к следующему посту:" + post.raw_text
+                        prompt = "Вы патриотичный человек Российской Федерации и женщина. Напишите содержательный и яркий комментарий менее чем в 11 словах к следующему посту:" + post.raw_text
                         output = openai.Completion.create(engine='text-davinci-003', prompt=prompt, max_tokens=170,
                                                           temperature=0.4, n=1, stop=None)
                         if output.choices:
@@ -54,10 +49,9 @@ class TelegramCommentator:
                                 output = "Не знаю, что сказать..."
                         else:
                             output = "Не знаю, что сказать..."
-                        time.sleep(25)
                         self.client.send_message(entity=name, message=output, comment_to=post.id)
                         print(f'Наш комментарий: {output}')
-                        time.sleep(25)
+                        time.sleep(50) # Спим 50 сек
 
     def start_telegram_client(self) -> None:
         self.client = connect_telegram_account(self.config.get("telegram_settings", "id"),
@@ -108,20 +102,15 @@ if __name__ == "__main__":
         main(client)
     elif user_input == "2":
         try:
-            # Путь к файлу базы данных SQLite
-            db_path = 'channels.db'
-            # Создаем подключение к базе данных
-            conn = sqlite3.connect(db_path)
+            db_path = 'channels.db'# Путь к файлу базы данных SQLite
+            conn = sqlite3.connect(db_path)# Создаем подключение к базе данных
             cursor = conn.cursor()
             # Выполняем SQL-запрос для извлечения username из таблицы channels
             cursor.execute('SELECT username FROM channels')
-            # Получаем все строки результата запроса
-            results = cursor.fetchall()
-            # Закрываем соединение с базой данных
-            conn.close()
+            results = cursor.fetchall()# Получаем все строки результата запроса
+            conn.close()# Закрываем соединение с базой данных
             # Преобразуем результат в словарь
             usernames = [row[0] for row in results]
-            # channels = {'usernames': usernames}
             # Выводим полученный словарь
             print(usernames)
             # Каналы с комментариями
