@@ -1,8 +1,12 @@
 import configparser
 import sqlite3
 import time
+import datetime
 import openai
+import telethon
+from faker import Faker
 from loguru import logger
+from telethon import functions
 from telethon.sync import TelegramClient
 
 
@@ -29,29 +33,52 @@ class TelegramCommentator:
         openai.api_key = openai_api_key  # ChatGPT токен
         self.client = None
 
+    def subscribe_to_channel(self, channel_name):
+        try:
+            channel_entity = self.client.get_entity(channel_name)
+            self.client.send_message(entity=channel_entity, message='/subscribe')  # Отправить команду на подписку
+            print(f'Подписка на канал {channel_name} выполнена успешно.')
+        except Exception as e:
+            print(f'Ошибка при подписке на канал {channel_name}: {e}')
+
     def write_comments_in_telegram(self, channels) -> None:
         """Пишите комментарии в Telegram-каналах"""
         last_message_ids = {name: 0 for name in channels}
         for name in channels:
-            channel_entity = self.client.get_entity(name)
-            messages = self.client.get_messages(channel_entity, limit=1)
-            print(messages)
-            if messages:
-                for post in messages:
-                    if post.id != last_message_ids[name]:
-                        last_message_ids[name] = post.id
-                        prompt = "Вы патриотичный человек Российской Федерации и женщина. Напишите содержательный и яркий комментарий менее чем в 11 словах к следующему посту:" + post.raw_text
-                        output = openai.Completion.create(engine='text-davinci-003', prompt=prompt, max_tokens=170,
-                                                          temperature=0.4, n=1, stop=None)
-                        if output.choices:
-                            output = output.choices[0].text.strip()
-                            if output == "":
+            # Подписываемся на канал перед отправкой комментария
+            self.subscribe_to_channel(name)
+            try:
+                channel_entity = self.client.get_entity(name)
+                messages = self.client.get_messages(channel_entity, limit=1)
+                print(messages)
+                if messages:
+                    for post in messages:
+                        if post.id != last_message_ids[name]:
+                            last_message_ids[name] = post.id
+                            prompt = ("Вы патриотичный человек Российской Федерации. Напишите содержательный и"
+                                      "яркий комментарий менее чем в 11 словах к следующему посту:") + post.raw_text
+                            output = openai.Completion.create(engine='text-davinci-003', prompt=prompt, max_tokens=170,
+                                                              temperature=0.4, n=1, stop=None)
+                            if output.choices:
+                                output = output.choices[0].text.strip()
+                                if output == "":
+                                    output = "Не знаю, что сказать..."
+                            else:
                                 output = "Не знаю, что сказать..."
-                        else:
-                            output = "Не знаю, что сказать..."
-                        self.client.send_message(entity=name, message=output, comment_to=post.id)
-                        print(f'Наш комментарий: {output}')
-                        time.sleep(50) # Спим 50 сек
+                            try:
+                                self.client.send_message(entity=name, message=output, comment_to=post.id)
+                                print(f'Наш комментарий: {output}')
+                                time.sleep(400)  # Спим 50 сек
+                            except telethon.errors.rpcerrorlist.ChatWriteForbiddenError:
+                                print(f"Вы не можете отправлять сообщения в: {name}")
+                            except telethon.errors.rpcerrorlist.MsgIdInvalidError:
+                                print("Возможно пост был изменен или удален")
+                            except telethon.errors.rpcerrorlist.FloodWaitError as e:
+                                print(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}')
+                                time.sleep(e.seconds)
+            except telethon.errors.rpcerrorlist.FloodWaitError as e:  # Если ошибка при подписке
+                print(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}')
+                time.sleep(e.seconds)
 
     def start_telegram_client(self) -> None:
         self.client = connect_telegram_account(self.config.get("telegram_settings", "id"),
@@ -90,11 +117,30 @@ def main(client):
     client.disconnect()
 
 
+def change_profile_descriptions(client):
+    """Смена описания профиля"""
+    fake = Faker('ru_RU')  # Устанавливаем локаль для генерации русских имен
+    fake_name = fake.first_name_female()  # Генерируем женское имя
+    print(fake_name)
+    # Вводим данные для телеги
+    with client as client:
+        about = "Мой основной проект https://t.me/+cKV31TBpVK85ZTAy"
+        # result = client(functions.account.UpdateProfileRequest(first_name=fake_name, last_name='', about=about))
+        result = client(functions.account.UpdateProfileRequest(about=about))
+        print(result)
+        # Загрузка новой фотографии профиля (замените 'photo.jpg' на путь к вашей фотографии)
+        # uploaded_photo = client.upload_file('photo.jpg')
+        # Обновление фотографии профиля
+        # client(functions.photos.UploadProfilePhotoRequest(file=uploaded_photo))
+        print("Профиль успешно обновлен!")
+
+
 if __name__ == "__main__":
     logger.add("log/log.log", rotation="1 MB", compression="zip")  # Логирование программы
     config = read_config()
     print("[1] - Получение списка каналов")
     print("[2] - Отправка комментариев")
+    print("[3] - Смена: имени, описания, фото профиля")
     user_input = input("Ваш выбор: ")
     if user_input == "1":
         client = connect_telegram_account(config.get("telegram_settings", "id"),
@@ -102,13 +148,13 @@ if __name__ == "__main__":
         main(client)
     elif user_input == "2":
         try:
-            db_path = 'channels.db'# Путь к файлу базы данных SQLite
-            conn = sqlite3.connect(db_path)# Создаем подключение к базе данных
+            db_path = 'channels.db'  # Путь к файлу базы данных SQLite
+            conn = sqlite3.connect(db_path)  # Создаем подключение к базе данных
             cursor = conn.cursor()
             # Выполняем SQL-запрос для извлечения username из таблицы channels
             cursor.execute('SELECT username FROM channels')
-            results = cursor.fetchall()# Получаем все строки результата запроса
-            conn.close()# Закрываем соединение с базой данных
+            results = cursor.fetchall()  # Получаем все строки результата запроса
+            conn.close()  # Закрываем соединение с базой данных
             # Преобразуем результат в словарь
             usernames = [row[0] for row in results]
             # Выводим полученный словарь
@@ -119,3 +165,7 @@ if __name__ == "__main__":
         except Exception as e:
             logger.exception(e)
             print("[bold red][!] Произошла ошибка, для подробного изучения проблемы просмотрите файл log.log")
+    elif user_input == "3":
+        client = connect_telegram_account(config.get("telegram_settings", "id"),
+                                          config.get("telegram_settings", "hash"))
+        change_profile_descriptions(client)
