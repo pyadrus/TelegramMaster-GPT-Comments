@@ -57,28 +57,37 @@ class TelegramCommentator:
                             last_message_ids[name] = post.id
                             prompt = ("Вы патриотичный человек Российской Федерации. Напишите содержательный и"
                                       "яркий комментарий менее чем в 11 словах к следующему посту:") + post.raw_text
-                            output = openai.Completion.create(engine='text-davinci-003', prompt=prompt, max_tokens=170,
-                                                              temperature=0.4, n=1, stop=None)
-                            if output.choices:
-                                output = output.choices[0].text.strip()
-                                if output == "":
-                                    output = "Не знаю, что сказать..."
-                            else:
-                                output = "Не знаю, что сказать..."
                             try:
-                                self.client.send_message(entity=name, message=output, comment_to=post.id)
-                                print(f'Наш комментарий: {output}')
-                                time.sleep(400)  # Спим 50 сек
-                            except telethon.errors.rpcerrorlist.ChatWriteForbiddenError:
-                                print(f"Вы не можете отправлять сообщения в: {name}")
-                            except telethon.errors.rpcerrorlist.MsgIdInvalidError:
-                                print("Возможно пост был изменен или удален")
-                            except telethon.errors.rpcerrorlist.FloodWaitError as e:
-                                print(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}')
-                                time.sleep(e.seconds)
+                                output = openai.Completion.create(engine='text-davinci-003', prompt=prompt, max_tokens=170,
+                                                                  temperature=0.4, n=1, stop=None)
+                                if output.choices:
+                                    output = output.choices[0].text.strip()
+                                    if output == "":
+                                        output = "Не знаю, что сказать..."
+                                else:
+                                    output = "Не знаю, что сказать..."
+                                try:
+                                    self.client.send_message(entity=name, message=output, comment_to=post.id)
+                                    print(f'Наш комментарий: {output}')
+                                    time.sleep(400)  # Спим 50 сек
+                                except telethon.errors.rpcerrorlist.ChatWriteForbiddenError:
+                                    print(f"Вы не можете отправлять сообщения в: {name}")
+                                except telethon.errors.rpcerrorlist.MsgIdInvalidError:
+                                    print("Возможно пост был изменен или удален")
+                                except telethon.errors.rpcerrorlist.UserBannedInChannelError:
+                                    print("Вам запрещено отправлять сообщения в супергруппы/каналы (вызвано SendMessageRequest)")
+                                except telethon.errors.rpcerrorlist.FloodWaitError as e:
+                                    print(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}')
+                                    time.sleep(e.seconds)
+                            except openai.error.RateLimitError:
+                                print("Достигнут предел скорости для default-text-davinci-003 по количеству запросов в минуту. Ограничение: 3/мин. Пожалуйста, повторите попытку через 20 секунд. ")
+                                time.sleep(200)
             except telethon.errors.rpcerrorlist.FloodWaitError as e:  # Если ошибка при подписке
                 print(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}')
                 time.sleep(e.seconds)
+            except telethon.errors.rpcerrorlist.AuthKeyUnregisteredError:  # Если аккаунт заблочен
+                print("Аккаунт заблокирован")
+                break
 
     def start_telegram_client(self) -> None:
         self.client = connect_telegram_account(self.config.get("telegram_settings", "id"),
@@ -155,12 +164,9 @@ if __name__ == "__main__":
             cursor.execute('SELECT username FROM channels')
             results = cursor.fetchall()  # Получаем все строки результата запроса
             conn.close()  # Закрываем соединение с базой данных
-            # Преобразуем результат в словарь
-            usernames = [row[0] for row in results]
-            # Выводим полученный словарь
-            print(usernames)
-            # Каналы с комментариями
-            telegram_commentator = TelegramCommentator(config)
+            usernames = [row[0] for row in results]# Преобразуем результат в словарь
+            print(usernames)# Выводим полученный словарь
+            telegram_commentator = TelegramCommentator(config)# Каналы с комментариями
             telegram_commentator.run(usernames)
         except Exception as e:
             logger.exception(e)
