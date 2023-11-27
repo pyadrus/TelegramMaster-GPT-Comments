@@ -1,11 +1,13 @@
 import configparser
+import datetime
 import sqlite3
 import time
-import datetime
+
 import openai
 import telethon
 from faker import Faker
 from loguru import logger
+from rich.progress import track
 from telethon import functions
 from telethon.sync import TelegramClient
 
@@ -58,7 +60,8 @@ class TelegramCommentator:
                             prompt = ("Вы патриотичный человек Российской Федерации. Напишите содержательный и"
                                       "яркий комментарий менее чем в 11 словах к следующему посту:") + post.raw_text
                             try:
-                                output = openai.Completion.create(engine='text-davinci-003', prompt=prompt, max_tokens=170,
+                                output = openai.Completion.create(engine='text-davinci-003', prompt=prompt,
+                                                                  max_tokens=170,
                                                                   temperature=0.4, n=1, stop=None)
                                 if output.choices:
                                     output = output.choices[0].text.strip()
@@ -69,7 +72,8 @@ class TelegramCommentator:
                                 try:
                                     self.client.send_message(entity=name, message=output, comment_to=post.id)
                                     print(f'Наш комментарий: {output}')
-                                    time.sleep(400)  # Спим 50 сек
+                                    for i in track(range(400), description="Перерыв в рассылке..."):
+                                        time.sleep(1)
                                 except telethon.errors.rpcerrorlist.ChatWriteForbiddenError:
                                     print(f"Вы не можете отправлять сообщения в: {name}")
                                 except telethon.errors.rpcerrorlist.MsgIdInvalidError:
@@ -79,9 +83,14 @@ class TelegramCommentator:
                                 except telethon.errors.rpcerrorlist.FloodWaitError as e:
                                     print(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}')
                                     time.sleep(e.seconds)
+                                except telethon.errors.rpcerrorlist.ChatGuestSendForbiddenError as e:
+                                    print(e)
                             except openai.error.RateLimitError:
                                 print("Достигнут предел скорости для default-text-davinci-003 по количеству запросов в минуту. Ограничение: 3/мин. Пожалуйста, повторите попытку через 20 секунд. ")
                                 time.sleep(200)
+                            except openai.error.APIConnectionError:
+                                print("Возникла проблема при попытке связаться с API OpenAI")
+                                break
             except telethon.errors.rpcerrorlist.FloodWaitError as e:  # Если ошибка при подписке
                 print(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}')
                 time.sleep(e.seconds)
@@ -137,10 +146,6 @@ def change_profile_descriptions(client):
         # result = client(functions.account.UpdateProfileRequest(first_name=fake_name, last_name='', about=about))
         result = client(functions.account.UpdateProfileRequest(about=about))
         print(result)
-        # Загрузка новой фотографии профиля (замените 'photo.jpg' на путь к вашей фотографии)
-        # uploaded_photo = client.upload_file('photo.jpg')
-        # Обновление фотографии профиля
-        # client(functions.photos.UploadProfilePhotoRequest(file=uploaded_photo))
         print("Профиль успешно обновлен!")
 
 
@@ -164,9 +169,9 @@ if __name__ == "__main__":
             cursor.execute('SELECT username FROM channels')
             results = cursor.fetchall()  # Получаем все строки результата запроса
             conn.close()  # Закрываем соединение с базой данных
-            usernames = [row[0] for row in results]# Преобразуем результат в словарь
-            print(usernames)# Выводим полученный словарь
-            telegram_commentator = TelegramCommentator(config)# Каналы с комментариями
+            usernames = [row[0] for row in results]  # Преобразуем результат в словарь
+            print(usernames)  # Выводим полученный словарь
+            telegram_commentator = TelegramCommentator(config)  # Каналы с комментариями
             telegram_commentator.run(usernames)
         except Exception as e:
             logger.exception(e)
