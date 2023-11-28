@@ -1,6 +1,5 @@
 import configparser
 import datetime
-import sqlite3
 import time
 
 import openai
@@ -8,8 +7,12 @@ import telethon
 from faker import Faker
 from loguru import logger
 from rich.progress import track
+from rich import print
 from telethon import functions
 from telethon.sync import TelegramClient
+
+from app_banner import banner
+from working_with_the_database import reading_from_the_channel_list_database, creating_a_channel_list
 
 
 def read_config():
@@ -79,15 +82,18 @@ class TelegramCommentator:
                                 except telethon.errors.rpcerrorlist.MsgIdInvalidError:
                                     print("Возможно пост был изменен или удален")
                                 except telethon.errors.rpcerrorlist.UserBannedInChannelError:
-                                    print("Вам запрещено отправлять сообщения в супергруппы/каналы (вызвано SendMessageRequest)")
+                                    print(
+                                        "Вам запрещено отправлять сообщения в супергруппы/каналы (вызвано SendMessageRequest)")
                                 except telethon.errors.rpcerrorlist.FloodWaitError as e:
                                     print(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}')
                                     time.sleep(e.seconds)
                                 except telethon.errors.rpcerrorlist.ChatGuestSendForbiddenError as e:
                                     print(e)
                             except openai.error.RateLimitError:
-                                print("Достигнут предел скорости для default-text-davinci-003 по количеству запросов в минуту. Ограничение: 3/мин. Пожалуйста, повторите попытку через 20 секунд. ")
-                                time.sleep(200)
+                                print(
+                                    "Достигнут предел скорости для default-text-davinci-003 по количеству запросов в минуту. Ограничение: 3/мин. Пожалуйста, повторите попытку через 20 секунд. ")
+                                for i in track(range(200), description="Перерыв в рассылке..."):
+                                    time.sleep(1)
                             except openai.error.APIConnectionError:
                                 print("Возникла проблема при попытке связаться с API OpenAI")
                                 break
@@ -108,29 +114,11 @@ class TelegramCommentator:
             self.write_comments_in_telegram(channels)
 
 
-# Путь к файлу базы данных SQLite
-db_path = 'channels.db'
-
-
 def main(client):
     # Получаем список диалогов (каналов, групп и т. д.)
     dialogs = client.get_dialogs()
     # Создаем или подключаемся к базе данных SQLite
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    # Создаем таблицу для хранения каналов, если ее еще нет
-    cursor.execute('''CREATE TABLE IF NOT EXISTS channels (id INTEGER PRIMARY KEY, title TEXT, username TEXT)''')
-    # Проходим по диалогам и записываем информацию о каналах в базу данных
-    for dialog in dialogs:
-        if dialog.is_channel:
-            title = dialog.title
-            username = dialog.entity.username if dialog.entity.username else ''
-            print(username)
-            # Вставляем данные в базу данных
-            cursor.execute('INSERT INTO channels (title, username) VALUES (?, ?)', (title, username))
-    # Сохраняем изменения и закрываем соединение
-    conn.commit()
-    conn.close()
+    creating_a_channel_list(dialogs)
     # Завершаем работу клиента
     client.disconnect()
 
@@ -152,9 +140,10 @@ def change_profile_descriptions(client):
 if __name__ == "__main__":
     logger.add("log/log.log", rotation="1 MB", compression="zip")  # Логирование программы
     config = read_config()
-    print("[1] - Получение списка каналов")
-    print("[2] - Отправка комментариев")
-    print("[3] - Смена: имени, описания, фото профиля")
+    banner()
+    print("[bold red][1] - Получение списка каналов")
+    print("[bold red][2] - Отправка комментариев")
+    print("[bold red][3] - Смена: имени, описания, фото профиля")
     user_input = input("Ваш выбор: ")
     if user_input == "1":
         client = connect_telegram_account(config.get("telegram_settings", "id"),
@@ -162,13 +151,7 @@ if __name__ == "__main__":
         main(client)
     elif user_input == "2":
         try:
-            db_path = 'channels.db'  # Путь к файлу базы данных SQLite
-            conn = sqlite3.connect(db_path)  # Создаем подключение к базе данных
-            cursor = conn.cursor()
-            # Выполняем SQL-запрос для извлечения username из таблицы channels
-            cursor.execute('SELECT username FROM channels')
-            results = cursor.fetchall()  # Получаем все строки результата запроса
-            conn.close()  # Закрываем соединение с базой данных
+            results = reading_from_the_channel_list_database()
             usernames = [row[0] for row in results]  # Преобразуем результат в словарь
             print(usernames)  # Выводим полученный словарь
             telegram_commentator = TelegramCommentator(config)  # Каналы с комментариями
