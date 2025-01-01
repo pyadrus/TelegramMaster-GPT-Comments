@@ -1,6 +1,7 @@
 import configparser
 import datetime
 import time
+import tkinter as tk
 
 import telethon
 from faker import Faker
@@ -10,9 +11,11 @@ from rich.progress import track
 from telethon import functions
 from telethon.sync import TelegramClient
 from telethon.tl.functions.channels import JoinChannelRequest
+
 from working_with_the_database import reading_from_the_channel_list_database, creating_a_channel_list
 
 logger.add("log/log.log", rotation="1 MB", compression="zip")  # Логирование программы
+about = "Мой основной проект https://t.me/+UvdDWG8iGgg1ZWUy"
 
 
 def read_config() -> configparser.ConfigParser:
@@ -146,38 +149,57 @@ def change_profile_descriptions(client) -> None:
     logger.info(fake_name)
     # Вводим данные для телеги
     with client as client:
-        about = "Мой основной проект https://t.me/+UvdDWG8iGgg1ZWUy"
         result = client(functions.account.UpdateProfileRequest(about=about))
         logger.info(result)
         logger.info("Профиль успешно обновлен!")
 
 
+def action_1():
+    print("[bold red]Получение списка каналов")
+    config = read_config()
+    client = connect_telegram_account(config.get("telegram_settings", "id"),
+                                      config.get("telegram_settings", "hash"))
+    main(client)
+
+
+def action_2():
+    print("[bold red]Отправка комментариев")
+    try:
+        config = read_config()
+        results = reading_from_the_channel_list_database()
+        usernames = [row[0] for row in results]  # Преобразуем результат в словарь
+        logger.info(usernames)  # Выводим полученный словарь
+        telegram_commentator = TelegramCommentator(config)  # Каналы с комментариями
+        telegram_commentator.run(usernames)
+    except Exception as e:
+        logger.exception(e)
+        logger.info("[bold red][!] Произошла ошибка, для подробного изучения проблемы просмотрите файл log.log")
+
+
+def action_3():
+    print("[bold red]Смена: имени, описания, фото профиля")
+    config = read_config()
+    client = connect_telegram_account(config.get("telegram_settings", "id"),
+                                      config.get("telegram_settings", "hash"))
+    change_profile_descriptions(client)
+
+
 if __name__ == "__main__":
 
-    config = read_config()
 
+    # Создаем главное окно
+    root = tk.Tk()
     program_version, date_of_program_change = "0.0.4", "01.01.2025"  # Версия программы, дата изменения
+    root.title(f"Версия {program_version}. Дата изменения {date_of_program_change}") # Описание окна
+    root.geometry("400x200")  # Размер окна ширина, высота
 
-    print(f"[bold red]{program_version} -  {date_of_program_change}")
-    print("[bold red][1] - Получение списка каналов")
-    print("[bold red][2] - Отправка комментариев")
-    print("[bold red][3] - Смена: имени, описания, фото профиля\n")
-    user_input = input("Ваш выбор: ")
-    if user_input == "1":  # Получение списка каналов
-        client = connect_telegram_account(config.get("telegram_settings", "id"),
-                                          config.get("telegram_settings", "hash"))
-        main(client)
-    elif user_input == "2":  # Отправка комментариев в каналы
-        try:
-            results = reading_from_the_channel_list_database()
-            usernames = [row[0] for row in results]  # Преобразуем результат в словарь
-            logger.info(usernames)  # Выводим полученный словарь
-            telegram_commentator = TelegramCommentator(config)  # Каналы с комментариями
-            telegram_commentator.run(usernames)
-        except Exception as e:
-            logger.exception(e)
-            logger.info("[bold red][!] Произошла ошибка, для подробного изучения проблемы просмотрите файл log.log")
-    elif user_input == "3":  # Смена: имени, описания, фото профиля
-        client = connect_telegram_account(config.get("telegram_settings", "id"),
-                                          config.get("telegram_settings", "hash"))
-        change_profile_descriptions(client)
+    # Создаем кнопки
+    btn_1 = tk.Button(root, text="Получение списка каналов", command=action_1)
+    btn_1.pack(pady=10)
+    btn_2 = tk.Button(root, text="Отправка комментариев", command=action_2)
+    btn_2.pack(pady=10)
+    btn_3 = tk.Button(root, text="Смена имени, описания, фото", command=action_3)
+    btn_3.pack(pady=10)
+
+    # Запускаем главный цикл приложения
+    root.mainloop()
