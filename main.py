@@ -1,6 +1,7 @@
 import configparser
 import datetime
 import time
+
 import telethon
 from faker import Faker
 from loguru import logger
@@ -8,7 +9,7 @@ from rich import print
 from rich.progress import track
 from telethon import functions
 from telethon.sync import TelegramClient
-from app_banner import banner
+
 from working_with_the_database import reading_from_the_channel_list_database, creating_a_channel_list
 
 logger.add("log/log.log", rotation="1 MB", compression="zip")  # Логирование программы
@@ -159,7 +160,10 @@ def change_profile_descriptions(client) -> None:
 if __name__ == "__main__":
 
     config = read_config()
-    banner()
+
+    program_version, date_of_program_change = "0.0.4", "01.01.2025"  # Версия программы, дата изменения
+
+    print(f"[bold red]{program_version} -  {date_of_program_change}")
     print("[bold red][1] - Получение списка каналов")
     print("[bold red][2] - Отправка комментариев")
     print("[bold red][3] - Смена: имени, описания, фото профиля\n")
