@@ -1,7 +1,7 @@
 import sqlite3
 
 # Путь к файлу базы данных SQLite
-db_path = 'channels.db'
+db_path = '../channels.db'
 
 
 def creating_a_channel_list(dialogs):
