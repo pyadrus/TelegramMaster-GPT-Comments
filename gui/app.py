@@ -11,11 +11,17 @@ from database.db_handler import reading_from_the_channel_list_database, creating
 
 
 def action_1():
+    """
+    Получает список диалогов (каналов, групп и т. д.) и создаёт базу данных.
+    """
     print("[bold red]Получение списка каналов")
     config = read_config()
     client = connect_telegram_account(config.get("telegram_settings", "id"),
                                       config.get("telegram_settings", "hash"))
-    main(client)
+
+    dialogs = client.get_dialogs()
+    creating_a_channel_list(dialogs)  # Создаем или подключаемся к базе данных SQLite
+    client.disconnect()  # Завершаем работу клиента
 
 
 def action_2():
@@ -41,19 +47,6 @@ def action_3():
 
 
 if __name__ == "__main__":
-    # Создаем главное окно
-    root = tk.Tk()
-    program_version, date_of_program_change = "0.0.4", "01.01.2025"  # Версия программы, дата изменения
-    root.title(f"Версия {program_version}. Дата изменения {date_of_program_change}")  # Описание окна
-    root.geometry("400x200")  # Размер окна ширина, высота
-
-    # Создаем кнопки
-    btn_1 = tk.Button(root, text="Получение списка каналов", command=action_1)
-    btn_1.pack(pady=10)
-    btn_2 = tk.Button(root, text="Отправка комментариев", command=action_2)
-    btn_2.pack(pady=10)
-    btn_3 = tk.Button(root, text="Смена имени, описания, фото", command=action_3)
-    btn_3.pack(pady=10)
-
-    # Запускаем главный цикл приложения
-    root.mainloop()
+    action_1()
+    action_2()
+    action_3()
