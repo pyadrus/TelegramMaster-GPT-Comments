@@ -3,20 +3,17 @@ import time
 import tkinter as tk
 
 import telethon
-from faker import Faker
 from loguru import logger
 from rich import print
 from rich.progress import track
-from telethon import functions
-
 from telethon.tl.functions.channels import JoinChannelRequest
 
 from config.config_handler import read_config
+from core.profile_updater import change_profile_descriptions
 from core.telegram_client import connect_telegram_account
 from working_with_the_database import reading_from_the_channel_list_database, creating_a_channel_list
 
 logger.add("log/log.log", rotation="1 MB", compression="zip")  # Логирование программы
-about = "Мой основной проект https://t.me/+UvdDWG8iGgg1ZWUy"
 
 
 class TelegramCommentator:
@@ -113,22 +110,6 @@ def main(client) -> None:
     dialogs = client.get_dialogs()
     creating_a_channel_list(dialogs)  # Создаем или подключаемся к базе данных SQLite
     client.disconnect()  # Завершаем работу клиента
-
-
-def change_profile_descriptions(client) -> None:
-    """
-    Обновляет описание профиля Telegram со случайными данными.
-
-    :param client: TelegramClient объект.
-    """
-    fake = Faker('ru_RU')  # Устанавливаем локаль для генерации русских имен
-    fake_name = fake.first_name_female()  # Генерируем женское имя
-    logger.info(fake_name)
-    # Вводим данные для телеги
-    with client as client:
-        result = client(functions.account.UpdateProfileRequest(about=about))
-        logger.info(result)
-        logger.info("Профиль успешно обновлен!")
 
 
 def action_1():
