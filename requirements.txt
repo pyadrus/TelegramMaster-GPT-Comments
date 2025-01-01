@@ -1,5 +1,5 @@
-telethon==1.29.3
-openai==0.28.0
-python-dotenv==1.0.0
+telethon
+python-dotenv
 faker
 rich
+loguru
