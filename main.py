@@ -8,27 +8,15 @@ from loguru import logger
 from rich import print
 from rich.progress import track
 from telethon import functions
-from telethon.sync import TelegramClient
+
 from telethon.tl.functions.channels import JoinChannelRequest
 
 from config.config_handler import read_config
+from core.telegram_client import connect_telegram_account
 from working_with_the_database import reading_from_the_channel_list_database, creating_a_channel_list
 
 logger.add("log/log.log", rotation="1 MB", compression="zip")  # Логирование программы
 about = "Мой основной проект https://t.me/+UvdDWG8iGgg1ZWUy"
-
-
-def connect_telegram_account(api_id, api_hash) -> TelegramClient:
-    """
-    Подключается к Telegram аккаунту используя api_id и api_hash.
-
-    :param api_id: Идентификатор API Telegram.
-    :param api_hash: Ключ API Telegram.
-    :return: TelegramClient объект, подключенный к Telegram.
-    """
-    client = TelegramClient('accounts/session_name', api_id, api_hash)
-    client.connect()
-    return client
 
 
 class TelegramCommentator:
