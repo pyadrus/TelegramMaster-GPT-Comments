@@ -1,4 +1,3 @@
-import configparser
 import datetime
 import time
 import tkinter as tk
@@ -12,21 +11,11 @@ from telethon import functions
 from telethon.sync import TelegramClient
 from telethon.tl.functions.channels import JoinChannelRequest
 
+from config.config_handler import read_config
 from working_with_the_database import reading_from_the_channel_list_database, creating_a_channel_list
 
 logger.add("log/log.log", rotation="1 MB", compression="zip")  # Логирование программы
 about = "Мой основной проект https://t.me/+UvdDWG8iGgg1ZWUy"
-
-
-def read_config() -> configparser.ConfigParser:
-    """
-    Читает данные из конфигурационного файла.
-
-    :return: Объект configparser.ConfigParser, содержащий настройки.
-    """
-    config = configparser.ConfigParser(empty_lines_in_values=False, allow_no_value=True)
-    config.read("setting/config.ini")
-    return config
 
 
 def connect_telegram_account(api_id, api_hash) -> TelegramClient:
@@ -185,12 +174,10 @@ def action_3():
 
 
 if __name__ == "__main__":
-
-
     # Создаем главное окно
     root = tk.Tk()
     program_version, date_of_program_change = "0.0.4", "01.01.2025"  # Версия программы, дата изменения
-    root.title(f"Версия {program_version}. Дата изменения {date_of_program_change}") # Описание окна
+    root.title(f"Версия {program_version}. Дата изменения {date_of_program_change}")  # Описание окна
     root.geometry("400x200")  # Размер окна ширина, высота
 
     # Создаем кнопки
