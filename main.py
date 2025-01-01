@@ -9,7 +9,7 @@ from rich import print
 from rich.progress import track
 from telethon import functions
 from telethon.sync import TelegramClient
-
+from telethon.tl.functions.channels import JoinChannelRequest
 from working_with_the_database import reading_from_the_channel_list_database, creating_a_channel_list
 
 logger.add("log/log.log", rotation="1 MB", compression="zip")  # Логирование программы
@@ -50,29 +50,30 @@ class TelegramCommentator:
         self.config = config
         self.client = None
 
-    def subscribe_to_channel(self, channel_name) -> None:
+    def subscribe_to_channel(self, client, channel_name) -> None:
         """
         Подписывается на Telegram-канал.
 
         :param channel_name: Имя канала Telegram.
+        :param client: TelegramClient объект.
         """
         try:
-            channel_entity = self.client.get_entity(channel_name)
-            self.client.send_message(entity=channel_entity, message='/subscribe')  # Отправить команду на подписку
+            client(JoinChannelRequest(channel_name))
             logger.info(f'Подписка на канал {channel_name} выполнена успешно.')
         except Exception as e:
             logger.exception(f'Ошибка при подписке на канал {channel_name}')
 
-    def write_comments_in_telegram(self, channels) -> None:
+    def write_comments_in_telegram(self, client, channels) -> None:
         """
         Пишет комментарии в указанных Telegram-каналах.
 
         :param channels: Список имен Telegram-каналов.
+        :param client: TelegramClient объект.
         """
         last_message_ids = {name: 0 for name in channels}
         for name in channels:
-            # Подписываемся на канал перед отправкой комментария
-            self.subscribe_to_channel(name)
+
+            self.subscribe_to_channel(client, channel_name=name)  # Подписываемся на канал перед отправкой комментария
             try:
                 channel_entity = self.client.get_entity(name)
                 messages = self.client.get_messages(channel_entity, limit=1)
@@ -111,22 +112,16 @@ class TelegramCommentator:
                 logger.info("Аккаунт заблокирован")
                 break
 
-    def start_telegram_client(self) -> None:
-        """
-        Запускает TelegramClient с настройками из config.
-        """
-        self.client = connect_telegram_account(self.config.get("telegram_settings", "id"),
-                                               self.config.get("telegram_settings", "hash"))
-
     def run(self, channels) -> None:
         """
         Запускает процесс комментирования в Telegram-каналах.
 
         :param channels: Список имен Telegram-каналов.
         """
-        self.start_telegram_client()
+        self.client = connect_telegram_account(self.config.get("telegram_settings", "id"),
+                                               self.config.get("telegram_settings", "hash"))
         while True:
-            self.write_comments_in_telegram(channels)
+            self.write_comments_in_telegram(self.client, channels)
 
 
 def main(client) -> None:
@@ -142,7 +137,7 @@ def main(client) -> None:
 
 def change_profile_descriptions(client) -> None:
     """
-    Обновляет описание профиля Telegram с случайными данными.
+    Обновляет описание профиля Telegram со случайными данными.
 
     :param client: TelegramClient объект.
     """
@@ -168,11 +163,11 @@ if __name__ == "__main__":
     print("[bold red][2] - Отправка комментариев")
     print("[bold red][3] - Смена: имени, описания, фото профиля\n")
     user_input = input("Ваш выбор: ")
-    if user_input == "1":
+    if user_input == "1":  # Получение списка каналов
         client = connect_telegram_account(config.get("telegram_settings", "id"),
                                           config.get("telegram_settings", "hash"))
         main(client)
-    elif user_input == "2":
+    elif user_input == "2":  # Отправка комментариев в каналы
         try:
             results = reading_from_the_channel_list_database()
             usernames = [row[0] for row in results]  # Преобразуем результат в словарь
@@ -182,7 +177,7 @@ if __name__ == "__main__":
         except Exception as e:
             logger.exception(e)
             logger.info("[bold red][!] Произошла ошибка, для подробного изучения проблемы просмотрите файл log.log")
-    elif user_input == "3":
+    elif user_input == "3":  # Смена: имени, описания, фото профиля
         client = connect_telegram_account(config.get("telegram_settings", "id"),
                                           config.get("telegram_settings", "hash"))
         change_profile_descriptions(client)
