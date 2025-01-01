@@ -15,27 +15,46 @@ logger.add("log/log.log", rotation="1 MB", compression="zip")  # Логиров�
 
 
 def read_config() -> configparser.ConfigParser:
-    """Считывание данных с config файла"""
+    """
+    Читает данные из конфигурационного файла.
+
+    :return: Объект configparser.ConfigParser, содержащий настройки.
+    """
     config = configparser.ConfigParser(empty_lines_in_values=False, allow_no_value=True)
     config.read("setting/config.ini")
     return config
 
 
 def connect_telegram_account(api_id, api_hash) -> TelegramClient:
-    """Подключение к аккаунту Telegram"""
+    """
+    Подключается к Telegram аккаунту используя api_id и api_hash.
+
+    :param api_id: Идентификатор API Telegram.
+    :param api_hash: Ключ API Telegram.
+    :return: TelegramClient объект, подключенный к Telegram.
+    """
     client = TelegramClient('accounts/session_name', api_id, api_hash)
     client.connect()
     return client
 
 
 class TelegramCommentator:
-    """Инициализация комментатора Telegram"""
+    """
+    Класс для автоматизированной работы с комментариями в Telegram-каналах.
+
+    :param config: Объект configparser.ConfigParser, содержащий настройки.
+    """
 
     def __init__(self, config) -> None:
         self.config = config
         self.client = None
 
     def subscribe_to_channel(self, channel_name) -> None:
+        """
+        Подписывается на Telegram-канал.
+
+        :param channel_name: Имя канала Telegram.
+        """
         try:
             channel_entity = self.client.get_entity(channel_name)
             self.client.send_message(entity=channel_entity, message='/subscribe')  # Отправить команду на подписку
@@ -44,7 +63,11 @@ class TelegramCommentator:
             logger.exception(f'Ошибка при подписке на канал {channel_name}')
 
     def write_comments_in_telegram(self, channels) -> None:
-        """Пишите комментарии в Telegram-каналах"""
+        """
+        Пишет комментарии в указанных Telegram-каналах.
+
+        :param channels: Список имен Telegram-каналов.
+        """
         last_message_ids = {name: 0 for name in channels}
         for name in channels:
             # Подписываемся на канал перед отправкой комментария
@@ -88,24 +111,40 @@ class TelegramCommentator:
                 break
 
     def start_telegram_client(self) -> None:
+        """
+        Запускает TelegramClient с настройками из config.
+        """
         self.client = connect_telegram_account(self.config.get("telegram_settings", "id"),
                                                self.config.get("telegram_settings", "hash"))
 
     def run(self, channels) -> None:
+        """
+        Запускает процесс комментирования в Telegram-каналах.
+
+        :param channels: Список имен Telegram-каналов.
+        """
         self.start_telegram_client()
         while True:
             self.write_comments_in_telegram(channels)
 
 
 def main(client) -> None:
-    """Получаем список диалогов (каналов, групп и т. д.)"""
+    """
+    Получает список диалогов (каналов, групп и т. д.) и создаёт базу данных.
+
+    :param client: TelegramClient объект.
+    """
     dialogs = client.get_dialogs()
     creating_a_channel_list(dialogs)  # Создаем или подключаемся к базе данных SQLite
     client.disconnect()  # Завершаем работу клиента
 
 
 def change_profile_descriptions(client) -> None:
-    """Смена описания профиля"""
+    """
+    Обновляет описание профиля Telegram с случайными данными.
+
+    :param client: TelegramClient объект.
+    """
     fake = Faker('ru_RU')  # Устанавливаем локаль для генерации русских имен
     fake_name = fake.first_name_female()  # Генерируем женское имя
     logger.info(fake_name)
