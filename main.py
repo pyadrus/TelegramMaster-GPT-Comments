@@ -11,17 +11,17 @@ from telethon.sync import TelegramClient
 from app_banner import banner
 from working_with_the_database import reading_from_the_channel_list_database, creating_a_channel_list
 
-logger.add("logs/log.log", format="{time} {level} {message}")
+logger.add("log/log.log", rotation="1 MB", compression="zip")  # Логирование программы
 
 
-def read_config():
+def read_config() -> configparser.ConfigParser:
     """Считывание данных с config файла"""
     config = configparser.ConfigParser(empty_lines_in_values=False, allow_no_value=True)
     config.read("setting/config.ini")
     return config
 
 
-def connect_telegram_account(api_id, api_hash):
+def connect_telegram_account(api_id, api_hash) -> TelegramClient:
     """Подключение к аккаунту Telegram"""
     client = TelegramClient('accounts/session_name', api_id, api_hash)
     client.connect()
@@ -35,7 +35,7 @@ class TelegramCommentator:
         self.config = config
         self.client = None
 
-    def subscribe_to_channel(self, channel_name):
+    def subscribe_to_channel(self, channel_name) -> None:
         try:
             channel_entity = self.client.get_entity(channel_name)
             self.client.send_message(entity=channel_entity, message='/subscribe')  # Отправить команду на подписку
@@ -97,16 +97,14 @@ class TelegramCommentator:
             self.write_comments_in_telegram(channels)
 
 
-def main(client):
+def main(client) -> None:
     """Получаем список диалогов (каналов, групп и т. д.)"""
     dialogs = client.get_dialogs()
-
     creating_a_channel_list(dialogs)  # Создаем или подключаемся к базе данных SQLite
-
     client.disconnect()  # Завершаем работу клиента
 
 
-def change_profile_descriptions(client):
+def change_profile_descriptions(client) -> None:
     """Смена описания профиля"""
     fake = Faker('ru_RU')  # Устанавливаем локаль для генерации русских имен
     fake_name = fake.first_name_female()  # Генерируем женское имя
@@ -120,7 +118,7 @@ def change_profile_descriptions(client):
 
 
 if __name__ == "__main__":
-    logger.add("log/log.log", rotation="1 MB", compression="zip")  # Логирование программы
+
     config = read_config()
     banner()
     print("[bold red][1] - Получение списка каналов")
