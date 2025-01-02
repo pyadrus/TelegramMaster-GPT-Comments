@@ -10,6 +10,7 @@ def change_profile_descriptions(client) -> None:
     Обновляет описание профиля Telegram со случайными данными.
 
     :param client: TelegramClient объект.
+    :return: None
     """
     fake = Faker('ru_RU')  # Устанавливаем локаль для генерации русских имен
     fake_name = fake.first_name_female()  # Генерируем женское имя

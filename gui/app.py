@@ -14,6 +14,7 @@ def action_1_with_log(text_widget: tk.Text):
     Получает список диалогов (каналов, групп и т. д.), создает базу данных и выводит информацию в текстовое поле.
 
     :param text_widget: Виджет Text для вывода логов и сообщений пользователю.
+    :return: None
     """
     try:
         log_message("Получение списка каналов...", text_widget)
@@ -38,6 +39,7 @@ def action_2_with_log(text_widget: tk.Text):
     Отправляет комментарии к постам каналов из базы данных и выводит информацию в текстовое поле.
 
     :param text_widget: Виджет Text для вывода логов и сообщений пользователю.
+    :return: None
     """
     log_message("Отправка комментариев...", text_widget)
     try:
@@ -57,6 +59,7 @@ def action_2_with_log(text_widget: tk.Text):
 def action_3():
     """
     Изменяет имя, описание и фото профиля Telegram аккаунта.
+    :return: None
     """
     print("[bold red]Смена: имени, описания, фото профиля")
     config = read_config()

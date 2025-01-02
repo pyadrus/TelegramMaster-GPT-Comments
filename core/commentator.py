@@ -28,6 +28,7 @@ class TelegramCommentator:
 
         :param channel_name: Имя канала Telegram.
         :param client: TelegramClient объект.
+        :return: None.
         """
         try:
             client(JoinChannelRequest(channel_name))
@@ -42,6 +43,7 @@ class TelegramCommentator:
         :param channels: Список имен Telegram-каналов.
         :param client: TelegramClient объект.
         :param text_widget: Виджет Text для вывода.
+        :return: None.
         """
         last_message_ids = {name: 0 for name in channels}
         for name in channels:
@@ -95,6 +97,7 @@ class TelegramCommentator:
 
         :param channels: Список имен Telegram-каналов.
         :param text_widget: Виджет Text для вывода.
+        :return: None
         """
         self.client = connect_telegram_account(self.config.get("telegram_settings", "id"),
                                                self.config.get("telegram_settings", "hash"))
