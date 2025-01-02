@@ -19,7 +19,6 @@ def creating_a_channel_list(dialogs):
             title = dialog.title
             username = dialog.entity.username if dialog.entity.username else ''
             username_diclist.append(username)
-            print(username)
             # Вставляем данные в базу данных
             cursor.execute('INSERT INTO channels (title, username) VALUES (?, ?)', (title, username))
     # Сохраняем изменения и закрываем соединение
