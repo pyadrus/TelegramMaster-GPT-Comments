@@ -6,16 +6,8 @@ from core.commentator import TelegramCommentator
 from core.profile_updater import change_profile_descriptions
 from core.telegram_client import connect_telegram_account
 from database.db_handler import reading_from_the_channel_list_database, creating_a_channel_list
+from gui.log_message import log_message
 
-def log_message(message: str, text_widget: tk.Text):
-    """
-    Выводит сообщение в текстовое поле.
-
-    :param message: Текст сообщения.
-    :param text_widget: Виджет Text для вывода.
-    """
-    text_widget.insert(tk.END, f"{message}\n")  # Добавляем текст
-    text_widget.see(tk.END)  # Автоматический скролл к последней строке
 
 def action_1_with_log(text_widget: tk.Text):
     """
@@ -40,18 +32,19 @@ def action_1_with_log(text_widget: tk.Text):
         log_message(f"Ошибка: {e}", text_widget)
 
 
-def action_2():
-    print("[bold red]Отправка комментариев")
+def action_2_with_log(text_widget: tk.Text):
+    log_message("Отправка комментариев...", text_widget)
     try:
         config = read_config()
         results = reading_from_the_channel_list_database()
         usernames = [row[0] for row in results]  # Преобразуем результат в словарь
-        logger.info(usernames)  # Выводим полученный словарь
+        logger.info(usernames)  # Логируем полученный список пользователей
         telegram_commentator = TelegramCommentator(config)  # Каналы с комментариями
-        telegram_commentator.run(usernames)
+        telegram_commentator.run(usernames, text_widget)
+        log_message("Комментарии успешно отправлены.", text_widget)  # Сообщаем об успехе
     except Exception as e:
         logger.exception(e)
-        logger.info("[bold red][!] Произошла ошибка, для подробного изучения проблемы просмотрите файл log.log")
+        log_message("[bold red][!] Произошла ошибка, для подробного изучения проблемы просмотрите файл log.log", text_widget)
 
 
 def action_3():
@@ -63,5 +56,4 @@ def action_3():
 
 
 if __name__ == "__main__":
-    action_2()
     action_3()

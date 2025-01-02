@@ -27,6 +27,7 @@ def creating_a_channel_list(dialogs):
 
     return username_diclist
 
+
 def reading_from_the_channel_list_database():
     """Считывание списка каналов с базы данных"""
     conn = sqlite3.connect(db_path)  # Создаем подключение к базе данных
