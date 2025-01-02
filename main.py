@@ -24,7 +24,7 @@ if __name__ == "__main__":
     btn_2 = tk.Button(root, text="Отправка комментариев", command=lambda: action_2_with_log(info_field))
     btn_2.place(x=50, y=80, width=250, height=50)  # Задаем ширину и высоту кнопки
 
-    btn_3 = tk.Button(root, text="Смена имени, описания, фото", command=action_3)
+    btn_3 = tk.Button(root, text="Смена имени, описания, фото", command=lambda: action_3(info_field))
     btn_3.place(x=50, y=140, width=250, height=50)  # Задаем ширину и высоту кнопки
 
     root.mainloop()

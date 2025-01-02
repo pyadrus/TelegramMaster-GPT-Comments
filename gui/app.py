@@ -1,6 +1,7 @@
-from loguru import logger
-from rich import print
 import tkinter as tk
+
+from loguru import logger
+
 from config.config_handler import read_config
 from core.commentator import TelegramCommentator
 from core.profile_updater import change_profile_descriptions
@@ -56,17 +57,13 @@ def action_2_with_log(text_widget: tk.Text):
                     text_widget)
 
 
-def action_3():
+def action_3(text_widget: tk.Text):
     """
     Изменяет имя, описание и фото профиля Telegram аккаунта.
     :return: None
     """
-    print("[bold red]Смена: имени, описания, фото профиля")
+    log_message("Смена: имени, описания, фото профиля", text_widget)  # Сообщаем об успехе
     config = read_config()
     client = connect_telegram_account(config.get("telegram_settings", "id"),
                                       config.get("telegram_settings", "hash"))
-    change_profile_descriptions(client)
-
-
-if __name__ == "__main__":
-    action_3()
+    change_profile_descriptions(client, text_widget)
