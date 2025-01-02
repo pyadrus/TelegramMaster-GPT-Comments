@@ -11,8 +11,9 @@ from gui.log_message import log_message
 
 def action_1_with_log(text_widget: tk.Text):
     """
-    Получает список диалогов (каналов, групп и т. д.) и создаёт базу данных.
-    Выводит информацию в текстовое поле.
+    Получает список диалогов (каналов, групп и т. д.), создает базу данных и выводит информацию в текстовое поле.
+
+    :param text_widget: Виджет Text для вывода логов и сообщений пользователю.
     """
     try:
         log_message("Получение списка каналов...", text_widget)
@@ -33,6 +34,11 @@ def action_1_with_log(text_widget: tk.Text):
 
 
 def action_2_with_log(text_widget: tk.Text):
+    """
+    Отправляет комментарии к постам каналов из базы данных и выводит информацию в текстовое поле.
+
+    :param text_widget: Виджет Text для вывода логов и сообщений пользователю.
+    """
     log_message("Отправка комментариев...", text_widget)
     try:
         config = read_config()
@@ -49,6 +55,9 @@ def action_2_with_log(text_widget: tk.Text):
 
 
 def action_3():
+    """
+    Изменяет имя, описание и фото профиля Telegram аккаунта.
+    """
     print("[bold red]Смена: имени, описания, фото профиля")
     config = read_config()
     client = connect_telegram_account(config.get("telegram_settings", "id"),

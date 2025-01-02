@@ -1,17 +1,22 @@
 import sqlite3
 
 # Путь к файлу базы данных SQLite
-db_path = '../channels.db'
+db_path = 'channels.db'
 
 
 def creating_a_channel_list(dialogs):
-    """Создание списка каналов"""
+    """
+    Создает список каналов на основе переданных диалогов и записывает их в базу данных SQLite.
+
+    :param dialogs: Список диалогов, содержащий объекты каналов.
+    :return: Список имен пользователей (username) всех каналов.
+    """
 
     username_diclist = []
-
+    # Подключаемся к базе данных
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    # Создаем таблицу для хранения каналов, если ее еще нет
+    # Создаем таблицу для хранения информации о каналах, если она еще не существует
     cursor.execute('''CREATE TABLE IF NOT EXISTS channels (id INTEGER PRIMARY KEY, title TEXT, username TEXT)''')
     # Проходим по диалогам и записываем информацию о каналах в базу данных
     for dialog in dialogs:
@@ -29,7 +34,11 @@ def creating_a_channel_list(dialogs):
 
 
 def reading_from_the_channel_list_database():
-    """Считывание списка каналов с базы данных"""
+    """
+    Считывает список имен пользователей (username) каналов из базы данных SQLite.
+
+    :return: Список кортежей с именами пользователей каналов.
+    """
     conn = sqlite3.connect(db_path)  # Создаем подключение к базе данных
     cursor = conn.cursor()
     # Выполняем SQL-запрос для извлечения username из таблицы channels
