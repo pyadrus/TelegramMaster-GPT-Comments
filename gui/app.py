@@ -44,7 +44,8 @@ def action_2_with_log(text_widget: tk.Text):
         log_message("Комментарии успешно отправлены.", text_widget)  # Сообщаем об успехе
     except Exception as e:
         logger.exception(e)
-        log_message("[bold red][!] Произошла ошибка, для подробного изучения проблемы просмотрите файл log.log", text_widget)
+        log_message("[bold red][!] Произошла ошибка, для подробного изучения проблемы просмотрите файл log.log",
+                    text_widget)
 
 
 def action_3():
