@@ -6,6 +6,9 @@ db_path = '../channels.db'
 
 def creating_a_channel_list(dialogs):
     """Создание списка каналов"""
+
+    username_diclist = []
+
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     # Создаем таблицу для хранения каналов, если ее еще нет
@@ -15,6 +18,7 @@ def creating_a_channel_list(dialogs):
         if dialog.is_channel:
             title = dialog.title
             username = dialog.entity.username if dialog.entity.username else ''
+            username_diclist.append(username)
             print(username)
             # Вставляем данные в базу данных
             cursor.execute('INSERT INTO channels (title, username) VALUES (?, ?)', (title, username))
@@ -22,6 +26,7 @@ def creating_a_channel_list(dialogs):
     conn.commit()
     conn.close()
 
+    return username_diclist
 
 def reading_from_the_channel_list_database():
     """Считывание списка каналов с базы данных"""
