@@ -3,7 +3,7 @@ import tkinter as tk
 from loguru import logger
 
 import __version__
-from gui.app import action_1_with_log, action_2_with_log, action_3
+from gui.app import action_1_with_log, action_2_with_log, action_3, action_4, action_5
 
 logger.add("log/log.log", rotation="1 MB", compression="zip")  # Логирование программы
 
@@ -11,7 +11,7 @@ if __name__ == "__main__":
     root = tk.Tk()
 
     root.title(f"Версия {__version__}. Дата изменения {__version__.__date__}")
-    root.geometry("720x250")  # Увеличиваем ширину окна для текстового поля
+    root.geometry("720x400")  # Увеличиваем ширину окна для текстового поля
 
     # Определение текстового поля для вывода информации
     info_field = tk.Text(root, width=30, height=10)  # Ширина 30 символов, высота 10 строк
@@ -26,5 +26,11 @@ if __name__ == "__main__":
 
     btn_3 = tk.Button(root, text="Смена имени, описания, фото", command=lambda: action_3(info_field))
     btn_3.place(x=50, y=140, width=250, height=50)  # Задаем ширину и высоту кнопки
+
+    btn_4 = tk.Button(root, text="Подписка на каналы", command=lambda: action_4(info_field))
+    btn_4.place(x=50, y=200, width=250, height=50)  # Задаем ширину и высоту кнопки
+
+    btn_5 = tk.Button(root, text="Формирование списка каналов", command=lambda: action_5(info_field))
+    btn_5.place(x=50, y=260, width=250, height=50)  # Задаем ширину и высоту кнопки
 
     root.mainloop()

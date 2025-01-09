@@ -1,7 +1,6 @@
 import tkinter as tk
 
 from faker import Faker
-# from loguru import logger
 from telethon import functions
 
 from gui.log_message import log_message
