@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 
 from loguru import logger
 
@@ -7,15 +8,47 @@ from gui.app import action_1_with_log, action_2_with_log, action_3, action_4, ac
 
 logger.add("log/log.log", rotation="1 MB", compression="zip")  # Логирование программы
 
+
+def show_author_info():
+    """Отображает информацию об авторе."""
+    messagebox.showinfo("Автор", "Разработчик: Ваше имя\nВерсия программы: " + __version__)
+
+
+def show_settings():
+    """Открывает окно настроек."""
+    settings_window = tk.Toplevel()
+    settings_window.title("Настройки")
+    settings_window.geometry("400x200")
+    tk.Label(settings_window, text="Настройки программы", font=("Arial", 14)).pack(pady=20)
+    tk.Button(settings_window, text="Закрыть", command=settings_window.destroy).pack(pady=20)
+
+
 if __name__ == "__main__":
     root = tk.Tk()
 
     root.title(f"Версия {__version__}. Дата изменения {__version__.__date__}")
     root.geometry("720x400")  # Увеличиваем ширину окна для текстового поля
 
+    # Создание меню
+    menu_bar = tk.Menu(root)
+
+    # Добавление меню "Файл"
+    file_menu = tk.Menu(menu_bar, tearoff=0)
+    file_menu.add_command(label="Выход", command=root.quit)
+    menu_bar.add_cascade(label="Файл", menu=file_menu)
+
+    # Добавление меню "Помощь"
+    help_menu = tk.Menu(menu_bar, tearoff=0)
+    help_menu.add_command(label="Автор", command=show_author_info)
+    help_menu.add_command(label="Настройки", command=show_settings)
+    menu_bar.add_cascade(label="Помощь", menu=help_menu)
+
+    # Установка меню в окне
+    root.config(menu=menu_bar)
+
     # Определение текстового поля для вывода информации
     info_field = tk.Text(root, width=30, height=10)  # Ширина 30 символов, высота 10 строк
-    info_field.place(x=360, y=20, width=350, height=200)  # Размещение справа
+    info_field.place(x=340, y=20, width=350, height=300)  # Размещение справа
 
     # Определение кнопок
     btn_1 = tk.Button(root, text="Получение списка каналов", command=lambda: action_1_with_log(info_field))
