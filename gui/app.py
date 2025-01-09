@@ -68,6 +68,7 @@ def action_3(text_widget: tk.Text):
                                       config.get("telegram_settings", "hash"))
     change_profile_descriptions(client, text_widget)
 
+
 def action_4(info_field):
     """Подписка на каналы"""
     pass

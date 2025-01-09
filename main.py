@@ -3,15 +3,16 @@ from tkinter import messagebox
 
 from loguru import logger
 
-import __version__
+from core.logging_in import loging
 from gui.app import action_1_with_log, action_2_with_log, action_3, action_4, action_5
+from src.core.configs import program_version, date_of_program_change
 
 logger.add("log/log.log", rotation="1 MB", compression="zip")  # Логирование программы
 
 
 def show_author_info():
     """Отображает информацию об авторе."""
-    messagebox.showinfo("Автор", "Разработчик: Ваше имя\nВерсия программы: " + __version__)
+    messagebox.showinfo("Автор", "Разработчик: Ваше имя\nВерсия программы: " + program_version)
 
 
 def show_settings():
@@ -24,9 +25,10 @@ def show_settings():
 
 
 if __name__ == "__main__":
+    loging()
     root = tk.Tk()
 
-    root.title(f"Версия {__version__}. Дата изменения {__version__.__date__}")
+    root.title(f"Версия {program_version}. Дата изменения {date_of_program_change}")
     root.geometry("720x400")  # Увеличиваем ширину окна для текстового поля
 
     # Создание меню
