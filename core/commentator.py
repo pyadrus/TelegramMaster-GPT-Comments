@@ -8,7 +8,7 @@ from rich.progress import track
 from telethon.tl.functions.channels import JoinChannelRequest
 
 from core.telegram_client import connect_telegram_account
-from gui.log_message import log_message
+from src.gui.log_message import log_message
 
 
 class TelegramCommentator:

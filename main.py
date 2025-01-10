@@ -4,10 +4,10 @@ from tkinter import messagebox
 from loguru import logger
 
 from core.logging_in import loging
-from gui.app import action_1_with_log, action_2_with_log, action_3, action_4, action_5
+from src.gui.app import action_1_with_log, action_2_with_log, action_3, action_4, action_5
 from src.core.configs import program_version, date_of_program_change
 
-logger.add("log/log.log", rotation="1 MB", compression="zip")  # Логирование программы
+logger.add("user_data/log/log.log", rotation="1 MB", compression="zip")  # Логирование программы
 
 
 def show_author_info():

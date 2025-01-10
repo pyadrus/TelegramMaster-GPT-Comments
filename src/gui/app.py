@@ -2,12 +2,12 @@ import tkinter as tk
 
 from loguru import logger
 
-from config.config_handler import read_config
+from src.config.config_handler import read_config
 from core.commentator import TelegramCommentator
 from core.profile_updater import change_profile_descriptions
 from core.telegram_client import connect_telegram_account
-from database.db_handler import reading_from_the_channel_list_database, creating_a_channel_list
-from gui.log_message import log_message
+from src.database.db_handler import reading_from_the_channel_list_database, creating_a_channel_list
+from src.gui.log_message import log_message
 
 
 def action_1_with_log(text_widget: tk.Text):

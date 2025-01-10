@@ -3,7 +3,7 @@ import tkinter as tk
 from faker import Faker
 from telethon import functions
 
-from gui.log_message import log_message
+from src.gui.log_message import log_message
 
 about = "Мой основной проект https://t.me/+UvdDWG8iGgg1ZWUy"
 
