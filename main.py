@@ -14,7 +14,7 @@ name = "MenuBar Example"
 async def display_main_menu(page):
     """Создает список кнопок для основного меню."""
     button_width = 500  # ширина
-    button_height = 50  # высота
+    button_height = 80  # высота
     buttons = [
         ft.ElevatedButton(text="Получение списка каналов", on_click=lambda _: action_1_with_log(page),
                           width=button_width, height=button_height),
@@ -29,9 +29,11 @@ async def display_main_menu(page):
     ]
     return ft.Column(
         [
-            ft.Row([btn], alignment=ft.MainAxisAlignment.START) for btn in buttons
+            ft.Row([btn]) for btn in buttons
         ],
-        alignment=ft.MainAxisAlignment.SPACE_BETWEEN, expand=True
+        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+        spacing=50,  # расстояние между кнопками
+        expand=True
     )
 
 
@@ -39,7 +41,14 @@ def example():
     def handle_menu_item_click(e):
         print(f"{e.control.content.value}.on_click")
 
-    menubar = ft.MenuBar(
+    menubar = ft.MenuBar( style=ft.MenuStyle(
+        alignment=ft.alignment.top_left,
+            bgcolor=ft.colors.RED_100,
+            mouse_cursor={
+                ft.ControlState.HOVERED: ft.MouseCursor.WAIT,
+                ft.ControlState.DEFAULT: ft.MouseCursor.ZOOM_OUT,
+            },
+        ),
         controls=[
             ft.SubmenuButton(content=ft.Text("Документация"), controls=[
                 ft.MenuItemButton(content=ft.Text("Документация"), on_click=handle_menu_item_click, ), ], ),
@@ -50,7 +59,7 @@ def example():
             ft.SubmenuButton(content=ft.Text("Об программе"), controls=[
                 ft.MenuItemButton(content=ft.Text("Об программе"), on_click=handle_menu_item_click, ), ], ),
         ], )
-    return menubar
+    return ft.Row([menubar])
 
 
 async def main(page: ft.Page):
