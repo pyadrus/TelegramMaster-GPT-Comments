@@ -4,7 +4,7 @@ import sqlite3
 db_path = 'channels.db'
 
 
-def creating_a_channel_list(dialogs):
+async def creating_a_channel_list(dialogs):
     """
     Создает список каналов на основе переданных диалогов и записывает их в базу данных SQLite.
 
@@ -33,7 +33,7 @@ def creating_a_channel_list(dialogs):
     return username_diclist
 
 
-def reading_from_the_channel_list_database():
+async def reading_from_the_channel_list_database():
     """
     Считывает список имен пользователей (username) каналов из базы данных SQLite.
 

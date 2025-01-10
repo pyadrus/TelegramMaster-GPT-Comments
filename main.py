@@ -1,84 +1,85 @@
-import tkinter as tk
-from tkinter import messagebox
-
+import flet as ft
 from loguru import logger
-
-from core.logging_in import loging
+from src.core.logging_in import loging
 from src.gui.app import action_1_with_log, action_2_with_log, action_3, action_4, action_5
 from src.core.configs import program_version, date_of_program_change
 
 logger.add("user_data/log/log.log", rotation="1 MB", compression="zip")  # Логирование программы
 
 
-def show_author_info():
+async def show_author_info(page: ft.Page):
     """Отображает информацию об авторе."""
-    messagebox.showinfo("Автор", "Разработчик: Ваше имя\nВерсия программы: " + program_version)
+    page.show_snack_bar(
+        ft.SnackBar(
+            ft.Text(f"Разработчик: Ваше имя\nВерсия программы: {program_version}"),
+            duration=3000,
+        )
+    )
 
 
-def display_settings(frame):
+async def display_settings(page: ft.Page):
     """Обновляет содержимое окна для отображения настроек."""
-    for widget in frame.winfo_children():
-        widget.destroy()  # Удаляем текущие виджеты
+    page.clean()
+    page.add(
+        ft.Text("Настройки программы", style="headlineMedium"),
+        ft.ElevatedButton(text="Назад", on_click=lambda _: display_main_menu(page))
+    )
 
-    tk.Label(frame, text="Настройки программы", font=("Arial", 16)).pack(pady=20)
-    tk.Button(frame, text="Назад", command=lambda: display_main_menu(frame)).pack(pady=20)
 
-
-def display_main_menu(frame):
+async def display_main_menu(page: ft.Page):
     """Обновляет содержимое окна для отображения основного меню."""
-    for widget in frame.winfo_children():
-        widget.destroy()  # Удаляем текущие виджеты
+    page.clean()
 
-    # Определение текстового поля для вывода информации
-    info_field = tk.Text(frame, width=30, height=10)  # Ширина 30 символов, высота 10 строк
-    info_field.place(x=340, y=20, width=350, height=300)  # Размещение справа
+    info_field = ft.TextField(read_only=True, multiline=True, width=350, height=300)
 
-    # Определение кнопок
-    btn_1 = tk.Button(frame, text="Получение списка каналов", command=lambda: action_1_with_log(info_field))
-    btn_1.place(x=50, y=20, width=250, height=50)
+    btn_1 = ft.ElevatedButton(text="Получение списка каналов", on_click=lambda _: action_1_with_log(info_field))
+    btn_2 = ft.ElevatedButton(text="Отправка комментариев", on_click=lambda _: action_2_with_log(info_field))
+    btn_3 = ft.ElevatedButton(text="Смена имени, описания, фото", on_click=lambda _: action_3(info_field))
+    btn_4 = ft.ElevatedButton(text="Подписка на каналы", on_click=lambda _: action_4(info_field))
+    btn_5 = ft.ElevatedButton(text="Формирование списка каналов", on_click=lambda _: action_5(info_field))
 
-    btn_2 = tk.Button(frame, text="Отправка комментариев", command=lambda: action_2_with_log(info_field))
-    btn_2.place(x=50, y=80, width=250, height=50)  # Задаем ширину и высоту кнопки
+    page.add(
+        ft.Column(
+            [
+                ft.Row([btn_1], alignment=ft.MainAxisAlignment.START),
+                ft.Row([btn_2], alignment=ft.MainAxisAlignment.START),
+                ft.Row([btn_3], alignment=ft.MainAxisAlignment.START),
+                ft.Row([btn_4], alignment=ft.MainAxisAlignment.START),
+                ft.Row([btn_5], alignment=ft.MainAxisAlignment.START),
+                ft.Row([info_field], alignment=ft.MainAxisAlignment.END)
+            ],
+            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+            expand=True
+        )
+    )
 
-    btn_3 = tk.Button(frame, text="Смена имени, описания, фото", command=lambda: action_3(info_field))
-    btn_3.place(x=50, y=140, width=250, height=50)  # Задаем ширину и высоту кнопки
 
-    btn_4 = tk.Button(frame, text="Подписка на каналы", command=lambda: action_4(info_field))
-    btn_4.place(x=50, y=200, width=250, height=50)  # Задаем ширину и высоту кнопки
+async def main(page: ft.Page):
+    await loging()
 
-    btn_5 = tk.Button(frame, text="Формирование списка каналов", command=lambda: action_5(info_field))
-    btn_5.place(x=50, y=260, width=250, height=50)  # Задаем ширину и высоту кнопки
+    page.title = f"Версия {program_version}. Дата изменения {date_of_program_change}"
+    page.window_width = 720
+    page.window_height = 400
+
+    def handle_menu_item_click(e: ft.ControlEvent):
+        if e.control.text == "Автор":
+            show_author_info(page)
+        elif e.control.text == "Настройки":
+            display_settings(page)
+        elif e.control.text == "Выход":
+            page.window_close()
+
+    menu_items = [
+        ft.PopupMenuItem(text="Автор", on_click=handle_menu_item_click),
+        ft.PopupMenuItem(text="Настройки", on_click=handle_menu_item_click),
+        ft.PopupMenuItem(),  # Разделитель
+        ft.PopupMenuItem(text="Выход", on_click=handle_menu_item_click),
+    ]
+
+    page.menu = ft.PopupMenuButton(items=menu_items)
+
+    await display_main_menu(page)
 
 
 if __name__ == "__main__":
-    loging()
-    root = tk.Tk()
-
-    root.title(f"Версия {program_version}. Дата изменения {date_of_program_change}")
-    root.geometry("720x400")  # Увеличиваем ширину окна для текстового поля
-
-    # Создание меню
-    menu_bar = tk.Menu(root)
-
-    # Добавление меню "Файл"
-    file_menu = tk.Menu(menu_bar, tearoff=0)
-    file_menu.add_command(label="Выход", command=root.quit)
-    menu_bar.add_cascade(label="Файл", menu=file_menu)
-
-    # Добавление меню "Помощь"
-    help_menu = tk.Menu(menu_bar, tearoff=0)
-    help_menu.add_command(label="Автор", command=show_author_info)
-    help_menu.add_command(label="Настройки", command=lambda: display_settings(main_frame))
-    menu_bar.add_cascade(label="Помощь", menu=help_menu)
-
-    # Установка меню в окне
-    root.config(menu=menu_bar)
-
-    # Основной контейнер для содержимого
-    main_frame = tk.Frame(root, width=720, height=400)
-    main_frame.pack(fill="both", expand=True)
-
-    # Отображение главного меню
-    display_main_menu(main_frame)
-
-    root.mainloop()
+    ft.app(target=main)

@@ -5,3 +5,4 @@ rich~=13.9.4
 loguru~=0.6.0
 requests~=2.32.3
 configparser~=7.0.1
+flet~=0.24.1

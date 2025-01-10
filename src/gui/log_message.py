@@ -1,13 +1,15 @@
-import tkinter as tk
+import flet as ft
 
 
-def log_message(message: str, text_widget: tk.Text):
+def log_message(message: str, text_field: ft.TextField):
     """
     Выводит сообщение в текстовое поле.
-
     :param message: Текст сообщения.
-    :param text_widget: Виджет Text для вывода.
+    :param text_field: Виджет TextField для вывода.
     :return: None
     """
-    text_widget.insert(tk.END, f"{message}\n")  # Добавляем текст
-    text_widget.see(tk.END)  # Автоматический скролл к последней строке
+    # Добавляем текст в конец текстового поля
+    text_field.value += f"{message}\n"
+    # Прокручиваем текстовое поле до последней строки
+    text_field.focus()
+    text_field.update()
