@@ -7,7 +7,7 @@ from src.core.telegram_client import connect_telegram_account
 from src.database.db_handler import reading_from_the_channel_list_database, creating_a_channel_list
 
 
-async def action_1_with_log(text_field: ft.TextField):
+async def action_1_with_log():
     """
     Получает список диалогов (каналов, групп и т. д.), создает базу данных и выводит информацию в текстовое поле.
 
@@ -32,7 +32,7 @@ async def action_1_with_log(text_field: ft.TextField):
         log_messagess(f"Ошибка: {e}", text_field)
 
 
-async def action_2_with_log(text_field: ft.TextField):
+async def action_2_with_log():
     """
     Отправляет комментарии к постам каналов из базы данных и выводит информацию в текстовое поле.
 
@@ -54,7 +54,7 @@ async def action_2_with_log(text_field: ft.TextField):
                       text_field)
 
 
-async def action_3(text_field: ft.TextField):
+async def action_3():
     """
     Изменяет имя, описание и фото профиля Telegram аккаунта.
     :return: None
@@ -66,11 +66,11 @@ async def action_3(text_field: ft.TextField):
     await change_profile_descriptions(client, text_field)
 
 
-async def action_4(info_field):
+async def action_4():
     """Подписка на каналы"""
     pass
 
 
-async def action_5(info_field):
+async def action_5():
     """Формирование списка каналов"""
     pass
