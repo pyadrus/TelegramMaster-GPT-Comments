@@ -116,7 +116,11 @@ class Application:
         page.title = f"Версия {program_version}. Дата изменения {date_of_program_change}"
         page.window.width = WINDOW_WIDTH
         page.window.height = WINDOW_HEIGHT
-        page.window.resizable = False
+        page.window.resizable = False  # Запрет изменения размера окна
+        page.window.min_width = WINDOW_WIDTH  # Минимальная ширина
+        page.window.max_width = WINDOW_WIDTH  # Максимальная ширина
+        page.window.min_height = WINDOW_HEIGHT  # Минимальная высота
+        page.window.max_height = WINDOW_HEIGHT  # Максимальная высота
 
         # Поле для вывода информации
         info_list = ft.ListView(expand=True, spacing=10, padding=20, auto_scroll=True)
@@ -133,9 +137,12 @@ class Application:
         layout = ft.Row(
             [
                 ft.Container(menu, width=300, padding=20),
+                ft.Container(width=2, bgcolor=ft.colors.BLACK),  # Вертикальная линия
                 ft.Container(info_list, expand=True, padding=20),
             ],
             alignment=ft.MainAxisAlignment.START,
+            spacing=0,  # Убираем промежуток между элементами
+            expand=True,
         )
 
         # Добавляем макет на страницу
