@@ -12,12 +12,12 @@ class AppConfig:
     """Класс для хранения конфигурации приложения."""
 
     # Размеры окна
-    WINDOW_WIDTH = 850# ширина окна
-    WINDOW_HEIGHT = 600# высота окна
+    WINDOW_WIDTH = 850  # ширина окна
+    WINDOW_HEIGHT = 600  # высота окна
 
     # Размеры кнопок
-    BUTTON_WIDTH = 700
-    BUTTON_HEIGHT = 60
+    BUTTON_WIDTH = 700  # ширина кнопки
+    BUTTON_HEIGHT = 60  # высота кнопки
 
     # Отступы и padding
     PADDING = 20
@@ -34,6 +34,7 @@ class AppConfig:
     # Вертикальная линия
     LINE_WIDTH = 2
     LINE_COLOR = ft.colors.BLACK
+
 
 # Конфигурация приложения
 config = AppConfig()
