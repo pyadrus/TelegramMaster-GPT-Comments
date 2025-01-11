@@ -8,8 +8,8 @@ from src.gui.app import action_1_with_log, action_2_with_log, action_3, action_4
 logger.add("user_data/log/log.log", rotation="1 MB", compression="zip")
 
 # Константы размеров окна
-WINDOW_WIDTH = 850 # ширина окна
-WINDOW_HEIGHT = 600 # высота окна
+WINDOW_WIDTH = 850  # ширина окна
+WINDOW_HEIGHT = 600  # высота окна
 
 
 class MainMenu:
@@ -126,10 +126,11 @@ class Application:
         info_list = ft.ListView(expand=True, spacing=10, padding=20, auto_scroll=True)
 
         # Добавляем стартовое сообщение в ListView
-        info_list.controls.append(ft.Text("TelegramMaster Commentator 🚀\n\nTelegramMaster Commentator 🚀 - это программа для автоматической расставления комментариев в каналах Telegram, а также для работы с аккаунтами.💬\n\n"
-        "Проект доступен на GitHub: https://github.com/pyadrus/TelegramMaster_Commentator 📂\n\n"
-        "Контакт с разработчиком в Telegram: https://t.me/PyAdminRU 📲\n\n"
-        "Информация на канале: https://t.me/master_tg_d 📡",))
+        info_list.controls.append(ft.Text(
+            "TelegramMaster Commentator 🚀\n\nTelegramMaster Commentator 🚀 - это программа для автоматической расставления комментариев в каналах Telegram, а также для работы с аккаунтами.💬\n\n"
+            "Проект доступен на GitHub: https://github.com/pyadrus/TelegramMaster_Commentator 📂\n\n"
+            "Контакт с разработчиком в Telegram: https://t.me/PyAdminRU 📲\n\n"
+            "Информация на канале: https://t.me/master_tg_d 📡", ))
 
         # Создаем главное меню
         menu = MainMenu(page, info_list).build()
