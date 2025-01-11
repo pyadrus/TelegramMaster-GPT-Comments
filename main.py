@@ -17,10 +17,10 @@ class AppConfig:
 
     # Размеры кнопок
     BUTTON_WIDTH = 700  # ширина кнопки
-    BUTTON_HEIGHT = 60  # высота кнопки
+    BUTTON_HEIGHT = 40  # высота кнопки
 
     # Отступы и padding
-    PADDING = 20
+    PADDING = 15
     SPACING = 15
 
     # Цвета
@@ -32,8 +32,8 @@ class AppConfig:
     TITLE_FONT_WEIGHT = ft.FontWeight.BOLD
 
     # Вертикальная линия
-    LINE_WIDTH = 2
-    LINE_COLOR = ft.colors.BLACK
+    LINE_WIDTH = 1
+    LINE_COLOR = ft.colors.GREY
 
 
 # Конфигурация приложения
