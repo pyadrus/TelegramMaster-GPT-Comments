@@ -4,103 +4,134 @@ from src.core.configs import program_version, date_of_program_change, program_na
 from src.core.logging_in import loging
 from src.gui.app import action_1_with_log, action_2_with_log, action_3, action_4, action_5
 
-logger.add("user_data/log/log.log", rotation="1 MB", compression="zip")  # Логирование программы
+# Настройка логирования
+logger.add("user_data/log/log.log", rotation="1 MB", compression="zip")
 
-window_width = 535  # ширина
-window_height = 600  # высота
-name = "MenuBar Example"
+# Константы размеров окна
+WINDOW_WIDTH = 820
+WINDOW_HEIGHT = 600
 
+class MainMenu:
+    """Класс для отображения главного меню."""
 
-async def display_main_menu(page):
-    """Создает список кнопок для основного меню."""
-    button_width = 500  # ширина
-    button_height = 80  # высота
-    buttons = [
-        ft.ElevatedButton(text="Получение списка каналов", on_click=lambda _: action_1_with_log(page),
-                          width=button_width, height=button_height),
-        ft.ElevatedButton(text="Отправка комментариев", on_click=lambda _: action_2_with_log(page),
-                          width=button_width, height=button_height),
-        ft.ElevatedButton(text="Смена имени, описания, фото", on_click=lambda _: action_3(page),
-                          width=button_width, height=button_height),
-        ft.ElevatedButton(text="Подписка на каналы", on_click=lambda _: action_4(page),
-                          width=button_width, height=button_height),
-        ft.ElevatedButton(text="Формирование списка каналов", on_click=lambda _: action_5(page),
-                          width=button_width, height=button_height),
-    ]
-    return ft.Column(
-        [
-            ft.Row([btn]) for btn in buttons
-        ],
-        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-        spacing=50,  # расстояние между кнопками
-        expand=True
-    )
+    def __init__(self, page: ft.Page, info_field: ft.TextField):
+        self.page = page
+        self.info_field = info_field
+        self.button_width = 700
+        self.button_height = 50
 
-
-def example():
-    def handle_menu_item_click(e):
-        print(f"{e.control.content.value}.on_click")
-
-    menubar = ft.MenuBar( style=ft.MenuStyle(
-        alignment=ft.alignment.top_left,
-            bgcolor=ft.colors.RED_100,
-            mouse_cursor={
-                ft.ControlState.HOVERED: ft.MouseCursor.WAIT,
-                ft.ControlState.DEFAULT: ft.MouseCursor.ZOOM_OUT,
-            },
-        ),
-        controls=[
-            ft.SubmenuButton(content=ft.Text("Документация"), controls=[
-                ft.MenuItemButton(content=ft.Text("Документация"), on_click=handle_menu_item_click, ), ], ),
-            ft.SubmenuButton(content=ft.Text("Настройки"), controls=[
-                ft.MenuItemButton(content=ft.Text("Настройки"), on_click=handle_menu_item_click, ), ], ),
-            ft.SubmenuButton(content=ft.Text("Выключить"), controls=[
-                ft.MenuItemButton(content=ft.Text("Выключить"), on_click=handle_menu_item_click, ), ], ),
-            ft.SubmenuButton(content=ft.Text("Об программе"), controls=[
-                ft.MenuItemButton(content=ft.Text("Об программе"), on_click=handle_menu_item_click, ), ], ),
-        ], )
-    return ft.Row([menubar])
-
-
-async def main(page: ft.Page):
-    await loging()
-    page.title = f"Версия {program_version}. Дата изменения {date_of_program_change}"
-    page.window.width = window_width  # Ширина окна
-    page.window.height = window_height  # Высота окна
-
-    # Создаем основной контейнер для страницы
-    main_container = ft.Column()
-
-    # Добавляем текстовый элемент в контейнер
-    t = ft.Text(
-        spans=[
-            ft.TextSpan(
-                program_name,
-                ft.TextStyle(
-                    size=30,
-                    weight=ft.FontWeight.BOLD,
-                    foreground=ft.Paint(
-                        gradient=ft.PaintLinearGradient(
-                            (0, 20), (150, 20), [ft.colors.RED, ft.colors.RED]
-                        )
+    def create_title(self, text: str, font_size: int = 13) -> ft.Text:
+        """Создает заголовок с градиентом."""
+        return ft.Text(
+            spans=[
+                ft.TextSpan(
+                    text,
+                    ft.TextStyle(
+                        size=font_size,
+                        weight=ft.FontWeight.BOLD,
+                        foreground=ft.Paint(
+                            gradient=ft.PaintLinearGradient(
+                                (0, 20), (150, 20), [ft.colors.RED, ft.colors.RED]
+                            )
+                        ),
                     ),
                 ),
+            ],
+        )
+
+    def create_buttons(self) -> list:
+        """Создает список кнопок меню."""
+        return [
+            ft.ElevatedButton(
+                text="Получение списка каналов",
+                on_click=lambda _: action_1_with_log(self.page, self.info_field),
+                width=self.button_width,
+                height=self.button_height,
             ),
-        ],
-    )
-    main_container.controls.append(t)
+            ft.ElevatedButton(
+                text="Отправка комментариев",
+                on_click=lambda _: action_2_with_log(self.page, self.info_field),
+                width=self.button_width,
+                height=self.button_height,
+            ),
+            ft.ElevatedButton(
+                text="Смена имени, описания, фото",
+                on_click=lambda _: action_3(self.page, self.info_field),
+                width=self.button_width,
+                height=self.button_height,
+            ),
+            ft.ElevatedButton(
+                text="Подписка на каналы",
+                on_click=lambda _: action_4(self.page, self.info_field),
+                width=self.button_width,
+                height=self.button_height,
+            ),
+            ft.ElevatedButton(
+                text="Формирование списка каналов",
+                on_click=lambda _: action_5(self.page, self.info_field),
+                width=self.button_width,
+                height=self.button_height,
+            ),
+        ]
 
-    # Добавляем кнопки в контейнер
-    menu = await display_main_menu(page)
-    main_container.controls.append(menu)
+    def build(self) -> ft.Column:
+        """Создает колонку с заголовками и кнопками."""
+        title = self.create_title(program_name, font_size=15)
+        version = self.create_title(program_version)
+        buttons = self.create_buttons()
+        return ft.Column(
+            [title, version, *buttons],
+            alignment=ft.MainAxisAlignment.START,
+            spacing=15,
+        )
 
-    # Добавьте строку меню на страницу
-    page.appbar = example()
 
-    # Обновляем содержимое страницы
-    page.add(main_container)
-    page.update()
+class Application:
+    """Класс для управления приложением."""
+
+    def __init__(self):
+        self.page = None
+
+    async def setup(self, page: ft.Page):
+        """Настраивает страницу."""
+        self.page = page
+        await loging()
+
+        page.title = f"Версия {program_version}. Дата изменения {date_of_program_change}"
+        page.window.width = WINDOW_WIDTH
+        page.window.height = WINDOW_HEIGHT
+        page.window.resizable = False
+
+        # Поле для вывода информации
+        info_field = ft.TextField(
+            multiline=True,
+            expand=True,
+            width=300,
+            label="Информация",
+            value="Тут будет выводиться информация...",
+        )
+
+        # Создаем главное меню
+        menu = MainMenu(page, info_field).build()
+
+        # Создаем макет
+        layout = ft.Row(
+            [
+                ft.Container(menu, width=250, padding=20),
+                ft.Container(info_field, expand=True, padding=20),
+            ],
+            alignment=ft.MainAxisAlignment.START,
+        )
+
+        # Добавляем макет на страницу
+        page.add(layout)
+        page.update()
+
+    async def main(self, page: ft.Page):
+        """Точка входа в приложение."""
+        await self.setup(page)
 
 
 if __name__ == "__main__":
-    ft.app(target=main)
+    app = Application()
+    ft.app(target=app.main)
