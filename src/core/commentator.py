@@ -23,6 +23,7 @@ def log_messagess(message: str, text_field: ft.TextField):
     text_field.focus()
     text_field.update()
 
+
 class TelegramCommentator:
     """
     Класс для автоматизированной работы с комментариями в Telegram-каналах.
@@ -58,7 +59,8 @@ class TelegramCommentator:
         """
         last_message_ids = {name: 0 for name in channels}
         for name in channels:
-            await self.subscribe_to_channel(client, channel_name=name)  # Подписываемся на канал перед отправкой комментария
+            await self.subscribe_to_channel(client,
+                                            channel_name=name)  # Подписываемся на канал перед отправкой комментария
             try:
                 channel_entity = self.client.get_entity(name)
                 messages = self.client.get_messages(channel_entity, limit=1)
@@ -89,7 +91,7 @@ class TelegramCommentator:
                                     text_field)
                             except telethon.errors.rpcerrorlist.FloodWaitError as e:
                                 log_messagess(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}',
-                                            text_field)
+                                              text_field)
                                 time.sleep(e.seconds)
                             except telethon.errors.rpcerrorlist.ChatGuestSendForbiddenError as e:
                                 log_messagess(str(e), text_field)

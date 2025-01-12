@@ -19,12 +19,12 @@ class AppConfig:
     WINDOW_WIDTH = 900  # ширина окна
     WINDOW_HEIGHT = 600  # высота окна
 
-    # Ширина бокового меню
-    PROGRAM_MENU_WIDTH = 300
-
     # Размеры кнопок
-    BUTTON_WIDTH = PROGRAM_MENU_WIDTH-PADDING  # ширина кнопки
+    BUTTON_WIDTH = 300  # ширина кнопки
     BUTTON_HEIGHT = 40  # высота кнопки
+
+    # Ширина бокового меню
+    PROGRAM_MENU_WIDTH = BUTTON_WIDTH + PADDING
 
     # Закругление кнопок
     RADIUS = 5  # Если значение равно 0, то кнопки не закруглены
@@ -65,12 +65,7 @@ class MainMenu:
                         foreground=ft.Paint(
                             gradient=ft.PaintLinearGradient(
                                 (0, 20), (150, 20), [config.PRIMARY_COLOR, config.PRIMARY_COLOR]
-                            )
-                        ),
-                    ),
-                ),
-            ],
-        )
+                            )), ), ), ], )
 
     def create_buttons(self) -> list:
         """Создает список кнопок меню."""
@@ -121,7 +116,7 @@ class MainMenu:
                 ),
             ),
             ft.OutlinedButton(
-                text="📂 Документация",
+                text="📖 Документация",
                 on_click=lambda _: action_5(self.page, self.info_list),
                 width=config.BUTTON_WIDTH,
                 height=config.BUTTON_HEIGHT,
@@ -133,7 +128,7 @@ class MainMenu:
 
     def build(self) -> ft.Column:
         """Создает колонку с заголовками и кнопками."""
-        title = self.create_title(text=program_name, font_size=18)
+        title = self.create_title(text=program_name, font_size=19)
         version = self.create_title(text=f"Версия программы: {program_version}", font_size=13)
         date_program_change = self.create_title(text=f"Дата изменения: {date_of_program_change}", font_size=13)
         buttons = self.create_buttons()
@@ -176,7 +171,7 @@ class Application:
             "TelegramMaster Commentator 🚀\n\nTelegramMaster Commentator - это программа для автоматической расставления комментариев в каналах Telegram, а также для работы с аккаунтами. 💬\n\n"
             "📂 Проект доступен на GitHub: https://github.com/pyadrus/TelegramMaster_Commentator \n"
             "📲 Контакт с разработчиком в Telegram: https://t.me/PyAdminRU\n"
-            "📡 Информация на канале: https://t.me/master_tg_d", ))
+            f"📡 Информация на канале: https://t.me/master_tg_d", ))
 
         # Создаем главное меню
         menu = MainMenu(page, info_list).build()
