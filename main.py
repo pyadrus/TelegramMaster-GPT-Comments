@@ -11,20 +11,26 @@ logger.add("user_data/log/log.log", rotation="1 MB", compression="zip")
 class AppConfig:
     """Класс для хранения конфигурации приложения."""
 
+    # Отступы и padding
+    PADDING = 10  # Отступ от левого бокового меню (кнопок) и разделительной линии
+    SPACING = 5  # Отступы между кнопками
+
     # Размеры окна
-    WINDOW_WIDTH = 850  # ширина окна
+    WINDOW_WIDTH = 900  # ширина окна
     WINDOW_HEIGHT = 600  # высота окна
 
+    # Ширина бокового меню
+    PROGRAM_MENU_WIDTH = 300
+
     # Размеры кнопок
-    BUTTON_WIDTH = 700  # ширина кнопки
+    BUTTON_WIDTH = PROGRAM_MENU_WIDTH-PADDING  # ширина кнопки
     BUTTON_HEIGHT = 40  # высота кнопки
 
-    # Отступы и padding
-    PADDING = 15
-    SPACING = 15
+    # Закругление кнопок
+    RADIUS = 5  # Если значение равно 0, то кнопки не закруглены
 
     # Цвета
-    PRIMARY_COLOR = ft.colors.RED
+    PRIMARY_COLOR = ft.colors.CYAN_600
     SECONDARY_COLOR = ft.colors.BLACK
 
     # Стили текста
@@ -32,8 +38,8 @@ class AppConfig:
     TITLE_FONT_WEIGHT = ft.FontWeight.BOLD
 
     # Вертикальная линия
-    LINE_WIDTH = 1
-    LINE_COLOR = ft.colors.GREY
+    LINE_WIDTH = 1  # ширина линии
+    LINE_COLOR = ft.colors.GREY  # цвет линии
 
 
 # Конфигурация приложения
@@ -70,59 +76,69 @@ class MainMenu:
         """Создает список кнопок меню."""
         return [
             ft.OutlinedButton(
-                text="Получение списка каналов",
+                text="📋 Получение списка каналов",
                 on_click=lambda _: action_1_with_log(self.page, self.info_list),
                 width=config.BUTTON_WIDTH,
                 height=config.BUTTON_HEIGHT,
                 style=ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=10),
+                    shape=ft.RoundedRectangleBorder(radius=config.RADIUS),
                 ),
             ),
             ft.OutlinedButton(
-                text="Отправка комментариев",
+                text="💬 Отправка комментариев",
                 on_click=lambda _: action_2_with_log(self.page, self.info_list),
                 width=config.BUTTON_WIDTH,
                 height=config.BUTTON_HEIGHT,
                 style=ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=10),
+                    shape=ft.RoundedRectangleBorder(radius=config.RADIUS),
                 ),
             ),
             ft.OutlinedButton(
-                text="Смена имени, описания, фото",
+                text="🖼️ Смена имени, описания, фото",
                 on_click=lambda _: action_3(self.page, self.info_list),
                 width=config.BUTTON_WIDTH,
                 height=config.BUTTON_HEIGHT,
                 style=ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=10),
+                    shape=ft.RoundedRectangleBorder(radius=config.RADIUS),
                 ),
             ),
             ft.OutlinedButton(
-                text="Подписка на каналы",
+                text="🔗 Подписка на каналы",
                 on_click=lambda _: action_4(self.page, self.info_list),
                 width=config.BUTTON_WIDTH,
                 height=config.BUTTON_HEIGHT,
                 style=ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=10),
+                    shape=ft.RoundedRectangleBorder(radius=config.RADIUS),
                 ),
             ),
             ft.OutlinedButton(
-                text="Формирование списка каналов",
+                text="📂 Формирование списка каналов",
                 on_click=lambda _: action_5(self.page, self.info_list),
                 width=config.BUTTON_WIDTH,
                 height=config.BUTTON_HEIGHT,
                 style=ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=10),
+                    shape=ft.RoundedRectangleBorder(radius=config.RADIUS),
+                ),
+            ),
+            ft.OutlinedButton(
+                text="📂 Документация",
+                on_click=lambda _: action_5(self.page, self.info_list),
+                width=config.BUTTON_WIDTH,
+                height=config.BUTTON_HEIGHT,
+                style=ft.ButtonStyle(
+                    shape=ft.RoundedRectangleBorder(radius=config.RADIUS),
                 ),
             ),
         ]
 
     def build(self) -> ft.Column:
         """Создает колонку с заголовками и кнопками."""
-        title = self.create_title(program_name)
-        version = self.create_title(program_version)
+        title = self.create_title(text=program_name, font_size=18)
+        version = self.create_title(text=f"Версия программы: {program_version}", font_size=13)
+        date_program_change = self.create_title(text=f"Дата изменения: {date_of_program_change}", font_size=13)
         buttons = self.create_buttons()
         return ft.Column(
-            [title, version, *buttons],
+            [title, version, date_program_change, *buttons],
             alignment=ft.MainAxisAlignment.START,
             spacing=config.SPACING,
         )
@@ -137,6 +153,10 @@ class Application:
     async def setup(self, page: ft.Page):
         """Настраивает страницу."""
         self.page = page
+
+        # Установка светлой темы
+        self.page.theme_mode = ft.ThemeMode.LIGHT
+
         await loging()
 
         page.title = f"Версия {program_version}. Дата изменения {date_of_program_change}"
@@ -153,17 +173,17 @@ class Application:
 
         # Добавляем стартовое сообщение в ListView
         info_list.controls.append(ft.Text(
-            "TelegramMaster Commentator 🚀\n\nTelegramMaster Commentator 🚀 - это программа для автоматической расставления комментариев в каналах Telegram, а также для работы с аккаунтами.💬\n\n"
-            "Проект доступен на GitHub: https://github.com/pyadrus/TelegramMaster_Commentator 📂\n\n"
-            "Контакт с разработчиком в Telegram: https://t.me/PyAdminRU 📲\n\n"
-            "Информация на канале: https://t.me/master_tg_d 📡", ))
+            "TelegramMaster Commentator 🚀\n\nTelegramMaster Commentator - это программа для автоматической расставления комментариев в каналах Telegram, а также для работы с аккаунтами. 💬\n\n"
+            "📂 Проект доступен на GitHub: https://github.com/pyadrus/TelegramMaster_Commentator \n"
+            "📲 Контакт с разработчиком в Telegram: https://t.me/PyAdminRU\n"
+            "📡 Информация на канале: https://t.me/master_tg_d", ))
 
         # Создаем главное меню
         menu = MainMenu(page, info_list).build()
 
         layout = ft.Row(
             [
-                ft.Container(menu, width=300, padding=config.PADDING),
+                ft.Container(menu, width=config.PROGRAM_MENU_WIDTH, padding=config.PADDING),
                 ft.Container(width=config.LINE_WIDTH, bgcolor=config.LINE_COLOR),  # Вертикальная линия
                 ft.Container(info_list, expand=True, padding=config.PADDING),
             ],
