@@ -70,60 +70,36 @@ class MainMenu:
     def create_buttons(self) -> list:
         """Создает список кнопок меню."""
         return [
-            ft.OutlinedButton(
-                text="📋 Получение списка каналов",
-                on_click=lambda _: action_1_with_log(self.page, self.info_list),
-                width=config.BUTTON_WIDTH,
-                height=config.BUTTON_HEIGHT,
-                style=ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=config.RADIUS),
-                ),
-            ),
-            ft.OutlinedButton(
-                text="💬 Отправка комментариев",
-                on_click=lambda _: action_2_with_log(self.page, self.info_list),
-                width=config.BUTTON_WIDTH,
-                height=config.BUTTON_HEIGHT,
-                style=ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=config.RADIUS),
-                ),
-            ),
-            ft.OutlinedButton(
-                text="🖼️ Смена имени, описания, фото",
-                on_click=lambda _: action_3(self.page, self.info_list),
-                width=config.BUTTON_WIDTH,
-                height=config.BUTTON_HEIGHT,
-                style=ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=config.RADIUS),
-                ),
-            ),
-            ft.OutlinedButton(
-                text="🔗 Подписка на каналы",
-                on_click=lambda _: action_4(self.page, self.info_list),
-                width=config.BUTTON_WIDTH,
-                height=config.BUTTON_HEIGHT,
-                style=ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=config.RADIUS),
-                ),
-            ),
-            ft.OutlinedButton(
-                text="📂 Формирование списка каналов",
-                on_click=lambda _: action_5(self.page, self.info_list),
-                width=config.BUTTON_WIDTH,
-                height=config.BUTTON_HEIGHT,
-                style=ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=config.RADIUS),
-                ),
-            ),
-            ft.OutlinedButton(
-                text="📖 Документация",
-                on_click=lambda _: action_5(self.page, self.info_list),
-                width=config.BUTTON_WIDTH,
-                height=config.BUTTON_HEIGHT,
-                style=ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=config.RADIUS),
-                ),
-            ),
+            ft.OutlinedButton(text="📋 Получение списка каналов",
+                              on_click=lambda _: self.page.go("/getting_list_channels"),
+                              width=config.BUTTON_WIDTH, height=config.BUTTON_HEIGHT,
+                              style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=config.RADIUS), ),
+                              ),
+            ft.OutlinedButton(text="💬 Отправка комментариев",
+                              on_click=lambda _: self.page.go("/submitting_comments"),
+                              width=config.BUTTON_WIDTH, height=config.BUTTON_HEIGHT,
+                              style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=config.RADIUS), ),
+                              ),
+            ft.OutlinedButton(text="🖼️ Смена имени, описания, фото",
+                              on_click=lambda _: self.page.go("/change_name_description_photo"),
+                              width=config.BUTTON_WIDTH, height=config.BUTTON_HEIGHT,
+                              style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=config.RADIUS), ),
+                              ),
+            ft.OutlinedButton(text="🔗 Подписка на каналы",
+                              on_click=lambda _: self.page.go("/channel_subscription"),
+                              width=config.BUTTON_WIDTH, height=config.BUTTON_HEIGHT,
+                              style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=config.RADIUS), ),
+                              ),
+            ft.OutlinedButton(text="📂 Формирование списка каналов",
+                              on_click=lambda _: self.page.go("/creating_list_of_channels"),
+                              width=config.BUTTON_WIDTH, height=config.BUTTON_HEIGHT,
+                              style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=config.RADIUS), ),
+                              ),
+            ft.OutlinedButton(text="📖 Документация",
+                              on_click=lambda _: self.page.go("/documentation"),
+                              width=config.BUTTON_WIDTH, height=config.BUTTON_HEIGHT,
+                              style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=config.RADIUS), ),
+                              ),
         ]
 
     def build(self) -> ft.Column:
@@ -152,6 +128,9 @@ class Application:
         # Установка светлой темы
         self.page.theme_mode = ft.ThemeMode.LIGHT
 
+        # Привязка обработчика маршрутов
+        self.page.on_route_change = self.route_change
+
         await loging()
 
         page.title = f"Версия {program_version}. Дата изменения {date_of_program_change}"
@@ -164,23 +143,34 @@ class Application:
         page.window.max_height = config.WINDOW_HEIGHT  # Максимальная высота
 
         # Поле для вывода информации
-        info_list = ft.ListView(expand=True, spacing=10, padding=config.PADDING, auto_scroll=True)
+        self.info_list = ft.ListView(expand=True, spacing=10, padding=config.PADDING, auto_scroll=True)
 
         # Добавляем стартовое сообщение в ListView
-        info_list.controls.append(ft.Text(
-            "TelegramMaster Commentator 🚀\n\nTelegramMaster Commentator - это программа для автоматической расставления комментариев в каналах Telegram, а также для работы с аккаунтами. 💬\n\n"
-            "📂 Проект доступен на GitHub: https://github.com/pyadrus/TelegramMaster_Commentator \n"
-            "📲 Контакт с разработчиком в Telegram: https://t.me/PyAdminRU\n"
-            f"📡 Информация на канале: https://t.me/master_tg_d", ))
+        self.info_list.controls.append(
+            ft.Text(
+                "TelegramMaster Commentator 🚀\n\nTelegramMaster Commentator - это программа для автоматической расставления комментариев в каналах Telegram, а также для работы с аккаунтами. 💬\n\n"
+                "📂 Проект доступен на GitHub: https://github.com/pyadrus/TelegramMaster_Commentator \n"
+                "📲 Контакт с разработчиком в Telegram: https://t.me/PyAdminRU\n"
+                f"📡 Информация на канале: https://t.me/master_tg_d"
+            )
+        )
 
         # Создаем главное меню
-        menu = MainMenu(page, info_list).build()
+        self.menu = MainMenu(page, self.info_list).build()
 
+        # Инициализация начального маршрута
+        await self.route_change(None)
+
+    async def route_change(self, route):
+        """Обработчик изменения маршрута."""
+        self.page.views.clear()
+
+        # Основной макет (боковое меню и информационная панель)
         layout = ft.Row(
             [
-                ft.Container(menu, width=config.PROGRAM_MENU_WIDTH, padding=config.PADDING),
+                ft.Container(self.menu, width=config.PROGRAM_MENU_WIDTH, padding=config.PADDING),
                 ft.Container(width=config.LINE_WIDTH, bgcolor=config.LINE_COLOR),  # Вертикальная линия
-                ft.Container(info_list, expand=True, padding=config.PADDING),
+                ft.Container(self.info_list, expand=True, padding=config.PADDING),
             ],
             alignment=ft.MainAxisAlignment.START,
             spacing=0,  # Убираем промежуток между элементами
@@ -188,8 +178,25 @@ class Application:
         )
 
         # Добавляем макет на страницу
-        page.add(layout)
-        page.update()
+        self.page.views.append(ft.View("/", [layout]))
+
+        # Обработка маршрутов
+        if self.page.route == "/getting_list_channels":  # 📋 Получение списка каналов
+            logger.info("Получение списка каналов")
+        elif self.page.route == "/submitting_comments":  # 💬 Отправка комментариев
+            logger.info("Отправка комментариев")
+        elif self.page.route == "/change_name_description_photo":  # 🖼️ Смена имени, описания, фото
+            logger.info("Смена имени, описания, фото")
+        elif self.page.route == "/channel_subscription":  # 🔗 Подписка на каналы
+            logger.info("Подписка на каналы")
+        elif self.page.route == "/creating_list_of_channels":  # 📂 Формирование списка каналов
+            logger.info("Формирование списка каналов")
+        elif self.page.route == "/documentation":  # 📖 Документация
+            logger.info("Документация")
+        elif self.page.route == "/errors":
+            # Пустая страница с уведомлением
+            logger.info("Ошибка")
+        self.page.update()
 
     async def main(self, page: ft.Page):
         """Точка входа в приложение."""
