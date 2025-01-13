@@ -1,5 +1,5 @@
 import flet as ft
-
+from loguru import logger
 from src.core.configs import config
 from src.core.logging_in import loging
 from src.core.main_menu import MainMenu, actions_with_the_program_window
@@ -22,6 +22,13 @@ class RadyAndBackButtons:
                 height=config.BUTTON_HEIGHT_RadyAndBackButtons,
                 style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=config.RADIUS)),
             ),
+            ft.OutlinedButton(
+                text="На главную",
+                on_click=lambda _: self.page.go("/"),  # Изменено на корневой маршрут
+                width=config.BUTTON_WIDTH_RadyAndBackButtons,
+                height=config.BUTTON_HEIGHT_RadyAndBackButtons,
+                style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=config.RADIUS)),
+            ),
         ]
 
     def build(self) -> ft.Column:
@@ -37,8 +44,9 @@ class RadyAndBackButtons:
 class ApplicationGettingListChannels:
     """Класс для управления приложением."""
 
-    def __init__(self):
-        self.page = None
+    def __init__(self, page: ft.Page, info_list: ft.ListView):
+        self.page = page
+        self.info_list = info_list
 
     async def setup(self, page: ft.Page):
         """Настраивает страницу."""
@@ -102,6 +110,29 @@ class ApplicationGettingListChannels:
 
         # Добавляем макет на страницу
         self.page.views.append(ft.View("/", [layout]))
+
+        # Обработка маршрутов
+        if self.page.route == "/getting_list_channels":  # 📋 Получение списка каналов
+            logger.info("Получение списка каналов")
+            # Очищаем info_list и добавляем новое сообщение
+            self.info_list.controls.clear()
+            self.info_list.controls.append(
+                ft.Text(
+                    "Получение списка каналов\n\n"
+                )
+            )
+        elif self.page.route == "/":  # Главная страница
+            logger.info("Главная страница")
+            # Очищаем info_list и добавляем стартовое сообщение
+            self.info_list.controls.clear()
+            self.info_list.controls.append(
+                ft.Text(
+                    "TelegramMaster Commentator 🚀\n\nTelegramMaster Commentator - это программа для автоматической расставления комментариев в каналах Telegram, а также для работы с аккаунтами. 💬\n\n"
+                    "📂 Проект доступен на GitHub: https://github.com/pyadrus/TelegramMaster_Commentator \n"
+                    "📲 Контакт с разработчиком в Telegram: https://t.me/PyAdminRU\n"
+                    f"📡 Информация на канале: https://t.me/master_tg_d"
+                )
+            )
 
         self.page.update()
 

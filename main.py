@@ -71,7 +71,7 @@ class Application:
         # Обработка маршрутов
         if self.page.route == "/getting_list_channels":  # 📋 Получение списка каналов
             logger.info("Получение списка каналов")
-            app_getting_list = ApplicationGettingListChannels()
+            app_getting_list = ApplicationGettingListChannels(self.page, self.info_list)
             await app_getting_list.setup(self.page)
         elif self.page.route == "/submitting_comments":  # 💬 Отправка комментариев
             logger.info("Отправка комментариев")
@@ -83,10 +83,10 @@ class Application:
             logger.info("Формирование списка каналов")
         elif self.page.route == "/documentation":  # 📖 Документация
             logger.info("Документация")
-
         elif self.page.route == "/errors":
             # Пустая страница с уведомлением
             logger.info("Ошибка")
+
         self.page.update()
 
     async def main(self, page: ft.Page):
