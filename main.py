@@ -181,20 +181,8 @@ class Application:
             size=24  # Размер заголовка
         )
 
-        # Создаем View с элементами
-        page.views.append(
-            ft.View(
-                "/getting_list_channels",
-                controls=[
-                    ft.Column(
-                        controls=[title, back_button],
-                        # alignment=ft.MainAxisAlignment.CENTER,  # Выравнивание по центру
-                        expand=True,  # Растягиваем Column на всю доступную область
-                    )
-                ],
-                padding=20,  # Добавляем отступы вокруг содержимого
-            )
-        )
+        route_page = "getting_list_channels"
+        await self.view_with_elements(page, title, back_button, route_page)
 
         page.update()  # Обновляем страницу
 
@@ -217,20 +205,8 @@ class Application:
             size=24  # Размер заголовка
         )
 
-        # Создаем View с элементами
-        page.views.append(
-            ft.View(
-                "/submitting_comments",
-                controls=[
-                    ft.Column(
-                        controls=[title, back_button],
-                        # alignment=ft.MainAxisAlignment.CENTER,  # Выравнивание по центру
-                        expand=True,  # Растягиваем Column на всю доступную область
-                    )
-                ],
-                padding=20,  # Добавляем отступы вокруг содержимого
-            )
-        )
+        route_page = "submitting_comments"
+        await self.view_with_elements(page, title, back_button, route_page)
 
         page.update()  # Обновляем страницу
 
@@ -253,28 +229,10 @@ class Application:
             size=24  # Размер заголовка
         )
 
-        # Создаем View с элементами
-        page.views.append(
-            ft.View(
-                "/change_name_description_photo",
-                controls=[
-                    ft.Column(
-                        controls=[title, back_button],
-                        # alignment=ft.MainAxisAlignment.CENTER,  # Выравнивание по центру
-                        expand=True,  # Растягиваем Column на всю доступную область
-                    )
-                ],
-                padding=20,  # Добавляем отступы вокруг содержимого
-            )
-        )
+        route_page = "change_name_description_photo"
+        await self.view_with_elements(page, title, back_button, route_page)
 
         page.update()  # Обновляем страницу
-
-    async def main(self, page: ft.Page):
-        """Точка входа в приложение."""
-        self.page = page
-        self.info_list = ft.ListView(expand=True, spacing=10, padding=PADDING, auto_scroll=True)
-        await self.setup()
 
     async def channel_subscription(self, page: ft.Page):
         """Создает страницу Подписка на каналы"""
@@ -295,20 +253,8 @@ class Application:
             size=24  # Размер заголовка
         )
 
-        # Создаем View с элементами
-        page.views.append(
-            ft.View(
-                "/channel_subscription",
-                controls=[
-                    ft.Column(
-                        controls=[title, back_button],
-                        # alignment=ft.MainAxisAlignment.CENTER,  # Выравнивание по центру
-                        expand=True,  # Растягиваем Column на всю доступную область
-                    )
-                ],
-                padding=20,  # Добавляем отступы вокруг содержимого
-            )
-        )
+        route_page = "channel_subscription"
+        await self.view_with_elements(page, title, back_button, route_page)
 
         page.update()  # Обновляем страницу
 
@@ -331,20 +277,8 @@ class Application:
             size=24  # Размер заголовка
         )
 
-        # Создаем View с элементами
-        page.views.append(
-            ft.View(
-                "/creating_list_of_channels",
-                controls=[
-                    ft.Column(
-                        controls=[title, back_button],
-                        # alignment=ft.MainAxisAlignment.CENTER,  # Выравнивание по центру
-                        expand=True,  # Растягиваем Column на всю доступную область
-                    )
-                ],
-                padding=20,  # Добавляем отступы вокруг содержимого
-            )
-        )
+        route_page = "creating_list_of_channels"
+        await self.view_with_elements(page, title, back_button, route_page)
 
         page.update()  # Обновляем страницу
 
@@ -366,23 +300,25 @@ class Application:
             "Документация",  # Текст заголовка
             size=24  # Размер заголовка
         )
+        route_page = "documentation"
+        await self.view_with_elements(page, title, back_button, route_page)
 
+        page.update()  # Обновляем страницу
+
+    async def view_with_elements(self, page: ft.Page, title: ft.Text, back_button: ft.ElevatedButton, route_page):
         # Создаем View с элементами
         page.views.append(
             ft.View(
-                "/documentation",
+                f"/{route_page}",
                 controls=[
                     ft.Column(
                         controls=[title, back_button],
-                        # alignment=ft.MainAxisAlignment.CENTER,  # Выравнивание по центру
                         expand=True,  # Растягиваем Column на всю доступную область
                     )
                 ],
                 padding=20,  # Добавляем отступы вокруг содержимого
             )
         )
-
-        page.update()  # Обновляем страницу
 
     async def main(self, page: ft.Page):
         """Точка входа в приложение."""
