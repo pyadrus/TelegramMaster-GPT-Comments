@@ -142,7 +142,8 @@ class Application:
         logger.info("Получение списка каналов")
 
     async def _handle_submitting_comments(self):
-        logger.info("Отправка комментариев")
+        """Страница Отправка комментариев"""
+        await self.submitting_comments(self.page)
 
     async def _handle_change_name_description_photo(self):
         """Страница Смена имени, описания, фото"""
@@ -159,6 +160,42 @@ class Application:
     async def _handle_documentation(self):
         """Страница документации"""
         await self.documentation(self.page)
+
+    async def submitting_comments(self, page: ft.Page):
+        """Создает страницу Отправка комментариев"""
+        logger.info("Пользователь перешел на страницу Отправка комментариев")
+        page.views.clear()  # Очищаем страницу и добавляем новый View
+
+        # Создаем кнопку "Назад"
+        back_button = ft.ElevatedButton(
+            "Назад",  # Текст на кнопке
+            on_click=lambda _: self.page.go("/"),  # Переход на главную страницу
+            width=850,  # Ширина кнопки (увеличено для наглядности)
+            height=35,  # Высота кнопки (увеличено для наглядности)
+        )
+
+        # Создаем заголовок
+        title = ft.Text(
+            "Отправка комментариев",  # Текст заголовка
+            size=24  # Размер заголовка
+        )
+
+        # Создаем View с элементами
+        page.views.append(
+            ft.View(
+                "/submitting_comments",
+                controls=[
+                    ft.Column(
+                        controls=[title, back_button],
+                        # alignment=ft.MainAxisAlignment.CENTER,  # Выравнивание по центру
+                        expand=True,  # Растягиваем Column на всю доступную область
+                    )
+                ],
+                padding=20,  # Добавляем отступы вокруг содержимого
+            )
+        )
+
+        page.update()  # Обновляем страницу
 
     async def change_name_description_photo(self, page: ft.Page):
         """Создает страницу Смена имени, описания, фото"""
