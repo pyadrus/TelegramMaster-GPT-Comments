@@ -304,14 +304,20 @@ class Application:
             height=35,  # Высота кнопки (увеличено для наглядности)
         )
 
-        buttons = [getting_list_channels_button, back_button]
-
         # Создаем заголовок
         title = ft.Text(
-            "Получение списка каналов",  # Текст заголовка
-            size=24  # Размер заголовка
-        )
+            spans=[
+                ft.TextSpan(
+                    "Получение списка каналов",  # Текст заголовка
+                    ft.TextStyle(
+                        size=24,  # Размер заголовка
+                        weight=TITLE_FONT_WEIGHT,
+                        foreground=ft.Paint(
+                            gradient=ft.PaintLinearGradient(
+                                (0, 20), (150, 20), [PRIMARY_COLOR, PRIMARY_COLOR]
+                            )), ), ), ], )
 
+        buttons = [getting_list_channels_button, back_button]
         route_page = "getting_list_channels"
         await self.view_with_elements(page, title, buttons, route_page)
 
