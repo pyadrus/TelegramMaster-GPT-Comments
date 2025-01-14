@@ -145,7 +145,8 @@ class Application:
         logger.info("Отправка комментариев")
 
     async def _handle_change_name_description_photo(self):
-        logger.info("Смена имени, описания, фото")
+        """Страница Смена имени, описания, фото"""
+        await self.change_name_description_photo(self.page)
 
     async def _handle_channel_subscription(self):
         """Страница Подписка на каналы"""
@@ -158,6 +159,49 @@ class Application:
     async def _handle_documentation(self):
         """Страница документации"""
         await self.documentation(self.page)
+
+    async def change_name_description_photo(self, page: ft.Page):
+        """Создает страницу Смена имени, описания, фото"""
+        logger.info("Пользователь перешел на страницу Смена имени, описания, фото")
+        page.views.clear()  # Очищаем страницу и добавляем новый View
+
+        # Создаем кнопку "Назад"
+        back_button = ft.ElevatedButton(
+            "Назад",  # Текст на кнопке
+            on_click=lambda _: self.page.go("/"),  # Переход на главную страницу
+            width=850,  # Ширина кнопки (увеличено для наглядности)
+            height=35,  # Высота кнопки (увеличено для наглядности)
+        )
+
+        # Создаем заголовок
+        title = ft.Text(
+            "Смена имени, описания, фото",  # Текст заголовка
+            size=24  # Размер заголовка
+        )
+
+        # Создаем View с элементами
+        page.views.append(
+            ft.View(
+                "/change_name_description_photo",
+                controls=[
+                    ft.Column(
+                        controls=[title, back_button],
+                        # alignment=ft.MainAxisAlignment.CENTER,  # Выравнивание по центру
+                        expand=True,  # Растягиваем Column на всю доступную область
+                    )
+                ],
+                padding=20,  # Добавляем отступы вокруг содержимого
+            )
+        )
+
+        page.update()  # Обновляем страницу
+
+    async def main(self, page: ft.Page):
+        """Точка входа в приложение."""
+        self.page = page
+        self.info_list = ft.ListView(expand=True, spacing=10, padding=PADDING, auto_scroll=True)
+        await self.setup()
+
 
     async def channel_subscription(self, page: ft.Page):
         """Создает страницу Подписка на каналы"""
