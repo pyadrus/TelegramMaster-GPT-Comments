@@ -139,7 +139,8 @@ class Application:
         self.page.update()
 
     async def _handle_getting_list_channels(self):
-        logger.info("Получение списка каналов")
+        """Страница Получение списка каналов"""
+        await self.getting_list_channels(self.page)
 
     async def _handle_submitting_comments(self):
         """Страница Отправка комментариев"""
@@ -160,6 +161,42 @@ class Application:
     async def _handle_documentation(self):
         """Страница документации"""
         await self.documentation(self.page)
+
+    async def getting_list_channels(self, page: ft.Page):
+        """Создает страницу Получение списка каналов"""
+        logger.info("Пользователь перешел на страницу Получение списка каналов")
+        page.views.clear()  # Очищаем страницу и добавляем новый View
+
+        # Создаем кнопку "Назад"
+        back_button = ft.ElevatedButton(
+            "Назад",  # Текст на кнопке
+            on_click=lambda _: self.page.go("/"),  # Переход на главную страницу
+            width=850,  # Ширина кнопки (увеличено для наглядности)
+            height=35,  # Высота кнопки (увеличено для наглядности)
+        )
+
+        # Создаем заголовок
+        title = ft.Text(
+            "Получение списка каналов",  # Текст заголовка
+            size=24  # Размер заголовка
+        )
+
+        # Создаем View с элементами
+        page.views.append(
+            ft.View(
+                "/getting_list_channels",
+                controls=[
+                    ft.Column(
+                        controls=[title, back_button],
+                        # alignment=ft.MainAxisAlignment.CENTER,  # Выравнивание по центру
+                        expand=True,  # Растягиваем Column на всю доступную область
+                    )
+                ],
+                padding=20,  # Добавляем отступы вокруг содержимого
+            )
+        )
+
+        page.update()  # Обновляем страницу
 
     async def submitting_comments(self, page: ft.Page):
         """Создает страницу Отправка комментариев"""
