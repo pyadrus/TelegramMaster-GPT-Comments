@@ -14,12 +14,9 @@ WINDOW_WIDTH = 900
 WINDOW_HEIGHT = 600
 BUTTON_WIDTH = 300
 BUTTON_HEIGHT = 40
-BUTTON_WIDTH_RadyAndBackButtons = 540
-BUTTON_HEIGHT_RadyAndBackButtons = 35
 PROGRAM_MENU_WIDTH = BUTTON_WIDTH + PADDING
 RADIUS = 5
 PRIMARY_COLOR = ft.colors.CYAN_600
-SECONDARY_COLOR = ft.colors.BLACK
 TITLE_FONT_SIZE = 13
 TITLE_FONT_WEIGHT = ft.FontWeight.BOLD
 LINE_WIDTH = 1
@@ -133,7 +130,6 @@ class Application:
             "/channel_subscription": self._handle_channel_subscription,
             "/creating_list_of_channels": self._handle_creating_list_of_channels,
             "/documentation": self._handle_documentation,
-            "/errors": self._handle_errors,
         }
 
         handler = route_handlers.get(self.page.route)
@@ -142,44 +138,80 @@ class Application:
 
         self.page.update()
 
-    async def _add_back_button(self):
-        """Добавляет кнопку 'Назад' на страницу."""
-        back_button = ft.ElevatedButton("Назад", on_click=lambda _: self.page.go("/"))
-        self.info_list.controls.append(back_button)
-        self.page.update()
-
     async def _handle_getting_list_channels(self):
         logger.info("Получение списка каналов")
-        await self._add_back_button()
 
     async def _handle_submitting_comments(self):
         logger.info("Отправка комментариев")
-        await self._add_back_button()
 
     async def _handle_change_name_description_photo(self):
         logger.info("Смена имени, описания, фото")
-        await self._add_back_button()
 
     async def _handle_channel_subscription(self):
         logger.info("Подписка на каналы")
-        await self._add_back_button()
 
     async def _handle_creating_list_of_channels(self):
-        logger.info("Формирование списка каналов")
-        await self._add_back_button()
+        """Страница Формирование списка каналов"""
+        await self.creating_list_of_channels(self.page)
 
     async def _handle_documentation(self):
         """Страница документации"""
         await self.documentation(self.page)
 
+    async def creating_list_of_channels(self, page: ft.Page):
+        """Создает страницу Формирование списка каналов"""
+        logger.info("Пользователь перешел на страницу Формирование списка каналов")
+        page.views.clear()  # Очищаем страницу и добавляем новый View
+
+        # Создаем кнопку "Назад"
+        back_button = ft.ElevatedButton(
+            "Назад",  # Текст на кнопке
+            on_click=lambda _: self.page.go("/"),  # Переход на главную страницу
+            width=850,  # Ширина кнопки (увеличено для наглядности)
+            height=35,  # Высота кнопки (увеличено для наглядности)
+        )
+
+        # Создаем заголовок
+        title = ft.Text(
+            "Формирование списка каналов",  # Текст заголовка
+            size=24  # Размер заголовка
+        )
+
+        # Создаем View с элементами
+        page.views.append(
+            ft.View(
+                "/creating_list_of_channels",
+                controls=[
+                    ft.Column(
+                        controls=[title, back_button],
+                        # alignment=ft.MainAxisAlignment.CENTER,  # Выравнивание по центру
+                        expand=True,  # Растягиваем Column на всю доступную область
+                    )
+                ],
+                padding=20,  # Добавляем отступы вокруг содержимого
+            )
+        )
+
+        page.update()  # Обновляем страницу
+
     async def documentation(self, page: ft.Page):
         """Создает страницу документации"""
-        logger.info("Страница документации")
+        logger.info("Пользователь перешел на страницу документации")
         page.views.clear()  # Очищаем страницу и добавляем новый View
+
         # Создаем кнопку "Назад"
-        back_button = ft.ElevatedButton("Назад", on_click=lambda _: self.page.go("/"))
+        back_button = ft.ElevatedButton(
+            "Назад",  # Текст на кнопке
+            on_click=lambda _: self.page.go("/"),  # Переход на главную страницу
+            width=850,  # Ширина кнопки (увеличено для наглядности)
+            height=35,  # Высота кнопки (увеличено для наглядности)
+        )
+
         # Создаем заголовок
-        title = ft.Text("Документация", size=24)  # Заголовок страницы
+        title = ft.Text(
+            "Документация",  # Текст заголовка
+            size=24  # Размер заголовка
+        )
 
         # Создаем View с элементами
         page.views.append(
@@ -187,10 +219,14 @@ class Application:
                 "/documentation",
                 controls=[
                     ft.Column(
-                        controls=[
-                            title,
-                            back_button
-                        ])]))
+                        controls=[title, back_button],
+                        # alignment=ft.MainAxisAlignment.CENTER,  # Выравнивание по центру
+                        expand=True,  # Растягиваем Column на всю доступную область
+                    )
+                ],
+                padding=20,  # Добавляем отступы вокруг содержимого
+            )
+        )
 
         page.update()  # Обновляем страницу
 
