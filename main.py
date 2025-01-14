@@ -202,7 +202,6 @@ class Application:
         self.info_list = ft.ListView(expand=True, spacing=10, padding=PADDING, auto_scroll=True)
         await self.setup()
 
-
     async def channel_subscription(self, page: ft.Page):
         """Создает страницу Подписка на каналы"""
         logger.info("Пользователь перешел на страницу Подписка на каналы")
