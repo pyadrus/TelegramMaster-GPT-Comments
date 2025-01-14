@@ -148,7 +148,8 @@ class Application:
         logger.info("Смена имени, описания, фото")
 
     async def _handle_channel_subscription(self):
-        logger.info("Подписка на каналы")
+        """Страница Подписка на каналы"""
+        await self.channel_subscription(self.page)
 
     async def _handle_creating_list_of_channels(self):
         """Страница Формирование списка каналов"""
@@ -157,6 +158,42 @@ class Application:
     async def _handle_documentation(self):
         """Страница документации"""
         await self.documentation(self.page)
+
+    async def channel_subscription(self, page: ft.Page):
+        """Создает страницу Подписка на каналы"""
+        logger.info("Пользователь перешел на страницу Подписка на каналы")
+        page.views.clear()  # Очищаем страницу и добавляем новый View
+
+        # Создаем кнопку "Назад"
+        back_button = ft.ElevatedButton(
+            "Назад",  # Текст на кнопке
+            on_click=lambda _: self.page.go("/"),  # Переход на главную страницу
+            width=850,  # Ширина кнопки (увеличено для наглядности)
+            height=35,  # Высота кнопки (увеличено для наглядности)
+        )
+
+        # Создаем заголовок
+        title = ft.Text(
+            "Подписка на каналы",  # Текст заголовка
+            size=24  # Размер заголовка
+        )
+
+        # Создаем View с элементами
+        page.views.append(
+            ft.View(
+                "/channel_subscription",
+                controls=[
+                    ft.Column(
+                        controls=[title, back_button],
+                        # alignment=ft.MainAxisAlignment.CENTER,  # Выравнивание по центру
+                        expand=True,  # Растягиваем Column на всю доступную область
+                    )
+                ],
+                padding=20,  # Добавляем отступы вокруг содержимого
+            )
+        )
+
+        page.update()  # Обновляем страницу
 
     async def creating_list_of_channels(self, page: ft.Page):
         """Создает страницу Формирование списка каналов"""
