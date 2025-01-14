@@ -5,6 +5,7 @@ from src.core.configs import config
 from src.core.getting_list_channels import ApplicationGettingListChannels
 from src.core.logging_in import loging
 from src.core.main_menu import MainMenu, actions_with_the_program_window
+from src.core.submitting_comments import SubmittingComments
 
 # Настройка логирования
 logger.add("user_data/log/log.log", rotation="1 MB", compression="zip")
@@ -75,6 +76,8 @@ class Application:
             await app_getting_list.setup(self.page)
         elif self.page.route == "/submitting_comments":  # 💬 Отправка комментариев
             logger.info("Отправка комментариев")
+            submitting_comments = SubmittingComments(self.page, self.info_list)
+            await submitting_comments.setup(self.page)
         elif self.page.route == "/change_name_description_photo":  # 🖼️ Смена имени, описания, фото
             logger.info("Смена имени, описания, фото")
         elif self.page.route == "/channel_subscription":  # 🔗 Подписка на каналы

@@ -20,7 +20,6 @@ class AppConfig:
     BUTTON_WIDTH = 300  # ширина кнопки
     BUTTON_HEIGHT = 40  # высота кнопки
 
-
     # Размеры кнопок Получить список каналов и На главную
     BUTTON_WIDTH_RadyAndBackButtons = 540
     BUTTON_HEIGHT_RadyAndBackButtons = 35

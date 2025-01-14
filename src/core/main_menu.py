@@ -2,6 +2,7 @@ import flet as ft
 
 from src.core.configs import config, program_name, program_version, date_of_program_change
 
+
 async def actions_with_the_program_window(page: ft.Page):
     """Изменение на изменение главного окна программы."""
     page.title = f"Версия {program_version}. Дата изменения {date_of_program_change}"
@@ -12,7 +13,6 @@ async def actions_with_the_program_window(page: ft.Page):
     page.window.max_width = config.WINDOW_WIDTH  # Максимальная ширина
     page.window.min_height = config.WINDOW_HEIGHT  # Минимальная высота
     page.window.max_height = config.WINDOW_HEIGHT  # Максимальная высота
-
 
 
 class MainMenu:
