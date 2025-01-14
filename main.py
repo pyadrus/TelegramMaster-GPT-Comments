@@ -162,30 +162,6 @@ class Application:
         """Страница документации"""
         await self.documentation(self.page)
 
-    async def getting_list_channels(self, page: ft.Page):
-        """Создает страницу Получение списка каналов"""
-        logger.info("Пользователь перешел на страницу Получение списка каналов")
-        page.views.clear()  # Очищаем страницу и добавляем новый View
-
-        # Создаем кнопку "Назад"
-        back_button = ft.ElevatedButton(
-            "Назад",  # Текст на кнопке
-            on_click=lambda _: self.page.go("/"),  # Переход на главную страницу
-            width=850,  # Ширина кнопки (увеличено для наглядности)
-            height=35,  # Высота кнопки (увеличено для наглядности)
-        )
-
-        # Создаем заголовок
-        title = ft.Text(
-            "Получение списка каналов",  # Текст заголовка
-            size=24  # Размер заголовка
-        )
-
-        route_page = "getting_list_channels"
-        await self.view_with_elements(page, title, back_button, route_page)
-
-        page.update()  # Обновляем страницу
-
     async def submitting_comments(self, page: ft.Page):
         """Создает страницу Отправка комментариев"""
         logger.info("Пользователь перешел на страницу Отправка комментариев")
@@ -204,9 +180,9 @@ class Application:
             "Отправка комментариев",  # Текст заголовка
             size=24  # Размер заголовка
         )
-
+        buttons = [back_button]
         route_page = "submitting_comments"
-        await self.view_with_elements(page, title, back_button, route_page)
+        await self.view_with_elements(page, title, buttons, route_page)
 
         page.update()  # Обновляем страницу
 
@@ -228,9 +204,9 @@ class Application:
             "Смена имени, описания, фото",  # Текст заголовка
             size=24  # Размер заголовка
         )
-
+        buttons = [back_button]
         route_page = "change_name_description_photo"
-        await self.view_with_elements(page, title, back_button, route_page)
+        await self.view_with_elements(page, title, buttons, route_page)
 
         page.update()  # Обновляем страницу
 
@@ -252,9 +228,9 @@ class Application:
             "Подписка на каналы",  # Текст заголовка
             size=24  # Размер заголовка
         )
-
+        buttons = [back_button]
         route_page = "channel_subscription"
-        await self.view_with_elements(page, title, back_button, route_page)
+        await self.view_with_elements(page, title, buttons, route_page)
 
         page.update()  # Обновляем страницу
 
@@ -276,9 +252,9 @@ class Application:
             "Формирование списка каналов",  # Текст заголовка
             size=24  # Размер заголовка
         )
-
+        buttons = [back_button]
         route_page = "creating_list_of_channels"
-        await self.view_with_elements(page, title, back_button, route_page)
+        await self.view_with_elements(page, title, buttons, route_page)
 
         page.update()  # Обновляем страницу
 
@@ -300,19 +276,55 @@ class Application:
             "Документация",  # Текст заголовка
             size=24  # Размер заголовка
         )
+
+        buttons = [back_button]
         route_page = "documentation"
-        await self.view_with_elements(page, title, back_button, route_page)
+        await self.view_with_elements(page, title, buttons, route_page)
 
         page.update()  # Обновляем страницу
 
-    async def view_with_elements(self, page: ft.Page, title: ft.Text, back_button: ft.ElevatedButton, route_page):
+    async def getting_list_channels(self, page: ft.Page):
+        """Создает страницу Получение списка каналов"""
+        logger.info("Пользователь перешел на страницу Получение списка каналов")
+        page.views.clear()  # Очищаем страницу и добавляем новый View
+
+        # Создаем кнопку "Получение списка каналов"
+        getting_list_channels_button = ft.ElevatedButton(
+            "Получение списка каналов",  # Текст на кнопке
+            on_click=lambda _: self.page.go("/"),  # Переход на главную страницу
+            width=850,  # Ширина кнопки (увеличено для наглядности)
+            height=35,  # Высота кнопки (увеличено для наглядности)
+        )
+
+        # Создаем кнопку "Назад"
+        back_button = ft.ElevatedButton(
+            "Назад",  # Текст на кнопке
+            on_click=lambda _: self.page.go("/"),  # Переход на главную страницу
+            width=850,  # Ширина кнопки (увеличено для наглядности)
+            height=35,  # Высота кнопки (увеличено для наглядности)
+        )
+
+        buttons = [getting_list_channels_button, back_button]
+
+        # Создаем заголовок
+        title = ft.Text(
+            "Получение списка каналов",  # Текст заголовка
+            size=24  # Размер заголовка
+        )
+
+        route_page = "getting_list_channels"
+        await self.view_with_elements(page, title, buttons, route_page)
+
+        page.update()  # Обновляем страницу
+
+    async def view_with_elements(self, page: ft.Page, title: ft.Text, buttons: list[ft.ElevatedButton], route_page):
         # Создаем View с элементами
         page.views.append(
             ft.View(
                 f"/{route_page}",
                 controls=[
                     ft.Column(
-                        controls=[title, back_button],
+                        controls=[title, *buttons],
                         expand=True,  # Растягиваем Column на всю доступную область
                     )
                 ],
