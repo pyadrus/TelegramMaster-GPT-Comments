@@ -34,7 +34,7 @@ class RadyAndBackButtonsSubmittingComments:
 
 
 class SubmittingComments(BaseApplication):
-    """Класс для управления приложением."""
+    """Класс для управления приложением. 💬 Отправка комментариев"""
 
     def create_buttons(self) -> list:
         """Создает список кнопок."""
@@ -67,7 +67,8 @@ class SubmittingComments(BaseApplication):
             self.info_list.controls.clear()
             self.info_list.controls.append(
                 ft.Text(
-                    "TelegramMaster Commentator 🚀\n\nTelegramMaster Commentator - это программа для автоматической расставления комментариев в каналах Telegram, а также для работы с аккаунтами. 💬\n\n"
+                    "TelegramMaster Commentator 🚀\n\nTelegramMaster Commentator - это программа для автоматической "
+                    "расставления комментариев в каналах Telegram, а также для работы с аккаунтами. 💬\n\n"
                     "📂 Проект доступен на GitHub: https://github.com/pyadrus/TelegramMaster_Commentator \n"
                     "📲 Контакт с разработчиком в Telegram: https://t.me/PyAdminRU\n"
                     f"📡 Информация на канале: https://t.me/master_tg_d"
