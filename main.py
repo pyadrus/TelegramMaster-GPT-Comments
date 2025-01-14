@@ -2,10 +2,10 @@ import flet as ft
 from loguru import logger
 
 from src.core.configs import config
-from src.core.getting_list_channels import ApplicationGettingListChannels
+from src.gui.getting_list_channels import ApplicationGettingListChannels
 from src.core.logging_in import loging
-from src.core.main_menu import MainMenu, actions_with_the_program_window
-from src.core.submitting_comments import SubmittingComments
+from src.gui.main_menu import MainMenu, actions_with_the_program_window
+from src.gui.submitting_comments import SubmittingComments
 
 # Настройка логирования
 logger.add("user_data/log/log.log", rotation="1 MB", compression="zip")
@@ -37,7 +37,8 @@ class Application:
         # Добавляем стартовое сообщение в ListView
         self.info_list.controls.append(
             ft.Text(
-                "TelegramMaster Commentator 🚀\n\nTelegramMaster Commentator - это программа для автоматической расставления комментариев в каналах Telegram, а также для работы с аккаунтами. 💬\n\n"
+                "TelegramMaster Commentator 🚀\n\nTelegramMaster Commentator - это программа для автоматической "
+                "расставления комментариев в каналах Telegram, а также для работы с аккаунтами. 💬\n\n"
                 "📂 Проект доступен на GitHub: https://github.com/pyadrus/TelegramMaster_Commentator \n"
                 "📲 Контакт с разработчиком в Telegram: https://t.me/PyAdminRU\n"
                 f"📡 Информация на канале: https://t.me/master_tg_d"
@@ -74,10 +75,12 @@ class Application:
             logger.info("Получение списка каналов")
             app_getting_list = ApplicationGettingListChannels(self.page, self.info_list)
             await app_getting_list.setup(self.page)
+
         elif self.page.route == "/submitting_comments":  # 💬 Отправка комментариев
             logger.info("Отправка комментариев")
             submitting_comments = SubmittingComments(self.page, self.info_list)
             await submitting_comments.setup(self.page)
+
         elif self.page.route == "/change_name_description_photo":  # 🖼️ Смена имени, описания, фото
             logger.info("Смена имени, описания, фото")
         elif self.page.route == "/channel_subscription":  # 🔗 Подписка на каналы
