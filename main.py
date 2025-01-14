@@ -25,23 +25,24 @@ TITLE_FONT_WEIGHT = ft.FontWeight.BOLD
 LINE_WIDTH = 1
 LINE_COLOR = ft.colors.GREY
 
-async def actions_with_the_program_window(page: ft.Page):
-    """Изменение на изменение главного окна программы."""
-    page.title = f"Версия {program_version}. Дата изменения {date_of_program_change}"
-    page.window.width = WINDOW_WIDTH
-    page.window.height = WINDOW_HEIGHT
-    page.window.resizable = False
-    page.window.min_width = WINDOW_WIDTH
-    page.window.max_width = WINDOW_WIDTH
-    page.window.min_height = WINDOW_HEIGHT
-    page.window.max_height = WINDOW_HEIGHT
 
-class MainMenu:
-    """Класс для отображения главного меню."""
+class Application:
+    """Класс для управления приложением."""
 
-    def __init__(self, page: ft.Page, info_list: ft.ListView):
-        self.page = page
-        self.info_list = info_list
+    def __init__(self):
+        self.page = None
+        self.info_list = None
+
+    async def actions_with_the_program_window(self, page: ft.Page):
+        """Изменение на изменение главного окна программы."""
+        page.title = f"Версия {program_version}. Дата изменения {date_of_program_change}"
+        page.window.width = WINDOW_WIDTH
+        page.window.height = WINDOW_HEIGHT
+        page.window.resizable = False
+        page.window.min_width = WINDOW_WIDTH
+        page.window.max_width = WINDOW_WIDTH
+        page.window.min_height = WINDOW_HEIGHT
+        page.window.max_height = WINDOW_HEIGHT
 
     def create_title(self, text: str, font_size: int = TITLE_FONT_SIZE) -> ft.Text:
         """Создает заголовок с градиентом."""
@@ -67,7 +68,7 @@ class MainMenu:
             style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=RADIUS)),
         )
 
-    def build(self) -> ft.Column:
+    def build_menu(self) -> ft.Column:
         """Создает колонку с заголовками и кнопками."""
         title = self.create_title(text=program_name, font_size=19)
         version = self.create_title(text=f"Версия программы: {program_version}", font_size=13)
@@ -86,20 +87,12 @@ class MainMenu:
             spacing=SPACING,
         )
 
-class Application:
-    """Класс для управления приложением."""
-
-    def __init__(self):
-        self.page = None
-        self.info_list = None
-        self.menu = None
-
     async def setup(self):
         """Настраивает страницу."""
         self.page.theme_mode = ft.ThemeMode.LIGHT
         self.page.on_route_change = self.route_change
 
-        await actions_with_the_program_window(self.page)
+        await self.actions_with_the_program_window(self.page)
 
         self._add_startup_message()
         await self.route_change(None)
@@ -122,7 +115,7 @@ class Application:
 
         layout = ft.Row(
             [
-                ft.Container(self.menu, width=PROGRAM_MENU_WIDTH, padding=PADDING),
+                ft.Container(self.build_menu(), width=PROGRAM_MENU_WIDTH, padding=PADDING),
                 ft.Container(width=LINE_WIDTH, bgcolor=LINE_COLOR),
                 ft.Container(self.info_list, expand=True, padding=PADDING),
             ],
@@ -176,19 +169,37 @@ class Application:
         await self._add_back_button()
 
     async def _handle_documentation(self):
-        logger.info("Документация")
-        await self._add_back_button()
+        """Страница документации"""
+        await self.documentation(self.page)
 
-    async def _handle_errors(self):
-        logger.info("Ошибка")
-        await self._add_back_button()
+    async def documentation(self, page: ft.Page):
+        """Создает страницу документации"""
+        logger.info("Страница документации")
+        page.views.clear()  # Очищаем страницу и добавляем новый View
+        # Создаем кнопку "Назад"
+        back_button = ft.ElevatedButton("Назад", on_click=lambda _: self.page.go("/"))
+        # Создаем заголовок
+        title = ft.Text("Документация", size=24)  # Заголовок страницы
+
+        # Создаем View с элементами
+        page.views.append(
+            ft.View(
+                "/documentation",
+                controls=[
+                    ft.Column(
+                        controls=[
+                            title,
+                            back_button
+                        ])]))
+
+        page.update()  # Обновляем страницу
 
     async def main(self, page: ft.Page):
         """Точка входа в приложение."""
         self.page = page
         self.info_list = ft.ListView(expand=True, spacing=10, padding=PADDING, auto_scroll=True)
-        self.menu = MainMenu(page, self.info_list).build()
         await self.setup()
+
 
 if __name__ == "__main__":
     ft.app(target=Application().main)
