@@ -78,8 +78,8 @@ class Application:
 
         elif self.page.route == "/submitting_comments":  # 💬 Отправка комментариев
             logger.info("Отправка комментариев")
-            submitting_comments = SubmittingComments(self.page, self.info_list)
-            await submitting_comments.setup(self.page)
+            app_submitting_comments = SubmittingComments(self.page, self.info_list)
+            await app_submitting_comments.setup(self.page)
 
         elif self.page.route == "/change_name_description_photo":  # 🖼️ Смена имени, описания, фото
             logger.info("Смена имени, описания, фото")
