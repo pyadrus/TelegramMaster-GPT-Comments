@@ -1,6 +1,10 @@
 from loguru import logger
 import flet as ft
 
+from src.config.config_handler import read_config
+from src.core.telegram_client import connect_telegram_account
+from src.database.db_handler import creating_a_channel_list
+
 # Настройка логирования
 logger.add("user_data/log/log.log", rotation="1 MB", compression="zip")
 
@@ -167,6 +171,9 @@ class Application:
         logger.info("Пользователь перешел на страницу Отправка комментариев")
         page.views.clear()  # Очищаем страницу и добавляем новый View
 
+        lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
+        page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
+
         # Создаем кнопку "Назад"
         back_button = ft.ElevatedButton(
             "Назад",  # Текст на кнопке
@@ -182,7 +189,7 @@ class Application:
         )
         buttons = [back_button]
         route_page = "submitting_comments"
-        await self.view_with_elements(page, title, buttons, route_page)
+        await self.view_with_elements(page, title, buttons, route_page, lv)
 
         page.update()  # Обновляем страницу
 
@@ -190,6 +197,9 @@ class Application:
         """Создает страницу Смена имени, описания, фото"""
         logger.info("Пользователь перешел на страницу Смена имени, описания, фото")
         page.views.clear()  # Очищаем страницу и добавляем новый View
+
+        lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
+        page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
 
         # Создаем кнопку "Назад"
         back_button = ft.ElevatedButton(
@@ -206,7 +216,7 @@ class Application:
         )
         buttons = [back_button]
         route_page = "change_name_description_photo"
-        await self.view_with_elements(page, title, buttons, route_page)
+        await self.view_with_elements(page, title, buttons, route_page, lv)
 
         page.update()  # Обновляем страницу
 
@@ -214,6 +224,9 @@ class Application:
         """Создает страницу Подписка на каналы"""
         logger.info("Пользователь перешел на страницу Подписка на каналы")
         page.views.clear()  # Очищаем страницу и добавляем новый View
+
+        lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
+        page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
 
         # Создаем кнопку "Назад"
         back_button = ft.ElevatedButton(
@@ -230,7 +243,7 @@ class Application:
         )
         buttons = [back_button]
         route_page = "channel_subscription"
-        await self.view_with_elements(page, title, buttons, route_page)
+        await self.view_with_elements(page, title, buttons, route_page, lv)
 
         page.update()  # Обновляем страницу
 
@@ -238,6 +251,9 @@ class Application:
         """Создает страницу Формирование списка каналов"""
         logger.info("Пользователь перешел на страницу Формирование списка каналов")
         page.views.clear()  # Очищаем страницу и добавляем новый View
+
+        lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
+        page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
 
         # Создаем кнопку "Назад"
         back_button = ft.ElevatedButton(
@@ -254,13 +270,17 @@ class Application:
         )
         buttons = [back_button]
         route_page = "creating_list_of_channels"
-        await self.view_with_elements(page, title, buttons, route_page)
+        await self.view_with_elements(page, title, buttons, route_page, lv)
 
         page.update()  # Обновляем страницу
 
     async def documentation(self, page: ft.Page):
         """Создает страницу документации"""
         logger.info("Пользователь перешел на страницу документации")
+
+        lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
+        page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
+
         page.views.clear()  # Очищаем страницу и добавляем новый View
 
         # Создаем кнопку "Назад"
@@ -279,19 +299,48 @@ class Application:
 
         buttons = [back_button]
         route_page = "documentation"
-        await self.view_with_elements(page, title, buttons, route_page)
+        await self.view_with_elements(page, title, buttons, route_page, lv)
 
         page.update()  # Обновляем страницу
 
     async def getting_list_channels(self, page: ft.Page):
         """Создает страницу Получение списка каналов"""
         logger.info("Пользователь перешел на страницу Получение списка каналов")
+
+        lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
+        page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
+
         page.views.clear()  # Очищаем страницу и добавляем новый View
+
+        async def action_1_with_log(_):
+            try:
+                lv.controls.append(ft.Text("Получение списка каналов..."))  # отображаем сообщение в ListView
+                page.update()  # Обновляем страницу
+
+                config = await read_config()
+                client = await connect_telegram_account(config.get("telegram_settings", "id"),
+                                                        config.get("telegram_settings", "hash"))
+
+                dialogs = await client.get_dialogs()
+                username_diclist = await creating_a_channel_list(
+                    dialogs)  # Создаем или подключаемся к базе данных SQLite
+                for username in username_diclist:
+                    logger.info(username)
+                    lv.controls.append(ft.Text(f"Найден канал: {username}"))  # отображаем сообщение в ListView
+                    page.update()  # Обновляем страницу после каждого добавления
+
+                await client.disconnect()  # Завершаем работу клиента
+                lv.controls.append(ft.Text("Получение списка каналов завершено."))  # отображаем сообщение в ListView
+                page.update()  # Обновляем страницу
+            except Exception as e:
+                logger.exception(e)
+                lv.controls.append(ft.Text(f"Ошибка: {str(e)}"))  # отображаем ошибку в ListView
+                page.update()  # Обновляем страницу
 
         # Создаем кнопку "Получение списка каналов"
         getting_list_channels_button = ft.ElevatedButton(
             "Получение списка каналов",  # Текст на кнопке
-            on_click=lambda _: self.page.go("/"),  # Переход на главную страницу
+            on_click=action_1_with_log,  # Переход на главную страницу
             width=850,  # Ширина кнопки (увеличено для наглядности)
             height=35,  # Высота кнопки (увеличено для наглядности)
         )
@@ -319,18 +368,19 @@ class Application:
 
         buttons = [getting_list_channels_button, back_button]
         route_page = "getting_list_channels"
-        await self.view_with_elements(page, title, buttons, route_page)
+        await self.view_with_elements(page, title, buttons, route_page, lv)
 
         page.update()  # Обновляем страницу
 
-    async def view_with_elements(self, page: ft.Page, title: ft.Text, buttons: list[ft.ElevatedButton], route_page):
+    async def view_with_elements(self, page: ft.Page, title: ft.Text, buttons: list[ft.ElevatedButton], route_page,
+                                 lv: ft.ListView):
         # Создаем View с элементами
         page.views.append(
             ft.View(
                 f"/{route_page}",
                 controls=[
                     ft.Column(
-                        controls=[title, *buttons],
+                        controls=[title, lv, *buttons],
                         expand=True,  # Растягиваем Column на всю доступную область
                     )
                 ],

@@ -9,6 +9,6 @@ async def connect_telegram_account(api_id, api_hash) -> TelegramClient:
     :param api_hash: Ключ API Telegram.
     :return: TelegramClient объект, подключенный к Telegram.
     """
-    client = TelegramClient('accounts/session_name', api_id, api_hash)
+    client = TelegramClient('user_data/accounts/session_name', api_id, api_hash)
     await client.connect()
     return client
