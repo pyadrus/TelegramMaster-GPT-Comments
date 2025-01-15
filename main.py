@@ -8,24 +8,6 @@ from src.database.db_handler import creating_a_channel_list
 # Настройка логирования
 logger.add("user_data/log/log.log", rotation="1 MB", compression="zip")
 
-# Константы
-program_version = "0.0.7"
-date_of_program_change = "12.01.2025"
-program_name = "TelegramMaster_Commentator"
-PADDING = 10
-SPACING = 5
-WINDOW_WIDTH = 900
-WINDOW_HEIGHT = 600
-BUTTON_WIDTH = 300
-BUTTON_HEIGHT = 40
-PROGRAM_MENU_WIDTH = BUTTON_WIDTH + PADDING
-RADIUS = 5
-PRIMARY_COLOR = ft.colors.CYAN_600
-TITLE_FONT_SIZE = 13
-TITLE_FONT_WEIGHT = ft.FontWeight.BOLD
-LINE_WIDTH = 1
-LINE_COLOR = ft.colors.GREY
-
 
 class Application:
     """Класс для управления приложением."""
@@ -33,19 +15,34 @@ class Application:
     def __init__(self):
         self.page = None
         self.info_list = None
+        self.WINDOW_WIDTH = 900
+        self.WINDOW_HEIGHT = 600
+        self.program_version = "0.0.7"
+        self.date_of_program_change = "12.01.2025"
+        self.program_name = "TelegramMaster_Commentator"
+        self.SPACING = 5
+        self.RADIUS = 5
+        self.PRIMARY_COLOR = ft.colors.CYAN_600
+        self.LINE_COLOR = ft.colors.GREY
+        self.BUTTON_HEIGHT = 40
+        self.LINE_WIDTH = 1
+        self.TITLE_FONT_WEIGHT = ft.FontWeight.BOLD
+        self.PADDING = 10
+        self.BUTTON_WIDTH = 300
+        self.PROGRAM_MENU_WIDTH = self.BUTTON_WIDTH + self.PADDING
 
     async def actions_with_the_program_window(self, page: ft.Page):
         """Изменение на изменение главного окна программы."""
-        page.title = f"Версия {program_version}. Дата изменения {date_of_program_change}"
-        page.window.width = WINDOW_WIDTH
-        page.window.height = WINDOW_HEIGHT
+        page.title = f"Версия {self.program_version}. Дата изменения {self.date_of_program_change}"
+        page.window.width = self.WINDOW_WIDTH
+        page.window.height = self.WINDOW_HEIGHT
         page.window.resizable = False
-        page.window.min_width = WINDOW_WIDTH
-        page.window.max_width = WINDOW_WIDTH
-        page.window.min_height = WINDOW_HEIGHT
-        page.window.max_height = WINDOW_HEIGHT
+        page.window.min_width = self.WINDOW_WIDTH
+        page.window.max_width = self.WINDOW_WIDTH
+        page.window.min_height = self.WINDOW_HEIGHT
+        page.window.max_height = self.WINDOW_HEIGHT
 
-    def create_title(self, text: str, font_size: int = TITLE_FONT_SIZE) -> ft.Text:
+    def create_title(self, text: str, font_size) -> ft.Text:
         """Создает заголовок с градиентом."""
         return ft.Text(
             spans=[
@@ -53,10 +50,10 @@ class Application:
                     text,
                     ft.TextStyle(
                         size=font_size,
-                        weight=TITLE_FONT_WEIGHT,
+                        weight=self.TITLE_FONT_WEIGHT,
                         foreground=ft.Paint(
                             gradient=ft.PaintLinearGradient(
-                                (0, 20), (150, 20), [PRIMARY_COLOR, PRIMARY_COLOR]
+                                (0, 20), (150, 20), [self.PRIMARY_COLOR, self.PRIMARY_COLOR]
                             )), ), ), ], )
 
     def create_button(self, text: str, route: str) -> ft.OutlinedButton:
@@ -64,16 +61,16 @@ class Application:
         return ft.OutlinedButton(
             text=text,
             on_click=lambda _: self.page.go(route),
-            width=BUTTON_WIDTH,
-            height=BUTTON_HEIGHT,
-            style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=RADIUS)),
+            width=self.BUTTON_WIDTH,
+            height=self.BUTTON_HEIGHT,
+            style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=self.RADIUS)),
         )
 
     def build_menu(self) -> ft.Column:
         """Создает колонку с заголовками и кнопками."""
-        title = self.create_title(text=program_name, font_size=19)
-        version = self.create_title(text=f"Версия программы: {program_version}", font_size=13)
-        date_program_change = self.create_title(text=f"Дата изменения: {date_of_program_change}", font_size=13)
+        title = self.create_title(text=self.program_name, font_size=19)
+        version = self.create_title(text=f"Версия программы: {self.program_version}", font_size=13)
+        date_program_change = self.create_title(text=f"Дата изменения: {self.date_of_program_change}", font_size=13)
         buttons = [
             self.create_button("📋 Получение списка каналов", "/getting_list_channels"),
             self.create_button("💬 Отправка комментариев", "/submitting_comments"),
@@ -85,7 +82,7 @@ class Application:
         return ft.Column(
             [title, version, date_program_change, *buttons],
             alignment=ft.MainAxisAlignment.START,
-            spacing=SPACING,
+            spacing=self.SPACING,
         )
 
     async def setup(self):
@@ -116,9 +113,9 @@ class Application:
 
         layout = ft.Row(
             [
-                ft.Container(self.build_menu(), width=PROGRAM_MENU_WIDTH, padding=PADDING),
-                ft.Container(width=LINE_WIDTH, bgcolor=LINE_COLOR),
-                ft.Container(self.info_list, expand=True, padding=PADDING),
+                ft.Container(self.build_menu(), width=self.PROGRAM_MENU_WIDTH, padding=self.PADDING),
+                ft.Container(width=self.LINE_WIDTH, bgcolor=self.LINE_COLOR),
+                ft.Container(self.info_list, expand=True, padding=self.PADDING),
             ],
             alignment=ft.MainAxisAlignment.START,
             spacing=0,
@@ -175,14 +172,10 @@ class Application:
         page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
 
         back_button = await self.back_button()  # Создаем кнопку "Назад"
-        # Создаем заголовок
-        title = ft.Text(
-            "Отправка комментариев",  # Текст заголовка
-            size=24  # Размер заголовка
-        )
+
+        title = await self.program_title(title="Отправка комментариев")
         buttons = [back_button]
-        route_page = "submitting_comments"
-        await self.view_with_elements(title, buttons, route_page, lv)
+        await self.view_with_elements(title=title, buttons=buttons, route_page= "submitting_comments", lv=lv)
 
         page.update()  # Обновляем страницу
 
@@ -196,11 +189,7 @@ class Application:
 
         back_button = await self.back_button()  # Создаем кнопку "Назад"
 
-        # Создаем заголовок
-        title = ft.Text(
-            "Смена имени, описания, фото",  # Текст заголовка
-            size=24  # Размер заголовка
-        )
+        title = await self.program_title(title="Смена имени, описания, фото")
         buttons = [back_button]
         route_page = "change_name_description_photo"
         await self.view_with_elements(title, buttons, route_page, lv)
@@ -217,11 +206,8 @@ class Application:
 
         back_button = await self.back_button()  # Создаем кнопку "Назад"
 
-        # Создаем заголовок
-        title = ft.Text(
-            "Подписка на каналы",  # Текст заголовка
-            size=24  # Размер заголовка
-        )
+        title = await self.program_title(title="Подписка на каналы")
+
         buttons = [back_button]
         route_page = "channel_subscription"
         await self.view_with_elements(title, buttons, route_page, lv)
@@ -238,11 +224,8 @@ class Application:
 
         back_button = await self.back_button()  # Создаем кнопку "Назад"
 
-        # Создаем заголовок
-        title = ft.Text(
-            "Формирование списка каналов",  # Текст заголовка
-            size=24  # Размер заголовка
-        )
+        title = await self.program_title(title="Формирование списка каналов")
+
         buttons = [back_button]
         route_page = "creating_list_of_channels"
         await self.view_with_elements(title, buttons, route_page, lv)
@@ -260,11 +243,7 @@ class Application:
 
         back_button = await self.back_button()  # Создаем кнопку "Назад"
 
-        # Создаем заголовок
-        title = ft.Text(
-            "Документация",  # Текст заголовка
-            size=24  # Размер заголовка
-        )
+        title = await self.program_title(title="Документация")
 
         buttons = [back_button]
         route_page = "documentation"
@@ -316,24 +295,29 @@ class Application:
 
         back_button = await self.back_button()  # Создаем кнопку "Назад"
 
-        # Создаем заголовок
-        title = ft.Text(
-            spans=[
-                ft.TextSpan(
-                    "Получение списка каналов",  # Текст заголовка
-                    ft.TextStyle(
-                        size=24,  # Размер заголовка
-                        weight=TITLE_FONT_WEIGHT,
-                        foreground=ft.Paint(
-                            gradient=ft.PaintLinearGradient(
-                                (0, 20), (150, 20), [PRIMARY_COLOR, PRIMARY_COLOR]
-                            )), ), ), ], )
+        title = await self.program_title(title="Получение списка каналов")
 
         buttons = [getting_list_channels_button, back_button]
         route_page = "getting_list_channels"
         await self.view_with_elements(title, buttons, route_page, lv)
 
         page.update()  # Обновляем страницу
+
+    async def program_title(self, title):
+        """"Заголовок страниц программы"""
+        # Создаем заголовок
+        title = ft.Text(
+            spans=[
+                ft.TextSpan(
+                    title,  # Текст заголовка
+                    ft.TextStyle(
+                        size=24,  # Размер заголовка
+                        weight=self.TITLE_FONT_WEIGHT,
+                        foreground=ft.Paint(
+                            gradient=ft.PaintLinearGradient(
+                                (0, 20), (150, 20), [self.PRIMARY_COLOR, self.PRIMARY_COLOR]
+                            )), ), ), ], )
+        return title
 
     async def back_button(self):
         """Кнопка назад."""
@@ -364,7 +348,7 @@ class Application:
     async def main(self, page: ft.Page):
         """Точка входа в приложение."""
         self.page = page
-        self.info_list = ft.ListView(expand=True, spacing=10, padding=PADDING, auto_scroll=True)
+        self.info_list = ft.ListView(expand=True, spacing=10, padding=self.PADDING, auto_scroll=True)
         await self.setup()
 
 
