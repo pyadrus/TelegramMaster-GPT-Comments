@@ -174,14 +174,7 @@ class Application:
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
         page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
 
-        # Создаем кнопку "Назад"
-        back_button = ft.ElevatedButton(
-            "Назад",  # Текст на кнопке
-            on_click=lambda _: self.page.go("/"),  # Переход на главную страницу
-            width=850,  # Ширина кнопки (увеличено для наглядности)
-            height=35,  # Высота кнопки (увеличено для наглядности)
-        )
-
+        back_button = await self.back_button()  # Создаем кнопку "Назад"
         # Создаем заголовок
         title = ft.Text(
             "Отправка комментариев",  # Текст заголовка
@@ -189,7 +182,7 @@ class Application:
         )
         buttons = [back_button]
         route_page = "submitting_comments"
-        await self.view_with_elements(page, title, buttons, route_page, lv)
+        await self.view_with_elements(title, buttons, route_page, lv)
 
         page.update()  # Обновляем страницу
 
@@ -201,13 +194,7 @@ class Application:
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
         page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
 
-        # Создаем кнопку "Назад"
-        back_button = ft.ElevatedButton(
-            "Назад",  # Текст на кнопке
-            on_click=lambda _: self.page.go("/"),  # Переход на главную страницу
-            width=850,  # Ширина кнопки (увеличено для наглядности)
-            height=35,  # Высота кнопки (увеличено для наглядности)
-        )
+        back_button = await self.back_button()  # Создаем кнопку "Назад"
 
         # Создаем заголовок
         title = ft.Text(
@@ -216,7 +203,7 @@ class Application:
         )
         buttons = [back_button]
         route_page = "change_name_description_photo"
-        await self.view_with_elements(page, title, buttons, route_page, lv)
+        await self.view_with_elements(title, buttons, route_page, lv)
 
         page.update()  # Обновляем страницу
 
@@ -228,13 +215,7 @@ class Application:
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
         page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
 
-        # Создаем кнопку "Назад"
-        back_button = ft.ElevatedButton(
-            "Назад",  # Текст на кнопке
-            on_click=lambda _: self.page.go("/"),  # Переход на главную страницу
-            width=850,  # Ширина кнопки (увеличено для наглядности)
-            height=35,  # Высота кнопки (увеличено для наглядности)
-        )
+        back_button = await self.back_button()  # Создаем кнопку "Назад"
 
         # Создаем заголовок
         title = ft.Text(
@@ -243,7 +224,7 @@ class Application:
         )
         buttons = [back_button]
         route_page = "channel_subscription"
-        await self.view_with_elements(page, title, buttons, route_page, lv)
+        await self.view_with_elements(title, buttons, route_page, lv)
 
         page.update()  # Обновляем страницу
 
@@ -255,13 +236,7 @@ class Application:
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
         page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
 
-        # Создаем кнопку "Назад"
-        back_button = ft.ElevatedButton(
-            "Назад",  # Текст на кнопке
-            on_click=lambda _: self.page.go("/"),  # Переход на главную страницу
-            width=850,  # Ширина кнопки (увеличено для наглядности)
-            height=35,  # Высота кнопки (увеличено для наглядности)
-        )
+        back_button = await self.back_button()  # Создаем кнопку "Назад"
 
         # Создаем заголовок
         title = ft.Text(
@@ -270,7 +245,7 @@ class Application:
         )
         buttons = [back_button]
         route_page = "creating_list_of_channels"
-        await self.view_with_elements(page, title, buttons, route_page, lv)
+        await self.view_with_elements(title, buttons, route_page, lv)
 
         page.update()  # Обновляем страницу
 
@@ -283,13 +258,7 @@ class Application:
 
         page.views.clear()  # Очищаем страницу и добавляем новый View
 
-        # Создаем кнопку "Назад"
-        back_button = ft.ElevatedButton(
-            "Назад",  # Текст на кнопке
-            on_click=lambda _: self.page.go("/"),  # Переход на главную страницу
-            width=850,  # Ширина кнопки (увеличено для наглядности)
-            height=35,  # Высота кнопки (увеличено для наглядности)
-        )
+        back_button = await self.back_button()  # Создаем кнопку "Назад"
 
         # Создаем заголовок
         title = ft.Text(
@@ -299,7 +268,7 @@ class Application:
 
         buttons = [back_button]
         route_page = "documentation"
-        await self.view_with_elements(page, title, buttons, route_page, lv)
+        await self.view_with_elements(title, buttons, route_page, lv)
 
         page.update()  # Обновляем страницу
 
@@ -345,13 +314,7 @@ class Application:
             height=35,  # Высота кнопки (увеличено для наглядности)
         )
 
-        # Создаем кнопку "Назад"
-        back_button = ft.ElevatedButton(
-            "Назад",  # Текст на кнопке
-            on_click=lambda _: self.page.go("/"),  # Переход на главную страницу
-            width=850,  # Ширина кнопки (увеличено для наглядности)
-            height=35,  # Высота кнопки (увеличено для наглядности)
-        )
+        back_button = await self.back_button()  # Создаем кнопку "Назад"
 
         # Создаем заголовок
         title = ft.Text(
@@ -368,14 +331,24 @@ class Application:
 
         buttons = [getting_list_channels_button, back_button]
         route_page = "getting_list_channels"
-        await self.view_with_elements(page, title, buttons, route_page, lv)
+        await self.view_with_elements(title, buttons, route_page, lv)
 
         page.update()  # Обновляем страницу
 
-    async def view_with_elements(self, page: ft.Page, title: ft.Text, buttons: list[ft.ElevatedButton], route_page,
-                                 lv: ft.ListView):
+    async def back_button(self):
+        """Кнопка назад."""
+        # Создаем кнопку "Назад"
+        back_button = ft.ElevatedButton(
+            "Назад",  # Текст на кнопке
+            on_click=lambda _: self.page.go("/"),  # Переход на главную страницу
+            width=850,  # Ширина кнопки (увеличено для наглядности)
+            height=35,  # Высота кнопки (увеличено для наглядности)
+        )
+        return back_button
+
+    async def view_with_elements(self, title: ft.Text, buttons: list[ft.ElevatedButton], route_page, lv: ft.ListView):
         # Создаем View с элементами
-        page.views.append(
+        self.page.views.append(
             ft.View(
                 f"/{route_page}",
                 controls=[
