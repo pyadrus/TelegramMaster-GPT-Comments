@@ -89,9 +89,7 @@ class Application:
         """Настраивает страницу."""
         self.page.theme_mode = ft.ThemeMode.LIGHT
         self.page.on_route_change = self.route_change
-
         await self.actions_with_the_program_window(self.page)
-
         self._add_startup_message()
         await self.route_change(None)
 
@@ -110,7 +108,6 @@ class Application:
     async def route_change(self, route):
         """Обработчик изменения маршрута."""
         self.page.views.clear()
-
         layout = ft.Row(
             [
                 ft.Container(self.build_menu(), width=self.PROGRAM_MENU_WIDTH, padding=self.PADDING),
@@ -121,9 +118,7 @@ class Application:
             spacing=0,
             expand=True,
         )
-
         self.page.views.append(ft.View("/", [layout]))
-
         route_handlers = {
             "/getting_list_channels": self._handle_getting_list_channels,
             "/submitting_comments": self._handle_submitting_comments,
@@ -132,11 +127,9 @@ class Application:
             "/creating_list_of_channels": self._handle_creating_list_of_channels,
             "/documentation": self._handle_documentation,
         }
-
         handler = route_handlers.get(self.page.route)
         if handler:
             await handler()
-
         self.page.update()
 
     async def _handle_getting_list_channels(self):
@@ -167,116 +160,78 @@ class Application:
         """Создает страницу Отправка комментариев"""
         logger.info("Пользователь перешел на страницу Отправка комментариев")
         page.views.clear()  # Очищаем страницу и добавляем новый View
-
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
         page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
-
         back_button = await self.back_button()  # Создаем кнопку "Назад"
-
         title = await self.program_title(title="Отправка комментариев")
-        buttons = [back_button]
-        await self.view_with_elements(title=title, buttons=buttons, route_page= "submitting_comments", lv=lv)
-
+        await self.view_with_elements(title=title, buttons=[back_button], route_page="submitting_comments", lv=lv)
         page.update()  # Обновляем страницу
 
     async def change_name_description_photo(self, page: ft.Page):
         """Создает страницу Смена имени, описания, фото"""
         logger.info("Пользователь перешел на страницу Смена имени, описания, фото")
         page.views.clear()  # Очищаем страницу и добавляем новый View
-
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
         page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
-
         back_button = await self.back_button()  # Создаем кнопку "Назад"
-
         title = await self.program_title(title="Смена имени, описания, фото")
-        buttons = [back_button]
-        route_page = "change_name_description_photo"
-        await self.view_with_elements(title, buttons, route_page, lv)
-
+        await self.view_with_elements(title=title, buttons=[back_button], route_page="change_name_description_photo",
+                                      lv=lv)
         page.update()  # Обновляем страницу
 
     async def channel_subscription(self, page: ft.Page):
         """Создает страницу Подписка на каналы"""
         logger.info("Пользователь перешел на страницу Подписка на каналы")
         page.views.clear()  # Очищаем страницу и добавляем новый View
-
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
         page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
-
         back_button = await self.back_button()  # Создаем кнопку "Назад"
-
         title = await self.program_title(title="Подписка на каналы")
-
-        buttons = [back_button]
-        route_page = "channel_subscription"
-        await self.view_with_elements(title, buttons, route_page, lv)
-
+        await self.view_with_elements(title=title, buttons=[back_button], route_page="channel_subscription", lv=lv)
         page.update()  # Обновляем страницу
 
     async def creating_list_of_channels(self, page: ft.Page):
         """Создает страницу Формирование списка каналов"""
         logger.info("Пользователь перешел на страницу Формирование списка каналов")
         page.views.clear()  # Очищаем страницу и добавляем новый View
-
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
         page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
-
         back_button = await self.back_button()  # Создаем кнопку "Назад"
-
         title = await self.program_title(title="Формирование списка каналов")
-
-        buttons = [back_button]
-        route_page = "creating_list_of_channels"
-        await self.view_with_elements(title, buttons, route_page, lv)
-
+        await self.view_with_elements(title=title, buttons=[back_button], route_page="creating_list_of_channels", lv=lv)
         page.update()  # Обновляем страницу
 
     async def documentation(self, page: ft.Page):
         """Создает страницу документации"""
         logger.info("Пользователь перешел на страницу документации")
-
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
         page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
-
         page.views.clear()  # Очищаем страницу и добавляем новый View
-
         back_button = await self.back_button()  # Создаем кнопку "Назад"
-
         title = await self.program_title(title="Документация")
-
-        buttons = [back_button]
-        route_page = "documentation"
-        await self.view_with_elements(title, buttons, route_page, lv)
-
+        await self.view_with_elements(title=title, buttons=[back_button], route_page="documentation", lv=lv)
         page.update()  # Обновляем страницу
 
     async def getting_list_channels(self, page: ft.Page):
         """Создает страницу Получение списка каналов"""
         logger.info("Пользователь перешел на страницу Получение списка каналов")
-
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
         page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
-
         page.views.clear()  # Очищаем страницу и добавляем новый View
 
         async def action_1_with_log(_):
             try:
                 lv.controls.append(ft.Text("Получение списка каналов..."))  # отображаем сообщение в ListView
                 page.update()  # Обновляем страницу
-
                 config = await read_config()
                 client = await connect_telegram_account(config.get("telegram_settings", "id"),
                                                         config.get("telegram_settings", "hash"))
-
                 dialogs = await client.get_dialogs()
-                username_diclist = await creating_a_channel_list(
-                    dialogs)  # Создаем или подключаемся к базе данных SQLite
+                username_diclist = await creating_a_channel_list(dialogs)  # Создаем или подключаемся к базе данных SQLite
                 for username in username_diclist:
                     logger.info(username)
                     lv.controls.append(ft.Text(f"Найден канал: {username}"))  # отображаем сообщение в ListView
                     page.update()  # Обновляем страницу после каждого добавления
-
                 await client.disconnect()  # Завершаем работу клиента
                 lv.controls.append(ft.Text("Получение списка каналов завершено."))  # отображаем сообщение в ListView
                 page.update()  # Обновляем страницу
@@ -292,15 +247,10 @@ class Application:
             width=850,  # Ширина кнопки (увеличено для наглядности)
             height=35,  # Высота кнопки (увеличено для наглядности)
         )
-
         back_button = await self.back_button()  # Создаем кнопку "Назад"
-
         title = await self.program_title(title="Получение списка каналов")
-
-        buttons = [getting_list_channels_button, back_button]
-        route_page = "getting_list_channels"
-        await self.view_with_elements(title, buttons, route_page, lv)
-
+        await self.view_with_elements(title=title, buttons=[getting_list_channels_button, back_button],
+                                      route_page="getting_list_channels", lv=lv)
         page.update()  # Обновляем страницу
 
     async def program_title(self, title):
@@ -339,11 +289,9 @@ class Application:
                     ft.Column(
                         controls=[title, lv, *buttons],
                         expand=True,  # Растягиваем Column на всю доступную область
-                    )
-                ],
+                    )],
                 padding=20,  # Добавляем отступы вокруг содержимого
-            )
-        )
+            ))
 
     async def main(self, page: ft.Page):
         """Точка входа в приложение."""
