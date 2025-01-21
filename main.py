@@ -2,6 +2,7 @@ from loguru import logger
 import flet as ft
 
 from src.config.config_handler import read_config
+from src.core.profile_updater import change_profile_descriptions
 from src.core.telegram_client import connect_telegram_account
 from src.database.db_handler import creating_a_channel_list
 
@@ -17,8 +18,8 @@ class Application:
         self.info_list = None
         self.WINDOW_WIDTH = 900
         self.WINDOW_HEIGHT = 600
-        self.program_version = "0.0.7"
-        self.date_of_program_change = "12.01.2025"
+        self.program_version = "0.0.8"
+        self.date_of_program_change = "21.01.2025"
         self.program_name = "TelegramMaster_Commentator"
         self.SPACING = 5
         self.RADIUS = 5
@@ -168,14 +169,39 @@ class Application:
         page.update()  # Обновляем страницу
 
     async def change_name_description_photo(self, page: ft.Page):
-        """Создает страницу Смена имени, описания, фото"""
+        """Создает страницу 🖼️ Смена имени, описания, фото"""
         logger.info("Пользователь перешел на страницу Смена имени, описания, фото")
         page.views.clear()  # Очищаем страницу и добавляем новый View
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
         page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
-        back_button = await self.back_button()  # Создаем кнопку "Назад"
-        title = await self.program_title(title="Смена имени, описания, фото")
-        await self.view_with_elements(title=title, buttons=[back_button], route_page="change_name_description_photo",
+
+        async def action_1_with_log(_):
+            try:
+                lv.controls.append(ft.Text("🖼️ Смена имени, описания, фото"))  # отображаем сообщение в ListView
+                page.update()  # Обновляем страницу
+                config = await read_config()
+                client = await connect_telegram_account(config.get("telegram_settings", "id"),
+                                                        config.get("telegram_settings", "hash"))
+                await change_profile_descriptions(client, lv)
+                page.update()  # Обновляем страницу
+            except Exception as e:
+                logger.exception(e)
+                lv.controls.append(ft.Text(f"Ошибка: {str(e)}"))  # отображаем ошибку в ListView
+                page.update()  # Обновляем страницу
+
+        # Создаем кнопку "Получение списка каналов"
+        change_bio_account_button = ft.ElevatedButton(
+                    "🖼️ Смена имени, описания, фото",  # Текст на кнопке
+                    on_click=action_1_with_log,  # Переход на главную страницу
+                    width=850,  # Ширина кнопки (увеличено для наглядности)
+                    height=35,  # Высота кнопки (увеличено для наглядности)
+                )
+
+        await self.view_with_elements(title=await self.program_title(title="🖼️ Смена имени, описания, фото"),
+                                      buttons=[change_bio_account_button,
+                                          await self.back_button()  # Создаем кнопку "Назад"
+                                      ],
+                                      route_page="change_name_description_photo",
                                       lv=lv)
         page.update()  # Обновляем страницу
 
@@ -227,7 +253,8 @@ class Application:
                 client = await connect_telegram_account(config.get("telegram_settings", "id"),
                                                         config.get("telegram_settings", "hash"))
                 dialogs = await client.get_dialogs()
-                username_diclist = await creating_a_channel_list(dialogs)  # Создаем или подключаемся к базе данных SQLite
+                username_diclist = await creating_a_channel_list(
+                    dialogs)  # Создаем или подключаемся к базе данных SQLite
                 for username in username_diclist:
                     logger.info(username)
                     lv.controls.append(ft.Text(f"Найден канал: {username}"))  # отображаем сообщение в ListView
