@@ -54,7 +54,7 @@ class TelegramCommentator:
 
         :param channels: Список имен Telegram-каналов.
         :param client: TelegramClient объект.
-        :param text_widget: Виджет Text для вывода.
+        :param text_field: Виджет Text для вывода.
         :return: None.
         """
         last_message_ids = {name: 0 for name in channels}

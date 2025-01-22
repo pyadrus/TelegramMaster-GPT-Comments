@@ -4,7 +4,7 @@ import flet as ft
 from src.config.config_handler import read_config
 from src.core.profile_updater import change_profile_descriptions
 from src.core.telegram_client import connect_telegram_account
-from src.database.db_handler import creating_a_channel_list
+from src.database.db_handler import creating_a_channel_list, save_channels_to_db
 
 # Настройка логирования
 logger.add("user_data/log/log.log", rotation="1 MB", compression="zip")
@@ -18,8 +18,8 @@ class Application:
         self.info_list = None
         self.WINDOW_WIDTH = 900
         self.WINDOW_HEIGHT = 600
-        self.program_version = "0.0.8"
-        self.date_of_program_change = "21.01.2025"
+        self.program_version = "0.0.9"
+        self.date_of_program_change = "23.01.2025"
         self.program_name = "TelegramMaster_Commentator"
         self.SPACING = 5
         self.RADIUS = 5
@@ -150,7 +150,7 @@ class Application:
         await self.channel_subscription(self.page)
 
     async def _handle_creating_list_of_channels(self):
-        """Страница Формирование списка каналов"""
+        """Страница 📂 Формирование списка каналов"""
         await self.creating_list_of_channels(self.page)
 
     async def _handle_documentation(self):
@@ -217,15 +217,69 @@ class Application:
         page.update()  # Обновляем страницу
 
     async def creating_list_of_channels(self, page: ft.Page):
-        """Создает страницу Формирование списка каналов"""
+        """Создает страницу 📂 Формирование списка каналов"""
         logger.info("Пользователь перешел на страницу Формирование списка каналов")
         page.views.clear()  # Очищаем страницу и добавляем новый View
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
         page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
-        back_button = await self.back_button()  # Создаем кнопку "Назад"
-        title = await self.program_title(title="Формирование списка каналов")
-        await self.view_with_elements(title=title, buttons=[back_button], route_page="creating_list_of_channels", lv=lv)
+
+        list_of_channels = ft.TextField(label="Введите список каналов", multiline=True, max_lines=19)
+
+        async def action_1_with_log(_):
+            try:
+                lv.controls.append(ft.Text("📝 Запись данных, введенных пользователем..."))  # отображаем сообщение в ListView
+                lv.controls.append(ft.Text(f"📋 Пользователь ввел список каналов: {list_of_channels.value}"))  # отображаем сообщение в ListView
+                page.update()  # Обновляем страницу
+                # Вызываем функцию для сохранения данных в базу данных
+                await save_channels_to_db(list_of_channels.value)
+                lv.controls.append(ft.Text("✅ Данные успешно записаны в базу данных!"))  # отображаем сообщение в ListView
+                page.update()  # Обновляем страницу
+            except Exception as e:
+                logger.exception(e)
+                lv.controls.append(ft.Text(f"❌ Ошибка: {str(e)}"))  # отображаем ошибку в ListView
+                page.update()  # Обновляем страницу
+
+        # Создаем кнопку "Готово"
+        done_button = ft.ElevatedButton(
+            "✅ Готово",  # Текст на кнопке
+            on_click=action_1_with_log,  # Переход на главную страницу
+            width=850,  # Ширина кнопки (увеличено для наглядности)
+            height=35,  # Высота кнопки (увеличено для наглядности)
+        )
+
+        await self.view_with_elements_input_field(
+            title=await self.program_title(title="📂 Формирование списка каналов"),
+            buttons=[
+                done_button,  # Создаем кнопку "Готово"
+                await self.back_button()  # Создаем кнопку "Назад"
+            ],
+            route_page="creating_list_of_channels",
+            lv=lv,
+            text_field=list_of_channels # Создаем TextField поле ввода
+        )
         page.update()  # Обновляем страницу
+
+    async def view_with_elements_input_field(self, title: ft.Text, buttons: list[ft.ElevatedButton], route_page,
+                                             lv: ft.ListView, text_field: ft.TextField):
+        """
+        Создаем View с элементами и добавляем в него элементы
+        :param title: Текст заголовка
+        :param buttons: Кнопки
+        :param route_page: Название страницы
+        :param lv: ListView
+        :param text_field: TextField
+        """
+        # Создаем View с элементами
+        self.page.views.append(
+            ft.View(
+                f"/{route_page}",
+                controls=[
+                    ft.Column(
+                        controls=[title, lv, text_field, *buttons],
+                        expand=True,  # Растягиваем Column на всю доступную область
+                    )],
+                padding=20,  # Добавляем отступы вокруг содержимого
+            ))
 
     async def documentation(self, page: ft.Page):
         """Создает страницу документации"""

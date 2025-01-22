@@ -3,6 +3,36 @@ import sqlite3
 # Путь к файлу базы данных SQLite
 db_path = 'channels.db'
 
+async def save_channels_to_db(channels_data: str):
+    """
+    Сохраняет список каналов, введенный пользователем, в базу данных SQLite.
+
+    :param channels_data: Строка с данными, введенными пользователем (список каналов).
+    :return: None
+    """
+    # Разделяем введенные данные на отдельные каналы (предполагаем, что каналы разделены запятыми или переносами строк)
+    channels_list = [channel.strip() for channel in channels_data.split(",")]  # Разделитель - запятая
+    # Если каналы вводятся через перенос строки, можно использовать:
+    # channels_list = [channel.strip() for channel in channels_data.split("\n")]
+
+    # Подключаемся к базе данных
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    # Создаем таблицу для хранения информации о каналах, если она еще не существует
+    cursor.execute('''CREATE TABLE IF NOT EXISTS user_channels (
+                        id INTEGER PRIMARY KEY,
+                        channel_name TEXT
+                    )''')
+
+    # Записываем каждый канал в базу данных
+    for channel in channels_list:
+        if channel:  # Проверяем, что строка не пустая
+            cursor.execute('INSERT INTO user_channels (channel_name) VALUES (?)', (channel,))
+
+    # Сохраняем изменения и закрываем соединение
+    conn.commit()
+    conn.close()
 
 async def creating_a_channel_list(dialogs):
     """
