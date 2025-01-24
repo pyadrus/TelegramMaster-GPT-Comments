@@ -77,6 +77,16 @@ async def reading_from_the_channel_list_database():
     conn.close()  # Закрываем соединение с базой данных
     return results
 
+async def read_channel_list_from_database():
+    """
+    Считывает список каналов из базы данных SQLite.
+    """
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute('SELECT channel_name FROM user_channels')
+    results = cursor.fetchall()
+    conn.close()
+    return results
 
 if __name__ == "__main__":
     reading_from_the_channel_list_database()

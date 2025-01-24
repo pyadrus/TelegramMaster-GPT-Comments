@@ -3,8 +3,9 @@ import flet as ft
 
 from src.config.config_handler import read_config
 from src.core.profile_updater import change_profile_descriptions
+from src.core.subscribe import SUBSCRIBE
 from src.core.telegram_client import connect_telegram_account
-from src.database.db_handler import creating_a_channel_list, save_channels_to_db
+from src.database.db_handler import creating_a_channel_list, save_channels_to_db, read_channel_list_from_database
 
 # Настройка логирования
 logger.add("user_data/log/log.log", rotation="1 MB", compression="zip")
@@ -211,9 +212,37 @@ class Application:
         page.views.clear()  # Очищаем страницу и добавляем новый View
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
         page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
+
+        async def action_1_with_log(_):
+            lv.controls.append(ft.Text("Подписка на каналы / группы"))  # отображаем сообщение в ListView
+            page.update()  # Обновляем страницу
+            config = await read_config()
+            client = await connect_telegram_account(config.get("telegram_settings", "id"),
+                                                    config.get("telegram_settings", "hash"))
+
+            channel_name = await read_channel_list_from_database()
+            lv.controls.append(ft.Text(f"Группы и каналы из базы данных {channel_name}"))  # отображаем сообщение в ListView
+            page.update()  # Обновляем страницу
+            for channel in channel_name:
+                lv.controls.append(ft.Text(f"Подписка на: {channel[0]}"))  # отображаем сообщение в ListView
+                page.update()  # Обновляем страницу
+                await SUBSCRIBE().subscribe_to_channel(client, channel[0], page, lv)
+            lv.controls.append(ft.Text(f"Подписка завершена"))  # отображаем сообщение в ListView
+            page.update()  # Обновляем страницу
+
+        # Создаем кнопку "Подписка"
+        done_button = ft.ElevatedButton(
+            "Подписка",  # Текст на кнопке
+            on_click=action_1_with_log,  # Переход на главную страницу
+            width=850,  # Ширина кнопки (увеличено для наглядности)
+            height=35,  # Высота кнопки (увеличено для наглядности)
+        )
+
+
+
         back_button = await self.back_button()  # Создаем кнопку "Назад"
         title = await self.program_title(title="Подписка на каналы")
-        await self.view_with_elements(title=title, buttons=[back_button], route_page="channel_subscription", lv=lv)
+        await self.view_with_elements(title=title, buttons=[done_button, back_button], route_page="channel_subscription", lv=lv)
         page.update()  # Обновляем страницу
 
     async def creating_list_of_channels(self, page: ft.Page):

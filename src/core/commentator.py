@@ -35,18 +35,7 @@ class TelegramCommentator:
         self.config = config
         self.client = None
 
-    async def subscribe_to_channel(self, client, channel_name) -> None:
-        """
-        Подписывается на Telegram-канал.
-        :param channel_name: Имя канала Telegram.
-        :param client: TelegramClient объект.
-        :return: None.
-        """
-        try:
-            await client(JoinChannelRequest(channel_name))
-            logger.info(f'Подписка на канал {channel_name} выполнена успешно.')
-        except Exception as e:
-            logger.exception(f'Ошибка при подписке на канал {channel_name}')
+
 
     async def write_comments_in_telegram(self, client, channels, text_field: ft.TextField) -> None:
         """
