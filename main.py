@@ -2,8 +2,9 @@ import flet as ft
 from loguru import logger
 
 from src.config_handler import program_version, program_last_modified_date, program_name
-from src.core.handlers import handle_getting_list_channels, handle_documentation, handle_creating_list_of_channels, \
-    handle_channel_subscription, handle_submitting_comments, handle_change_name_description_photo
+from src.core.handlers import (handle_getting_list_channels, handle_documentation,
+                               handle_creating_list_of_channels, handle_channel_subscription,
+                               handle_submitting_comments, handle_change_name_description_photo)
 from src.core.views import PRIMARY_COLOR, TITLE_FONT_WEIGHT
 from src.logging_in import loging
 
