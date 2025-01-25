@@ -14,7 +14,6 @@ async def save_channels_to_db(channels_data: str):
     # Разделяем введенные данные на отдельные каналы (предполагаем, что каналы разделены запятыми или переносами строк)
     channels_list = [channel.strip() for channel in channels_data.split(",")]  # Разделитель - запятая
     # Если каналы вводятся через перенос строки, можно использовать:
-    # channels_list = [channel.strip() for channel in channels_data.split("\n")]
 
     # Подключаемся к базе данных
     conn = sqlite3.connect(db_path)

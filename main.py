@@ -167,17 +167,12 @@ class Application:
         page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
 
         async def action_1_with_log(_):
-            # try:
             lv.controls.append(ft.Text("Отправка комментариев"))  # отображаем сообщение в ListView
             page.update()  # Обновляем страницу
             config = await read_config()
             client = await connect_telegram_account(config.get("telegram_settings", "id"),
                                                     config.get("telegram_settings", "hash"))
             await TelegramCommentator().write_comments_in_telegram(client, page, lv)
-            # except Exception as e:
-            #     logger.exception(e)
-            #     lv.controls.append(ft.Text(f"Ошибка: {str(e)}"))  # отображаем ошибку в ListView
-            #     page.update()  # Обновляем страницу
 
         # Создаем кнопку "Отправка комментариев"
         sending_comments_button = ft.ElevatedButton(

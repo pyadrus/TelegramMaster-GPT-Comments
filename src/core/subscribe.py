@@ -1,6 +1,5 @@
-from loguru import logger
-from telethon.tl.functions.channels import JoinChannelRequest
 import flet as ft
+from telethon.tl.functions.channels import JoinChannelRequest
 
 
 class SUBSCRIBE:
@@ -15,10 +14,8 @@ class SUBSCRIBE:
         :param lv: ListView.
         :return: None.
         """
-        # try:
+
         await client(JoinChannelRequest(channel_name))
         lv.controls.append(
             ft.Text(f"Подписка на канал {channel_name} выполнена успешно."))  # отображаем сообщение в ListView
         page.update()  # Обновляем страницу
-        # except Exception as e:
-        #     logger.exception(f'Ошибка при подписке на канал {channel_name}')
