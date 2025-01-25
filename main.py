@@ -160,32 +160,30 @@ class Application:
 
     async def submitting_comments(self, page: ft.Page):
         """Создает страницу Отправка комментариев"""
-        logger.info("Пользователь перешел на страницу Отправка комментариев")
-        page.views.clear()  # Очищаем страницу и добавляем новый View
-        lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
-        page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
+        try:
+            logger.info("Пользователь перешел на страницу Отправка комментариев")
+            page.views.clear()  # Очищаем страницу и добавляем новый View
+            lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
+            page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
 
-        async def action_1_with_log(_):
-            lv.controls.append(ft.Text("Отправка комментариев"))  # отображаем сообщение в ListView
+            async def action_1(_):
+                lv.controls.append(ft.Text("Отправка комментариев"))  # отображаем сообщение в ListView
+                page.update()  # Обновляем страницу
+                client = await connect_telegram_account()
+                await TelegramCommentator().write_comments_in_telegram(client, page, lv)
+
+            # Создаем кнопку "Отправка комментариев"
+            sending_comments_button = await self.create_buttons(text="Отправка комментариев", on_click=action_1)
+
+            await self.view_with_elements(title=await self.program_title(title="Отправка комментариев"),
+                                          buttons=[
+                                              sending_comments_button,
+                                              await self.back_button()  # Создаем кнопку "Назад"
+                                          ],
+                                          route_page="submitting_comments", lv=lv)
             page.update()  # Обновляем страницу
-            client = await connect_telegram_account()
-            await TelegramCommentator().write_comments_in_telegram(client, page, lv)
-
-        # Создаем кнопку "Отправка комментариев"
-        sending_comments_button = ft.ElevatedButton(
-            "Отправка комментариев",  # Текст на кнопке
-            on_click=action_1_with_log,  # Переход на главную страницу
-            width=850,  # Ширина кнопки (увеличено для наглядности)
-            height=35,  # Высота кнопки (увеличено для наглядности)
-        )
-
-        await self.view_with_elements(title=await self.program_title(title="Отправка комментариев"),
-                                      buttons=[
-                                          sending_comments_button,
-                                          await self.back_button()  # Создаем кнопку "Назад"
-                                      ],
-                                      route_page="submitting_comments", lv=lv)
-        page.update()  # Обновляем страницу
+        except Exception as e:
+            logger.exception(e)
 
     async def change_name_description_photo(self, page: ft.Page):
         """Создает страницу 🖼️ Смена имени, описания, фото"""
@@ -416,6 +414,7 @@ class Application:
             width=850,  # Ширина кнопки (увеличено для наглядности)
             height=35,  # Высота кнопки (увеличено для наглядности)
         )
+
         await self.view_with_elements(title=await self.program_title(title="Получение списка каналов"),
                                       buttons=[
                                           getting_list_channels_button,
@@ -423,6 +422,18 @@ class Application:
                                       ],
                                       route_page="getting_list_channels", lv=lv)
         page.update()  # Обновляем страницу
+
+    async def create_buttons(self, text: str, on_click, width: int = 850, height: int = 35) -> ft.ElevatedButton:
+        """
+        Создает универсальную кнопку с заданными параметрами.
+
+        :param text: Текст на кнопке.
+        :param on_click: Функция, вызываемая при нажатии на кнопку.
+        :param width: Ширина кнопки (по умолчанию 850).
+        :param height: Высота кнопки (по умолчанию 35).
+        :return: Объект кнопки ft.ElevatedButton.
+        """
+        return ft.ElevatedButton(text=text, on_click=on_click, width=width, height=height, )
 
     async def program_title(self, title):
         """"Заголовок страниц программы"""

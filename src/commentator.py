@@ -3,7 +3,7 @@ import time
 
 import flet as ft
 import telethon
-from faker.providers.bank.en_PH import logger
+from loguru import logger
 from rich.progress import track
 
 from src.subscribe import SUBSCRIBE
