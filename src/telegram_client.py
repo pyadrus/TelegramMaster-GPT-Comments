@@ -1,6 +1,6 @@
 from telethon.sync import TelegramClient
 
-from src.config.config_handler import api_id, api_hash
+from src.config_handler import api_id, api_hash
 
 
 async def connect_telegram_account() -> TelegramClient:
@@ -9,13 +9,15 @@ async def connect_telegram_account() -> TelegramClient:
 
     :return: TelegramClient объект, подключенный к Telegram.
     """
-    client = TelegramClient('user_data/accounts/session_name', # Путь и имя аккаунта.
-                            api_id, # Идентификатор API Telegram.
-                            api_hash # Ключ API Telegram.
-                            )
+    client = TelegramClient(
+        'data/accounts/session_name',  # Путь и имя аккаунта.
+        api_id,  # Идентификатор API Telegram.
+        api_hash  # Ключ API Telegram.
+    )
 
     await client.connect()
     return client
+
 
 if __name__ == '__main__':
     connect_telegram_account()

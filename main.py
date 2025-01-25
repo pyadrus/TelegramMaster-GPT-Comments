@@ -1,15 +1,17 @@
 from loguru import logger
 import flet as ft
 
-from src.config.config_handler import program_version, program_last_modified_date, program_name
-from src.core.commentator import TelegramCommentator
-from src.core.profile_updater import change_profile_descriptions
-from src.core.subscribe import SUBSCRIBE
-from src.core.telegram_client import connect_telegram_account
-from src.database.db_handler import creating_a_channel_list, save_channels_to_db, read_channel_list_from_database
+from src.config_handler import program_version, program_last_modified_date, program_name
+from src.commentator import TelegramCommentator
+from src.logging_in import loging
+from src.profile_updater import change_profile_descriptions
+from src.subscribe import SUBSCRIBE
+from src.telegram_client import connect_telegram_account
+from src.db_handler import creating_a_channel_list, save_channels_to_db, read_channel_list_from_database
 
 # Настройка логирования
-logger.add("user_data/log/log.log", rotation="1 MB", compression="zip")
+logger.add("data/logs/app.log", rotation="1 MB", compression="zip", level="INFO")
+logger.add("data/logs/errors.log", rotation="1 MB", compression="zip", level="ERROR")
 
 
 class Application:
@@ -202,7 +204,7 @@ class Application:
                 await change_profile_descriptions(client, lv)
                 page.update()  # Обновляем страницу
             except Exception as e:
-                logger.exception(e)
+                logger.error(e)
                 lv.controls.append(ft.Text(f"Ошибка: {str(e)}"))  # отображаем ошибку в ListView
                 page.update()  # Обновляем страницу
 
@@ -281,7 +283,7 @@ class Application:
                     ft.Text("✅ Данные успешно записаны в базу данных!"))  # отображаем сообщение в ListView
                 page.update()  # Обновляем страницу
             except Exception as e:
-                logger.exception(e)
+                logger.error(e)
                 lv.controls.append(ft.Text(f"❌ Ошибка: {str(e)}"))  # отображаем ошибку в ListView
                 page.update()  # Обновляем страницу
 
@@ -361,7 +363,7 @@ class Application:
                 lv.controls.append(ft.Text("Получение списка каналов завершено."))  # отображаем сообщение в ListView
                 page.update()  # Обновляем страницу
             except Exception as e:
-                logger.exception(e)
+                logger.error(e)
                 lv.controls.append(ft.Text(f"Ошибка: {str(e)}"))  # отображаем ошибку в ListView
                 page.update()  # Обновляем страницу
 
@@ -422,7 +424,9 @@ class Application:
         """Точка входа в приложение."""
         self.page = page
         self.info_list = ft.ListView(expand=True, spacing=10, padding=self.PADDING, auto_scroll=True)
+
         await self.setup()
+        await loging()
 
 
 if __name__ == "__main__":

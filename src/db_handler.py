@@ -1,7 +1,7 @@
 import sqlite3
 
 # Путь к файлу базы данных SQLite
-db_path = 'channels.db'
+db_path = 'data/database/app.db'
 
 
 async def save_channels_to_db(channels_data: str):

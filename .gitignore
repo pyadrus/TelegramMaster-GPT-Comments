@@ -1,7 +1,6 @@
-
-!/user_data/accounts/79538320570.session
-!/user_data/accounts/session_name.session
-!/user_data/accounts/session_name.session-journal
-!/user_data/accounts/session_name_1.session
-!/user_data/accounts/session_name_2.session
-!/src/setting/config.ini
+!/data/accounts/79538320570.session
+!/data/accounts/session_name.session
+!/data/accounts/session_name.session-journal
+!/data/accounts/session_name_1.session
+!/data/accounts/session_name_2.session
+!/data/config/config.ini

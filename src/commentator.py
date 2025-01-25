@@ -6,8 +6,8 @@ import telethon
 from faker.providers.bank.en_PH import logger
 from rich.progress import track
 
-from src.core.subscribe import SUBSCRIBE
-from src.database.db_handler import reading_from_the_channel_list_database
+from src.subscribe import SUBSCRIBE
+from src.db_handler import reading_from_the_channel_list_database
 
 
 class TelegramCommentator:
