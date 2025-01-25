@@ -3,100 +3,77 @@ import time
 
 import flet as ft
 import telethon
+from faker.providers.bank.en_PH import logger
 from rich.progress import track
 
-from src.core.telegram_client import connect_telegram_account
-
-
-def log_messagess(message: str, text_field: ft.TextField):
-    """
-    Выводит сообщение в текстовое поле.
-    :param message: Текст сообщения.
-    :param text_field: Виджет TextField для вывода.
-    :return: None
-    """
-    # Добавляем текст в конец текстового поля
-    text_field.value += f"{message}\n"
-    # Прокручиваем текстовое поле до последней строки
-    text_field.focus()
-    text_field.update()
+from src.core.subscribe import SUBSCRIBE
+from src.database.db_handler import reading_from_the_channel_list_database
 
 
 class TelegramCommentator:
     """
     Класс для автоматизированной работы с комментариями в Telegram-каналах.
-
-    :param config: Объект configparser.ConfigParser, содержащий настройки.
     """
 
-    def __init__(self, config) -> None:
-        self.config = config
-        self.client = None
-
-    async def write_comments_in_telegram(self, client, channels, text_field: ft.TextField) -> None:
+    async def write_comments_in_telegram(self, client, page, lv) -> None:
         """
         Пишет комментарии в указанных Telegram-каналах.
 
-        :param channels: Список имен Telegram-каналов.
         :param client: TelegramClient объект.
-        :param text_field: Виджет Text для вывода.
+        :param page: Номер страницы.
+        :param lv: Номер уровня.
         :return: None.
         """
+        channels = await reading_from_the_channel_list_database()
+        logger.info(channels)
         last_message_ids = {name: 0 for name in channels}
         for name in channels:
-            await self.subscribe_to_channel(client,
-                                            channel_name=name)  # Подписываемся на канал перед отправкой комментария
+            logger.info(name)
+            await SUBSCRIBE().subscribe_to_channel(client, name[0], page,
+                                                   lv)  # Подписываемся на канал перед отправкой комментария
             try:
-                channel_entity = self.client.get_entity(name)
-                messages = self.client.get_messages(channel_entity, limit=1)
+                channel_entity = await client.get_entity(name[0])
+                messages = await client.get_messages(channel_entity, limit=1)
                 for message in messages:
-                    log_messagess(
-                        f"ID сообщения: {message.id} ID: {message.peer_id} Дата: {message.date} Сообщение: {message.message}",
-                        text_field)
-                    text_field.update()
+                    lv.controls.append(ft.Text(
+                        f"ID сообщения: {message.id} ID: {message.peer_id} Дата: {message.date} Сообщение: {message.message}"))  # отображаем сообщение в ListView
+                    page.update()  # Обновляем страницу
 
                     if messages:
                         post = messages[0]
-                        if post.id != last_message_ids.get(name, None):
-                            last_message_ids[name] = post.id
+                        if post.id != last_message_ids.get(name[0], None):
+                            last_message_ids[name[0]] = post.id
                             message = 'Россия лучшая страна!'
                             try:
-                                self.client.send_message(entity=name, message=message, comment_to=post.id)
-                                log_messagess(f'Наш комментарий: {message}', text_field)
-                                text_field.update()
+                                await client.send_message(entity=name[0], message=message, comment_to=post.id)
+                                lv.controls.append(ft.Text(f'Наш комментарий: {message}'))  # отображаем сообщение в ListView
+                                page.update()  # Обновляем страницу
                                 for i in track(range(400), description="Перерыв в рассылке..."):
                                     time.sleep(1)
                             except telethon.errors.rpcerrorlist.ChatWriteForbiddenError:
-                                log_messagess(f"Вы не можете отправлять сообщения в: {name}", text_field)
+                                lv.controls.append(ft.Text(f"Вы не можете отправлять сообщения в: {name[0]}"))  # отображаем сообщение в ListView
+                                page.update()  # Обновляем страницу
                             except telethon.errors.rpcerrorlist.MsgIdInvalidError:
-                                log_messagess("Возможно пост был изменен или удален", text_field)
+                                lv.controls.append(ft.Text("Возможно пост был изменен или удален"))  # отображаем сообщение в ListView
+                                page.update()  # Обновляем страницу
                             except telethon.errors.rpcerrorlist.UserBannedInChannelError:
-                                log_messagess(
-                                    "Вам запрещено отправлять сообщения в супергруппы/каналы (вызвано SendMessageRequest)",
-                                    text_field)
+                                lv.controls.append(ft.Text("Вам запрещено отправлять сообщения в супергруппы/каналы (вызвано SendMessageRequest)"))  # отображаем сообщение в ListView
+                                page.update()  # Обновляем страницу
                             except telethon.errors.rpcerrorlist.FloodWaitError as e:
-                                log_messagess(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}',
-                                              text_field)
+                                lv.controls.append(ft.Text(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}'))  # отображаем сообщение в ListView
+                                page.update()  # Обновляем страницу
                                 time.sleep(e.seconds)
                             except telethon.errors.rpcerrorlist.ChatGuestSendForbiddenError as e:
-                                log_messagess(str(e), text_field)
+                                lv.controls.append(ft.Text(str(e)))  # отображаем сообщение в ListView
+                                page.update()  # Обновляем страницу
                             except telethon.errors.rpcerrorlist.ChannelPrivateError:
-                                log_messagess(f"Канал {name} закрыт", text_field)
+                                lv.controls.append(ft.Text(f"Канал {name[0]} закрыт"))  # отображаем сообщение в ListView
+                                page.update()  # Обновляем страницу
             except telethon.errors.rpcerrorlist.FloodWaitError as e:  # Если ошибка при подписке
-                log_messagess(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}', text_field)
+                lv.controls.append(ft.Text(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}'))  # отображаем сообщение в ListView
+                page.update()  # Обновляем страницу
                 time.sleep(e.seconds)
             except telethon.errors.rpcerrorlist.AuthKeyUnregisteredError:  # Если аккаунт заблочен
-                log_messagess("Аккаунт заблокирован", text_field)
+                lv.controls.append(ft.Text("Аккаунт заблокирован"))  # отображаем сообщение в ListView
+                page.update()  # Обновляем страницу
                 break
-
-    async def run(self, channels, text_field: ft.TextField) -> None:
-        """
-        Запускает процесс комментирования в Telegram-каналах.
-        :param channels: Список имен Telegram-каналов.
-        :param text_field: Виджет TextField для вывода.
-        :return: None
-        """
-        self.client = connect_telegram_account(self.config.get("telegram_settings", "id"),
-                                               self.config.get("telegram_settings", "hash"))
-        while True:
-            await self.write_comments_in_telegram(self.client, channels, text_field)

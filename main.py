@@ -2,6 +2,7 @@ from loguru import logger
 import flet as ft
 
 from src.config.config_handler import read_config
+from src.core.commentator import TelegramCommentator
 from src.core.profile_updater import change_profile_descriptions
 from src.core.subscribe import SUBSCRIBE
 from src.core.telegram_client import connect_telegram_account
@@ -19,8 +20,8 @@ class Application:
         self.info_list = None
         self.WINDOW_WIDTH = 900
         self.WINDOW_HEIGHT = 600
-        self.program_version = "0.0.9"
-        self.date_of_program_change = "23.01.2025"
+        self.program_version = "0.0.10"
+        self.date_of_program_change = "25.01.2025"
         self.program_name = "TelegramMaster_Commentator"
         self.SPACING = 5
         self.RADIUS = 5
@@ -164,9 +165,35 @@ class Application:
         page.views.clear()  # Очищаем страницу и добавляем новый View
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
         page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
+
+        async def action_1_with_log(_):
+            # try:
+            lv.controls.append(ft.Text("Отправка комментариев"))  # отображаем сообщение в ListView
+            page.update()  # Обновляем страницу
+            config = await read_config()
+            client = await connect_telegram_account(config.get("telegram_settings", "id"),
+                                                    config.get("telegram_settings", "hash"))
+            await TelegramCommentator().write_comments_in_telegram(client, page, lv)
+            # except Exception as e:
+            #     logger.exception(e)
+            #     lv.controls.append(ft.Text(f"Ошибка: {str(e)}"))  # отображаем ошибку в ListView
+            #     page.update()  # Обновляем страницу
+
+        # Создаем кнопку "Отправка комментариев"
+        sending_comments_button = ft.ElevatedButton(
+            "Отправка комментариев",  # Текст на кнопке
+            on_click=action_1_with_log,  # Переход на главную страницу
+            width=850,  # Ширина кнопки (увеличено для наглядности)
+            height=35,  # Высота кнопки (увеличено для наглядности)
+        )
+
         back_button = await self.back_button()  # Создаем кнопку "Назад"
         title = await self.program_title(title="Отправка комментариев")
-        await self.view_with_elements(title=title, buttons=[back_button], route_page="submitting_comments", lv=lv)
+        await self.view_with_elements(title=title,
+                                      buttons=[
+                                          sending_comments_button, back_button
+                                      ],
+                                      route_page="submitting_comments", lv=lv)
         page.update()  # Обновляем страницу
 
     async def change_name_description_photo(self, page: ft.Page):

@@ -11,12 +11,14 @@ class SUBSCRIBE:
         Подписывается на Telegram-канал.
         :param channel_name: Имя канала Telegram.
         :param client: TelegramClient объект.
+        :param page: Страница приложения.
+        :param lv: ListView.
         :return: None.
         """
-        try:
-            await client(JoinChannelRequest(channel_name))
-            lv.controls.append(
-                ft.Text(f"Подписка на канал {channel_name} выполнена успешно."))  # отображаем сообщение в ListView
-            page.update()  # Обновляем страницу
-        except Exception as e:
-            logger.exception(f'Ошибка при подписке на канал {channel_name}')
+        # try:
+        await client(JoinChannelRequest(channel_name))
+        lv.controls.append(
+            ft.Text(f"Подписка на канал {channel_name} выполнена успешно."))  # отображаем сообщение в ListView
+        page.update()  # Обновляем страницу
+        # except Exception as e:
+        #     logger.exception(f'Ошибка при подписке на канал {channel_name}')
