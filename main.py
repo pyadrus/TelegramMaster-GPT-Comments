@@ -135,19 +135,19 @@ class Application:
         self.page.update()
 
     async def _handle_getting_list_channels(self):
-        """Страница Получение списка каналов"""
+        """Страница 📋 Получение списка каналов"""
         await self.getting_list_channels(self.page)
 
     async def _handle_submitting_comments(self):
-        """Страница Отправка комментариев"""
+        """Страница 💬 Отправка комментариев"""
         await self.submitting_comments(self.page)
 
     async def _handle_change_name_description_photo(self):
-        """Страница Смена имени, описания, фото"""
+        """Страница 🖼️ Смена имени, описания, фото"""
         await self.change_name_description_photo(self.page)
 
     async def _handle_channel_subscription(self):
-        """Страница Подписка на каналы"""
+        """Страница 🔗 Подписка на каналы"""
         await self.channel_subscription(self.page)
 
     async def _handle_creating_list_of_channels(self):
@@ -155,7 +155,7 @@ class Application:
         await self.creating_list_of_channels(self.page)
 
     async def _handle_documentation(self):
-        """Страница документации"""
+        """Страница 📖 Документация"""
         await self.documentation(self.page)
 
     async def submitting_comments(self, page: ft.Page):
@@ -179,11 +179,10 @@ class Application:
             height=35,  # Высота кнопки (увеличено для наглядности)
         )
 
-        back_button = await self.back_button()  # Создаем кнопку "Назад"
-        title = await self.program_title(title="Отправка комментариев")
-        await self.view_with_elements(title=title,
+        await self.view_with_elements(title=await self.program_title(title="Отправка комментариев"),
                                       buttons=[
-                                          sending_comments_button, back_button
+                                          sending_comments_button,
+                                          await self.back_button()  # Создаем кнопку "Назад"
                                       ],
                                       route_page="submitting_comments", lv=lv)
         page.update()  # Обновляем страницу
@@ -254,9 +253,11 @@ class Application:
             height=35,  # Высота кнопки (увеличено для наглядности)
         )
 
-        back_button = await self.back_button()  # Создаем кнопку "Назад"
-        title = await self.program_title(title="Подписка на каналы")
-        await self.view_with_elements(title=title, buttons=[done_button, back_button],
+        await self.view_with_elements(title=await self.program_title(title="Подписка на каналы"),
+                                      buttons=[
+                                          done_button,
+                                          await self.back_button()  # Создаем кнопку "Назад"
+                                      ],
                                       route_page="channel_subscription", lv=lv)
         page.update()  # Обновляем страницу
 
@@ -368,16 +369,12 @@ class Application:
             on_tap_link=lambda e: page.launch_url(e.data),  # Открываем ссылки в браузере
         )
 
-        # Создаем кнопку "Назад"
-        back_button = await self.back_button()
-
-        # Создаем заголовок страницы
-        title = await self.program_title(title="Документация")
-
         # Добавляем элементы на страницу
         await self.view_with_elements(
-            title=title,
-            buttons=[back_button],
+            title=await self.program_title(title="Документация"),  # Создаем заголовок страницы
+            buttons=[
+                await self.back_button()  # Создаем кнопку "Назад"
+            ],
             route_page="documentation",
             lv=ft.ListView(controls=[markdown_widget], expand=True, spacing=10, padding=20),
         )
@@ -419,9 +416,11 @@ class Application:
             width=850,  # Ширина кнопки (увеличено для наглядности)
             height=35,  # Высота кнопки (увеличено для наглядности)
         )
-        back_button = await self.back_button()  # Создаем кнопку "Назад"
-        title = await self.program_title(title="Получение списка каналов")
-        await self.view_with_elements(title=title, buttons=[getting_list_channels_button, back_button],
+        await self.view_with_elements(title=await self.program_title(title="Получение списка каналов"),
+                                      buttons=[
+                                          getting_list_channels_button,
+                                          await self.back_button()  # Создаем кнопку "Назад"
+                                      ],
                                       route_page="getting_list_channels", lv=lv)
         page.update()  # Обновляем страницу
 
