@@ -1,13 +1,16 @@
-from loguru import logger
 import flet as ft
+from loguru import logger
 
-from src.config_handler import program_version, program_last_modified_date, program_name
 from src.commentator import TelegramCommentator
+from src.config_handler import program_version, program_last_modified_date, program_name
+from src.core.buttons import create_buttons
+from src.core.handlers import handle_getting_list_channels
+from src.core.views import PRIMARY_COLOR, TITLE_FONT_WEIGHT, program_title, view_with_elements
+from src.db_handler import save_channels_to_db, read_channel_list_from_database
 from src.logging_in import loging
 from src.profile_updater import change_profile_descriptions
 from src.subscribe import SUBSCRIBE
 from src.telegram_client import connect_telegram_account
-from src.db_handler import creating_a_channel_list, save_channels_to_db, read_channel_list_from_database
 
 # Настройка логирования
 logger.add("data/logs/app.log", rotation="500 KB", compression="zip", level="INFO")
@@ -24,11 +27,11 @@ class Application:
         self.WINDOW_HEIGHT = 600
         self.SPACING = 5
         self.RADIUS = 5
-        self.PRIMARY_COLOR = ft.colors.CYAN_600
+
         self.LINE_COLOR = ft.colors.GREY
         self.BUTTON_HEIGHT = 40
         self.LINE_WIDTH = 1
-        self.TITLE_FONT_WEIGHT = ft.FontWeight.BOLD
+
         self.PADDING = 10
         self.BUTTON_WIDTH = 300
         self.PROGRAM_MENU_WIDTH = self.BUTTON_WIDTH + self.PADDING
@@ -52,10 +55,10 @@ class Application:
                     text,
                     ft.TextStyle(
                         size=font_size,
-                        weight=self.TITLE_FONT_WEIGHT,
+                        weight=TITLE_FONT_WEIGHT,
                         foreground=ft.Paint(
                             gradient=ft.PaintLinearGradient(
-                                (0, 20), (150, 20), [self.PRIMARY_COLOR, self.PRIMARY_COLOR]
+                                (0, 20), (150, 20), [PRIMARY_COLOR, PRIMARY_COLOR]
                             )), ), ), ], )
 
     def create_button(self, text: str, route: str) -> ft.OutlinedButton:
@@ -136,7 +139,7 @@ class Application:
 
     async def _handle_getting_list_channels(self):
         """Страница 📋 Получение списка каналов"""
-        await self.getting_list_channels(self.page)
+        await handle_getting_list_channels(self.page)
 
     async def _handle_submitting_comments(self):
         """Страница 💬 Отправка комментариев"""
@@ -172,14 +175,12 @@ class Application:
                 client = await connect_telegram_account()
                 await TelegramCommentator().write_comments_in_telegram(client, page, lv)
 
-            await self.view_with_elements(title=await self.program_title(title="Отправка комментариев"),
-                                          buttons=[
-                                              await self.create_buttons(text="Отправка комментариев",
-                                                                        on_click=action_1),
-                                              await self.create_buttons(text="Назад",
-                                                                        on_click=lambda _: self.page.go("/"))
-                                          ],
-                                          route_page="submitting_comments", lv=lv)
+            await view_with_elements(page=page, title=await program_title(title="Отправка комментариев"),
+                                     buttons=[
+                                         await create_buttons(text="Отправка комментариев", on_click=action_1),
+                                         await create_buttons(text="Назад", on_click=lambda _: self.page.go("/"))
+                                     ],
+                                     route_page="submitting_comments", lv=lv)
             page.update()  # Обновляем страницу
         except Exception as e:
             logger.exception(e)
@@ -203,14 +204,14 @@ class Application:
                 lv.controls.append(ft.Text(f"Ошибка: {str(e)}"))  # отображаем ошибку в ListView
                 page.update()  # Обновляем страницу
 
-        await self.view_with_elements(title=await self.program_title(title="🖼️ Смена имени, описания, фото"),
-                                      buttons=[
-                                          await self.create_buttons(text="🖼️ Смена имени, описания, фото",
-                                                                    on_click=action_1),
-                                          await self.create_buttons(text="Назад", on_click=lambda _: self.page.go("/"))
-                                      ],
-                                      route_page="change_name_description_photo",
-                                      lv=lv)
+        await view_with_elements(page=page, title=await program_title(title="🖼️ Смена имени, описания, фото"),
+                                 buttons=[
+                                     await create_buttons(text="🖼️ Смена имени, описания, фото",
+                                                          on_click=action_1),
+                                     await create_buttons(text="Назад", on_click=lambda _: self.page.go("/"))
+                                 ],
+                                 route_page="change_name_description_photo",
+                                 lv=lv)
         page.update()  # Обновляем страницу
 
     async def channel_subscription(self, page: ft.Page):
@@ -236,13 +237,12 @@ class Application:
             lv.controls.append(ft.Text(f"Подписка завершена"))  # отображаем сообщение в ListView
             page.update()  # Обновляем страницу
 
-        await self.view_with_elements(title=await self.program_title(title="Подписка на каналы"),
-                                      buttons=[
-                                          await self.create_buttons(text="Подписка",
-                                                                    on_click=action_1),
-                                          await self.create_buttons(text="Назад", on_click=lambda _: self.page.go("/"))
-                                      ],
-                                      route_page="channel_subscription", lv=lv)
+        await view_with_elements(page=page, title=await program_title(title="Подписка на каналы"),
+                                 buttons=[
+                                     await create_buttons(text="Подписка", on_click=action_1),
+                                     await create_buttons(text="Назад", on_click=lambda _: self.page.go("/"))
+                                 ],
+                                 route_page="channel_subscription", lv=lv)
         page.update()  # Обновляем страницу
 
     async def creating_list_of_channels(self, page: ft.Page):
@@ -272,10 +272,10 @@ class Application:
                 page.update()  # Обновляем страницу
 
         await self.view_with_elements_input_field(
-            title=await self.program_title(title="📂 Формирование списка каналов"),
+            title=await program_title(title="📂 Формирование списка каналов"),
             buttons=[
-                await self.create_buttons(text="✅ Готово", on_click=action_1),
-                await self.create_buttons(text="Назад", on_click=lambda _: self.page.go("/"))
+                await create_buttons(text="✅ Готово", on_click=action_1),
+                await create_buttons(text="Назад", on_click=lambda _: self.page.go("/"))
             ],
             route_page="creating_list_of_channels",
             lv=lv,
@@ -346,93 +346,17 @@ class Application:
         )
 
         # Добавляем элементы на страницу
-        await self.view_with_elements(
-            title=await self.program_title(title="Документация"),  # Создаем заголовок страницы
-            buttons=[
-                await self.create_buttons(text="Назад", on_click=lambda _: self.page.go("/"))
-            ],
-            route_page="documentation",
-            lv=ft.ListView(controls=[markdown_widget], expand=True, spacing=10, padding=20),
-        )
+        await view_with_elements(page=page,
+                                 title=await program_title(title="Документация"),  # Создаем заголовок страницы
+                                 buttons=[
+                                     await create_buttons(text="Назад", on_click=lambda _: self.page.go("/"))
+                                 ],
+                                 route_page="documentation",
+                                 lv=ft.ListView(controls=[markdown_widget], expand=True, spacing=10, padding=20),
+                                 )
 
         # Обновляем страницу
         page.update()
-
-    async def getting_list_channels(self, page: ft.Page):
-        """Создает страницу Получение списка каналов"""
-        logger.info("Пользователь перешел на страницу Получение списка каналов")
-        lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
-        page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
-        page.views.clear()  # Очищаем страницу и добавляем новый View
-
-        async def action_1(_):
-            try:
-                lv.controls.append(ft.Text("Получение списка каналов..."))  # отображаем сообщение в ListView
-                page.update()  # Обновляем страницу
-                client = await connect_telegram_account()
-                dialogs = await client.get_dialogs()
-                username_diclist = await creating_a_channel_list(
-                    dialogs)  # Создаем или подключаемся к базе данных SQLite
-                for username in username_diclist:
-                    logger.info(username)
-                    lv.controls.append(ft.Text(f"Найден канал: {username}"))  # отображаем сообщение в ListView
-                    page.update()  # Обновляем страницу после каждого добавления
-                await client.disconnect()  # Завершаем работу клиента
-                lv.controls.append(ft.Text("Получение списка каналов завершено."))  # отображаем сообщение в ListView
-                page.update()  # Обновляем страницу
-            except Exception as e:
-                logger.error(e)
-                lv.controls.append(ft.Text(f"Ошибка: {str(e)}"))  # отображаем ошибку в ListView
-                page.update()  # Обновляем страницу
-
-        await self.view_with_elements(title=await self.program_title(title="Получение списка каналов"),
-                                      buttons=[
-                                          await self.create_buttons(text="Получение списка каналов", on_click=action_1),
-                                          await self.create_buttons(text="Назад", on_click=lambda _: self.page.go("/")),
-                                      ],
-                                      route_page="getting_list_channels", lv=lv)
-        page.update()  # Обновляем страницу
-
-    async def create_buttons(self, text: str, on_click, width: int = 850, height: int = 35) -> ft.ElevatedButton:
-        """
-        Создает универсальную кнопку с заданными параметрами.
-
-        :param text: Текст на кнопке.
-        :param on_click: Функция, вызываемая при нажатии на кнопку.
-        :param width: Ширина кнопки (по умолчанию 850).
-        :param height: Высота кнопки (по умолчанию 35).
-        :return: Объект кнопки ft.ElevatedButton.
-        """
-        return ft.ElevatedButton(text=text, on_click=on_click, width=width, height=height, )
-
-    async def program_title(self, title):
-        """"Заголовок страниц программы"""
-        # Создаем заголовок
-        title = ft.Text(
-            spans=[
-                ft.TextSpan(
-                    title,  # Текст заголовка
-                    ft.TextStyle(
-                        size=24,  # Размер заголовка
-                        weight=self.TITLE_FONT_WEIGHT,
-                        foreground=ft.Paint(
-                            gradient=ft.PaintLinearGradient(
-                                (0, 20), (150, 20), [self.PRIMARY_COLOR, self.PRIMARY_COLOR]
-                            )), ), ), ], )
-        return title
-
-    async def view_with_elements(self, title: ft.Text, buttons: list[ft.ElevatedButton], route_page, lv: ft.ListView):
-        # Создаем View с элементами
-        self.page.views.append(
-            ft.View(
-                f"/{route_page}",
-                controls=[
-                    ft.Column(
-                        controls=[title, lv, *buttons],
-                        expand=True,  # Растягиваем Column на всю доступную область
-                    )],
-                padding=20,  # Добавляем отступы вокруг содержимого
-            ))
 
     async def main(self, page: ft.Page):
         """Точка входа в приложение."""
