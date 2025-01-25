@@ -3,6 +3,7 @@ import sqlite3
 # Путь к файлу базы данных SQLite
 db_path = 'channels.db'
 
+
 async def save_channels_to_db(channels_data: str):
     """
     Сохраняет список каналов, введенный пользователем, в базу данных SQLite.
@@ -33,6 +34,7 @@ async def save_channels_to_db(channels_data: str):
     # Сохраняем изменения и закрываем соединение
     conn.commit()
     conn.close()
+
 
 async def creating_a_channel_list(dialogs):
     """
@@ -77,6 +79,7 @@ async def reading_from_the_channel_list_database():
     conn.close()  # Закрываем соединение с базой данных
     return results
 
+
 async def read_channel_list_from_database():
     """
     Считывает список каналов из базы данных SQLite.
@@ -87,6 +90,7 @@ async def read_channel_list_from_database():
     results = cursor.fetchall()
     conn.close()
     return results
+
 
 if __name__ == "__main__":
     reading_from_the_channel_list_database()

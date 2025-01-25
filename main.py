@@ -221,7 +221,8 @@ class Application:
                                                     config.get("telegram_settings", "hash"))
 
             channel_name = await read_channel_list_from_database()
-            lv.controls.append(ft.Text(f"Группы и каналы из базы данных {channel_name}"))  # отображаем сообщение в ListView
+            lv.controls.append(
+                ft.Text(f"Группы и каналы из базы данных {channel_name}"))  # отображаем сообщение в ListView
             page.update()  # Обновляем страницу
             for channel in channel_name:
                 lv.controls.append(ft.Text(f"Подписка на: {channel[0]}"))  # отображаем сообщение в ListView
@@ -238,11 +239,10 @@ class Application:
             height=35,  # Высота кнопки (увеличено для наглядности)
         )
 
-
-
         back_button = await self.back_button()  # Создаем кнопку "Назад"
         title = await self.program_title(title="Подписка на каналы")
-        await self.view_with_elements(title=title, buttons=[done_button, back_button], route_page="channel_subscription", lv=lv)
+        await self.view_with_elements(title=title, buttons=[done_button, back_button],
+                                      route_page="channel_subscription", lv=lv)
         page.update()  # Обновляем страницу
 
     async def creating_list_of_channels(self, page: ft.Page):
@@ -256,12 +256,15 @@ class Application:
 
         async def action_1_with_log(_):
             try:
-                lv.controls.append(ft.Text("📝 Запись данных, введенных пользователем..."))  # отображаем сообщение в ListView
-                lv.controls.append(ft.Text(f"📋 Пользователь ввел список каналов: {list_of_channels.value}"))  # отображаем сообщение в ListView
+                lv.controls.append(
+                    ft.Text("📝 Запись данных, введенных пользователем..."))  # отображаем сообщение в ListView
+                lv.controls.append(ft.Text(
+                    f"📋 Пользователь ввел список каналов: {list_of_channels.value}"))  # отображаем сообщение в ListView
                 page.update()  # Обновляем страницу
                 # Вызываем функцию для сохранения данных в базу данных
                 await save_channels_to_db(list_of_channels.value)
-                lv.controls.append(ft.Text("✅ Данные успешно записаны в базу данных!"))  # отображаем сообщение в ListView
+                lv.controls.append(
+                    ft.Text("✅ Данные успешно записаны в базу данных!"))  # отображаем сообщение в ListView
                 page.update()  # Обновляем страницу
             except Exception as e:
                 logger.exception(e)
@@ -284,7 +287,7 @@ class Application:
             ],
             route_page="creating_list_of_channels",
             lv=lv,
-            text_field=list_of_channels # Создаем TextField поле ввода
+            text_field=list_of_channels  # Создаем TextField поле ввода
         )
         page.update()  # Обновляем страницу
 

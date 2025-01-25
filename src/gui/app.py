@@ -1,10 +1,11 @@
-from loguru import logger
 import flet as ft
+from loguru import logger
+
 from src.config.config_handler import read_config
 from src.core.commentator import TelegramCommentator, log_messagess
 from src.core.profile_updater import change_profile_descriptions
 from src.core.telegram_client import connect_telegram_account
-from src.database.db_handler import reading_from_the_channel_list_database, creating_a_channel_list
+from src.database.db_handler import reading_from_the_channel_list_database
 
 
 async def action_2_with_log(page: ft.Page, text_field: ft.Text):

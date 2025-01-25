@@ -3,9 +3,7 @@ import time
 
 import flet as ft
 import telethon
-from loguru import logger
 from rich.progress import track
-from telethon.tl.functions.channels import JoinChannelRequest
 
 from src.core.telegram_client import connect_telegram_account
 
@@ -34,8 +32,6 @@ class TelegramCommentator:
     def __init__(self, config) -> None:
         self.config = config
         self.client = None
-
-
 
     async def write_comments_in_telegram(self, client, channels, text_field: ft.TextField) -> None:
         """
