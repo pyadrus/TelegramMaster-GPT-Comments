@@ -172,13 +172,12 @@ class Application:
                 client = await connect_telegram_account()
                 await TelegramCommentator().write_comments_in_telegram(client, page, lv)
 
-            # Создаем кнопку "Отправка комментариев"
-            sending_comments_button = await self.create_buttons(text="Отправка комментариев", on_click=action_1)
-
             await self.view_with_elements(title=await self.program_title(title="Отправка комментариев"),
                                           buttons=[
-                                              sending_comments_button,
-                                              await self.back_button()  # Создаем кнопку "Назад"
+                                              await self.create_buttons(text="Отправка комментариев",
+                                                                        on_click=action_1),
+                                              await self.create_buttons(text="Назад",
+                                                                        on_click=lambda _: self.page.go("/"))
                                           ],
                                           route_page="submitting_comments", lv=lv)
             page.update()  # Обновляем страницу
@@ -192,7 +191,7 @@ class Application:
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
         page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
 
-        async def action_1_with_log(_):
+        async def action_1(_):
             try:
                 lv.controls.append(ft.Text("🖼️ Смена имени, описания, фото"))  # отображаем сообщение в ListView
                 page.update()  # Обновляем страницу
@@ -204,18 +203,12 @@ class Application:
                 lv.controls.append(ft.Text(f"Ошибка: {str(e)}"))  # отображаем ошибку в ListView
                 page.update()  # Обновляем страницу
 
-        # Создаем кнопку "Получение списка каналов"
-        change_bio_account_button = ft.ElevatedButton(
-            "🖼️ Смена имени, описания, фото",  # Текст на кнопке
-            on_click=action_1_with_log,  # Переход на главную страницу
-            width=850,  # Ширина кнопки (увеличено для наглядности)
-            height=35,  # Высота кнопки (увеличено для наглядности)
-        )
-
         await self.view_with_elements(title=await self.program_title(title="🖼️ Смена имени, описания, фото"),
-                                      buttons=[change_bio_account_button,
-                                               await self.back_button()  # Создаем кнопку "Назад"
-                                               ],
+                                      buttons=[
+                                          await self.create_buttons(text="🖼️ Смена имени, описания, фото",
+                                                                    on_click=action_1),
+                                          await self.create_buttons(text="Назад", on_click=lambda _: self.page.go("/"))
+                                      ],
                                       route_page="change_name_description_photo",
                                       lv=lv)
         page.update()  # Обновляем страницу
@@ -227,7 +220,7 @@ class Application:
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
         page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
 
-        async def action_1_with_log(_):
+        async def action_1(_):
             lv.controls.append(ft.Text("Подписка на каналы / группы"))  # отображаем сообщение в ListView
             page.update()  # Обновляем страницу
             client = await connect_telegram_account()
@@ -243,18 +236,11 @@ class Application:
             lv.controls.append(ft.Text(f"Подписка завершена"))  # отображаем сообщение в ListView
             page.update()  # Обновляем страницу
 
-        # Создаем кнопку "Подписка"
-        done_button = ft.ElevatedButton(
-            "Подписка",  # Текст на кнопке
-            on_click=action_1_with_log,  # Переход на главную страницу
-            width=850,  # Ширина кнопки (увеличено для наглядности)
-            height=35,  # Высота кнопки (увеличено для наглядности)
-        )
-
         await self.view_with_elements(title=await self.program_title(title="Подписка на каналы"),
                                       buttons=[
-                                          done_button,
-                                          await self.back_button()  # Создаем кнопку "Назад"
+                                          await self.create_buttons(text="Подписка",
+                                                                    on_click=action_1),
+                                          await self.create_buttons(text="Назад", on_click=lambda _: self.page.go("/"))
                                       ],
                                       route_page="channel_subscription", lv=lv)
         page.update()  # Обновляем страницу
@@ -268,7 +254,7 @@ class Application:
 
         list_of_channels = ft.TextField(label="Введите список каналов", multiline=True, max_lines=19)
 
-        async def action_1_with_log(_):
+        async def action_1(_):
             try:
                 lv.controls.append(
                     ft.Text("📝 Запись данных, введенных пользователем..."))  # отображаем сообщение в ListView
@@ -285,19 +271,11 @@ class Application:
                 lv.controls.append(ft.Text(f"❌ Ошибка: {str(e)}"))  # отображаем ошибку в ListView
                 page.update()  # Обновляем страницу
 
-        # Создаем кнопку "Готово"
-        done_button = ft.ElevatedButton(
-            "✅ Готово",  # Текст на кнопке
-            on_click=action_1_with_log,  # Переход на главную страницу
-            width=850,  # Ширина кнопки (увеличено для наглядности)
-            height=35,  # Высота кнопки (увеличено для наглядности)
-        )
-
         await self.view_with_elements_input_field(
             title=await self.program_title(title="📂 Формирование списка каналов"),
             buttons=[
-                done_button,  # Создаем кнопку "Готово"
-                await self.back_button()  # Создаем кнопку "Назад"
+                await self.create_buttons(text="✅ Готово", on_click=action_1),
+                await self.create_buttons(text="Назад", on_click=lambda _: self.page.go("/"))
             ],
             route_page="creating_list_of_channels",
             lv=lv,
@@ -371,7 +349,7 @@ class Application:
         await self.view_with_elements(
             title=await self.program_title(title="Документация"),  # Создаем заголовок страницы
             buttons=[
-                await self.back_button()  # Создаем кнопку "Назад"
+                await self.create_buttons(text="Назад", on_click=lambda _: self.page.go("/"))
             ],
             route_page="documentation",
             lv=ft.ListView(controls=[markdown_widget], expand=True, spacing=10, padding=20),
@@ -387,7 +365,7 @@ class Application:
         page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
         page.views.clear()  # Очищаем страницу и добавляем новый View
 
-        async def action_1_with_log(_):
+        async def action_1(_):
             try:
                 lv.controls.append(ft.Text("Получение списка каналов..."))  # отображаем сообщение в ListView
                 page.update()  # Обновляем страницу
@@ -407,18 +385,10 @@ class Application:
                 lv.controls.append(ft.Text(f"Ошибка: {str(e)}"))  # отображаем ошибку в ListView
                 page.update()  # Обновляем страницу
 
-        # Создаем кнопку "Получение списка каналов"
-        getting_list_channels_button = ft.ElevatedButton(
-            "Получение списка каналов",  # Текст на кнопке
-            on_click=action_1_with_log,  # Переход на главную страницу
-            width=850,  # Ширина кнопки (увеличено для наглядности)
-            height=35,  # Высота кнопки (увеличено для наглядности)
-        )
-
         await self.view_with_elements(title=await self.program_title(title="Получение списка каналов"),
                                       buttons=[
-                                          getting_list_channels_button,
-                                          await self.back_button()  # Создаем кнопку "Назад"
+                                          await self.create_buttons(text="Получение списка каналов", on_click=action_1),
+                                          await self.create_buttons(text="Назад", on_click=lambda _: self.page.go("/")),
                                       ],
                                       route_page="getting_list_channels", lv=lv)
         page.update()  # Обновляем страницу
@@ -450,17 +420,6 @@ class Application:
                                 (0, 20), (150, 20), [self.PRIMARY_COLOR, self.PRIMARY_COLOR]
                             )), ), ), ], )
         return title
-
-    async def back_button(self):
-        """Кнопка назад."""
-        # Создаем кнопку "Назад"
-        back_button = ft.ElevatedButton(
-            "Назад",  # Текст на кнопке
-            on_click=lambda _: self.page.go("/"),  # Переход на главную страницу
-            width=850,  # Ширина кнопки (увеличено для наглядности)
-            height=35,  # Высота кнопки (увеличено для наглядности)
-        )
-        return back_button
 
     async def view_with_elements(self, title: ft.Text, buttons: list[ft.ElevatedButton], route_page, lv: ft.ListView):
         # Создаем View с элементами
