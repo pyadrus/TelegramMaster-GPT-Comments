@@ -1,7 +1,7 @@
 from loguru import logger
 import flet as ft
 
-from src.config.config_handler import program_version, date_of_program_change, program_name
+from src.config.config_handler import program_version, program_last_modified_date, program_name
 from src.core.commentator import TelegramCommentator
 from src.core.profile_updater import change_profile_descriptions
 from src.core.subscribe import SUBSCRIBE
@@ -34,7 +34,7 @@ class Application:
 
     async def actions_with_the_program_window(self, page: ft.Page):
         """Изменение на изменение главного окна программы."""
-        page.title = f"Версия {program_version}. Дата изменения {date_of_program_change}"
+        page.title = f"Версия {program_version}. Дата изменения {program_last_modified_date}"
         page.window.width = self.WINDOW_WIDTH
         page.window.height = self.WINDOW_HEIGHT
         page.window.resizable = False
@@ -71,7 +71,7 @@ class Application:
         """Создает колонку с заголовками и кнопками."""
         title = self.create_title(text=program_name, font_size=19)
         version = self.create_title(text=f"Версия программы: {program_version}", font_size=13)
-        date_program_change = self.create_title(text=f"Дата изменения: {date_of_program_change}", font_size=13)
+        date_program_change = self.create_title(text=f"Дата изменения: {program_last_modified_date}", font_size=13)
         buttons = [
             self.create_button("📋 Получение списка каналов", "/getting_list_channels"),
             self.create_button("💬 Отправка комментариев", "/submitting_comments"),

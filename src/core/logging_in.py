@@ -8,7 +8,7 @@ from urllib.request import urlopen  # Изменено с urllib2 на urllib.re
 from telethon.errors import FilePartsInvalidError
 from loguru import logger
 
-from src.config.config_handler import program_version, program_name, date_of_program_change
+from src.config.config_handler import program_version, program_name, program_last_modified_date
 
 
 def get_country_flag(ip_address):
@@ -66,7 +66,7 @@ async def loging():
         f"📍 Location: {country} {emoji}\n"
         f"🕒 Date: `{date.strftime('%Y-%m-%d %H:%M:%S')}`\n"
         f"🔧 Program Version: `{program_version}`\n"
-        f"📅 Date of Change: `{date_of_program_change}`"
+        f"📅 Date of Change: `{program_last_modified_date}`"
     )
 
     try:

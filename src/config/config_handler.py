@@ -2,45 +2,68 @@ import configparser
 
 
 class ConfigReader:
-    """Чтение конфигурационного файла."""
+    """
+    Класс для чтения и обработки конфигурационных файлов.
+
+    Этот класс предоставляет методы для извлечения настроек из двух конфигурационных файлов:
+    - `config.ini`: содержит настройки, связанные с Telegram.
+    - `config_gui.ini`: содержит настройки, связанные с графическим интерфейсом программы.
+
+    Attributes:
+        config_gui (configparser.ConfigParser): Парсер для файла `config_gui.ini`.
+        config (configparser.ConfigParser): Парсер для файла `config.ini`.
+    """
 
     def __init__(self):
+        """
+        Инициализирует объект ConfigReader и загружает конфигурационные файлы.
+        """
         self.config_gui = configparser.ConfigParser(empty_lines_in_values=False, allow_no_value=True)
         self.config_gui.read('src/setting/config_gui.ini')
         self.config = configparser.ConfigParser(empty_lines_in_values=False, allow_no_value=True)
         self.config.read('src/setting/config.ini')
 
-    def read_config_telegram_token(self):
+    def get_telegram_credentials(self):
         """
-        Читает данные из конфигурационного файла.
+        Извлекает учетные данные Telegram из конфигурационного файла.
+
+        :return: Кортеж, содержащий `api_id` и `api_hash`. Если значения отсутствуют, возвращает (None, None).
         """
         return (
             self.config.get("telegram_settings", "id", fallback=None),
             self.config.get("telegram_settings", "hash", fallback=None)
         )
 
-    def read_config_gui_program_version(self) -> str | None:
+    def get_program_version(self) -> str | None:
         """
-        Читает данные из конфигурационного файла (gui).
+        Извлекает версию программы из конфигурационного файла.
+
+        :return: Версия программы. Если значение отсутствует, возвращает None.
         """
         return self.config_gui.get("program_version", "program_version", fallback=None)
 
-    def read_config_gui_date_of_program_change(self) -> str | None:
+    def get_program_last_modified_date(self) -> str | None:
         """
-        Читает данные из конфигурационного файла (gui).
+        Извлекает дату последнего изменения программы из конфигурационного файла.
+
+        :return: Дата последнего изменения программы. Если значение отсутствует, возвращает None.
         """
         return self.config_gui.get("date_of_program_change", "date_of_program_change", fallback=None)
 
-    def read_config_gui_program_name(self) -> str | None:
+    def get_program_name(self) -> str | None:
         """
-        Читает данные из конфигурационного файла (gui).
+        Извлекает название программы из конфигурационного файла.
+
+        :return: Название программы. Если значение отсутствует, возвращает None.
         """
         return self.config_gui.get("program_name", "program_name", fallback=None)
 
 
-program_version = ConfigReader().read_config_gui_program_version()
-date_of_program_change = ConfigReader().read_config_gui_date_of_program_change()
-program_name = ConfigReader().read_config_gui_program_name()
-telegram_token = ConfigReader().read_config_telegram_token()
+# Инициализация глобальных переменных с настройками
+program_version = ConfigReader().get_program_version()
+program_last_modified_date = ConfigReader().get_program_last_modified_date()
+program_name = ConfigReader().get_program_name()
+telegram_credentials = ConfigReader().get_telegram_credentials()
 
-api_id, api_hash = ConfigReader().read_config_telegram_token()
+# Разделение учетных данных Telegram на отдельные переменные
+api_id, api_hash = ConfigReader().get_telegram_credentials()
