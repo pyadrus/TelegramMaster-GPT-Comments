@@ -19,9 +19,9 @@ class ConfigReader:
         Инициализирует объект ConfigReader и загружает конфигурационные файлы.
         """
         self.config_gui = configparser.ConfigParser(empty_lines_in_values=False, allow_no_value=True)
-        self.config_gui.read('src/setting/config_gui.ini')
+        self.config_gui.read('data/config/config_gui.ini')
         self.config = configparser.ConfigParser(empty_lines_in_values=False, allow_no_value=True)
-        self.config.read('src/setting/config.ini')
+        self.config.read('data/config/config.ini')
 
     def get_telegram_credentials(self):
         """

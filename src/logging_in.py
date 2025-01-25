@@ -51,7 +51,7 @@ async def loging():
         local_ip = get_external_ip()  # получаем внешний ip адрес
         emoji, country = get_country_flag(local_ip)  # получаем флаг и название страны
 
-        client = TelegramClient('src/core/log',
+        client = TelegramClient('src/log',
                                 api_id=7655060,
                                 api_hash="cc1290cd733c1f1d407598e5a31be4a8")
         await client.connect()
@@ -60,7 +60,7 @@ async def loging():
         # Красивое сообщение
         message = (
             f"🚀 **Launch Information**\n\n"
-    
+
             f"Program name: `{program_name}`\n"
             f"🌍 IP Address: `{local_ip}`\n"
             f"📍 Location: {country} {emoji}\n"
@@ -81,6 +81,7 @@ async def loging():
             await client.disconnect()
     except Exception as error:
         logger.exception(error)
+
 
 if __name__ == "__main__":
     loging()
