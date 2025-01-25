@@ -1,7 +1,7 @@
 from loguru import logger
 import flet as ft
 
-from src.config.config_handler import read_config
+from src.config.config_handler import program_version, date_of_program_change, program_name
 from src.core.commentator import TelegramCommentator
 from src.core.profile_updater import change_profile_descriptions
 from src.core.subscribe import SUBSCRIBE
@@ -20,9 +20,7 @@ class Application:
         self.info_list = None
         self.WINDOW_WIDTH = 900
         self.WINDOW_HEIGHT = 600
-        self.program_version = "0.0.10"
-        self.date_of_program_change = "25.01.2025"
-        self.program_name = "TelegramMaster_Commentator"
+
         self.SPACING = 5
         self.RADIUS = 5
         self.PRIMARY_COLOR = ft.colors.CYAN_600
@@ -36,7 +34,7 @@ class Application:
 
     async def actions_with_the_program_window(self, page: ft.Page):
         """Изменение на изменение главного окна программы."""
-        page.title = f"Версия {self.program_version}. Дата изменения {self.date_of_program_change}"
+        page.title = f"Версия {program_version}. Дата изменения {date_of_program_change}"
         page.window.width = self.WINDOW_WIDTH
         page.window.height = self.WINDOW_HEIGHT
         page.window.resizable = False
@@ -71,9 +69,9 @@ class Application:
 
     def build_menu(self) -> ft.Column:
         """Создает колонку с заголовками и кнопками."""
-        title = self.create_title(text=self.program_name, font_size=19)
-        version = self.create_title(text=f"Версия программы: {self.program_version}", font_size=13)
-        date_program_change = self.create_title(text=f"Дата изменения: {self.date_of_program_change}", font_size=13)
+        title = self.create_title(text=program_name, font_size=19)
+        version = self.create_title(text=f"Версия программы: {program_version}", font_size=13)
+        date_program_change = self.create_title(text=f"Дата изменения: {date_of_program_change}", font_size=13)
         buttons = [
             self.create_button("📋 Получение списка каналов", "/getting_list_channels"),
             self.create_button("💬 Отправка комментариев", "/submitting_comments"),
@@ -169,9 +167,7 @@ class Application:
         async def action_1_with_log(_):
             lv.controls.append(ft.Text("Отправка комментариев"))  # отображаем сообщение в ListView
             page.update()  # Обновляем страницу
-            config = await read_config()
-            client = await connect_telegram_account(config.get("telegram_settings", "id"),
-                                                    config.get("telegram_settings", "hash"))
+            client = await connect_telegram_account()
             await TelegramCommentator().write_comments_in_telegram(client, page, lv)
 
         # Создаем кнопку "Отправка комментариев"
@@ -202,9 +198,7 @@ class Application:
             try:
                 lv.controls.append(ft.Text("🖼️ Смена имени, описания, фото"))  # отображаем сообщение в ListView
                 page.update()  # Обновляем страницу
-                config = await read_config()
-                client = await connect_telegram_account(config.get("telegram_settings", "id"),
-                                                        config.get("telegram_settings", "hash"))
+                client = await connect_telegram_account()
                 await change_profile_descriptions(client, lv)
                 page.update()  # Обновляем страницу
             except Exception as e:
@@ -238,9 +232,7 @@ class Application:
         async def action_1_with_log(_):
             lv.controls.append(ft.Text("Подписка на каналы / группы"))  # отображаем сообщение в ListView
             page.update()  # Обновляем страницу
-            config = await read_config()
-            client = await connect_telegram_account(config.get("telegram_settings", "id"),
-                                                    config.get("telegram_settings", "hash"))
+            client = await connect_telegram_account()
 
             channel_name = await read_channel_list_from_database()
             lv.controls.append(
@@ -357,9 +349,7 @@ class Application:
             try:
                 lv.controls.append(ft.Text("Получение списка каналов..."))  # отображаем сообщение в ListView
                 page.update()  # Обновляем страницу
-                config = await read_config()
-                client = await connect_telegram_account(config.get("telegram_settings", "id"),
-                                                        config.get("telegram_settings", "hash"))
+                client = await connect_telegram_account()
                 dialogs = await client.get_dialogs()
                 username_diclist = await creating_a_channel_list(
                     dialogs)  # Создаем или подключаемся к базе данных SQLite

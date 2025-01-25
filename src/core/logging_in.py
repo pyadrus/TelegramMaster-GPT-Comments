@@ -6,9 +6,9 @@ from telethon import TelegramClient
 from urllib.request import urlopen  # Изменено с urllib2 на urllib.request
 
 from telethon.errors import FilePartsInvalidError
-
-from src.core.configs import program_version, date_of_program_change, program_name
 from loguru import logger
+
+from src.config.config_handler import program_version, program_name, date_of_program_change
 
 
 def get_country_flag(ip_address):
