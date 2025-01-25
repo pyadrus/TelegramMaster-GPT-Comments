@@ -10,8 +10,8 @@ from src.telegram_client import connect_telegram_account
 from src.db_handler import creating_a_channel_list, save_channels_to_db, read_channel_list_from_database
 
 # Настройка логирования
-logger.add("data/logs/app.log", rotation="1 MB", compression="zip", level="INFO")
-logger.add("data/logs/errors.log", rotation="1 MB", compression="zip", level="ERROR")
+logger.add("data/logs/app.log", rotation="500 KB", compression="zip", level="INFO")
+logger.add("data/logs/errors.log", rotation="500 KB", compression="zip", level="ERROR")
 
 
 class Application:
@@ -22,7 +22,6 @@ class Application:
         self.info_list = None
         self.WINDOW_WIDTH = 900
         self.WINDOW_HEIGHT = 600
-
         self.SPACING = 5
         self.RADIUS = 5
         self.PRIMARY_COLOR = ft.colors.CYAN_600
@@ -330,15 +329,61 @@ class Application:
             ))
 
     async def documentation(self, page: ft.Page):
-        """Создает страницу документации"""
+        """
+        Создает страницу документации.
+
+        При запуске функции автоматически открывается файл `doc/doc.md`,
+        который содержит документацию по использованию программы.
+        Также добавлена кнопка "Назад" для возврата в начальное меню.
+
+        :param page: Страница приложения.
+        """
         logger.info("Пользователь перешел на страницу документации")
-        lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
-        page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
-        page.views.clear()  # Очищаем страницу и добавляем новый View
-        back_button = await self.back_button()  # Создаем кнопку "Назад"
+
+        # Очищаем страницу и настраиваем шрифты
+        page.views.clear()
+        page.fonts = {
+            "Roboto Mono": "RobotoMono-VariableFont_wght.ttf",  # Шрифт
+        }
+        page.scroll = "auto"
+
+        # Функция для загрузки и отображения Markdown-файла
+        def load_markdown(file_path: str):
+            try:
+                with open(file_path, "r", encoding='utf-8') as f:
+                    markdown_content = f.read()
+                return markdown_content
+            except FileNotFoundError:
+                return "Файл документации не найден."
+            except Exception as e:
+                return f"Ошибка при чтении файла: {str(e)}"
+
+        # Загружаем файл документации
+        markdown_content = load_markdown("doc/doc.md")
+        # Создаем Markdown-виджет для отображения документации
+        markdown_widget = ft.Markdown(
+            markdown_content,
+            selectable=True,
+            code_style=ft.TextStyle(font_family="Roboto Mono"),
+            on_tap_link=lambda e: page.launch_url(e.data),  # Открываем ссылки в браузере
+        )
+
+        # Создаем кнопку "Назад"
+        back_button = await self.back_button()
+
+        # Создаем заголовок страницы
         title = await self.program_title(title="Документация")
-        await self.view_with_elements(title=title, buttons=[back_button], route_page="documentation", lv=lv)
-        page.update()  # Обновляем страницу
+
+        # Добавляем элементы на страницу
+        await self.view_with_elements(
+            title=title,
+            buttons=[back_button],
+            route_page="documentation",
+            lv=ft.ListView(controls=[markdown_widget], expand=True, spacing=10, padding=20),
+        )
+
+        # Обновляем страницу
+        page.update()
 
     async def getting_list_channels(self, page: ft.Page):
         """Создает страницу Получение списка каналов"""

