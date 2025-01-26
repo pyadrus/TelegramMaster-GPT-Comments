@@ -2,6 +2,7 @@ import flet as ft
 from loguru import logger
 
 from src.commentator import TelegramCommentator
+from src.connect import TGConnect
 from src.core.buttons import create_buttons
 from src.core.views import program_title, view_with_elements
 from src.core.views import view_with_elements_input_field
@@ -11,6 +12,43 @@ from src.db_handler import save_channels_to_db
 from src.profile_updater import change_profile_descriptions
 from src.subscribe import SUBSCRIBE
 from src.telegram_client import connect_telegram_account
+
+
+async def handle_connect_accounts(page: ft.Page):
+    logger.info("Пользователь перешел на страницу Подключение аккаунтов")
+    page.views.clear()
+    lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
+    page.controls.append(lv)
+
+    async def action_1(_):
+        lv.controls.append(ft.Text("Подключение session аккаунта"))
+        page.update()
+        await TGConnect().connecting_session_accounts(
+            page=page,
+            account_directory='data/accounts',
+            appointment='Комментариев'
+        )
+
+    async def action_2(_):
+        lv.controls.append(ft.Text("Подключение по номеру телефона"))
+        page.update()
+        await TGConnect().connecting_number_accounts(
+            page=page,
+            account_directory='data/accounts',
+            appointment='Комментариев'
+        )
+
+    await view_with_elements(page=page, title=await program_title(title="Подключение аккаунтов"),
+                             buttons=[
+                                 await create_buttons(text="Подключение session аккаунта",
+                                                      on_click=action_1),
+                                 await create_buttons(text="Подключение по номеру телефона",
+                                                      on_click=action_2),
+                                 await create_buttons(text="Назад", on_click=lambda _: page.go("/"))
+                             ],
+                             route_page="change_name_description_photo",
+                             lv=lv)
+    page.update()  # Обновляем страницу
 
 
 async def handle_change_name_description_photo(page: ft.Page):

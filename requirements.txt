@@ -6,3 +6,6 @@ loguru~=0.6.0
 requests~=2.32.3
 configparser~=7.0.1
 flet~=0.24.1
+thefuzz~=0.22.1
+peewee~=3.17.8
+phonenumbers~=8.13.51

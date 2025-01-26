@@ -4,7 +4,8 @@ from loguru import logger
 from src.config_handler import program_version, program_last_modified_date, program_name
 from src.core.handlers import (handle_getting_list_channels, handle_documentation,
                                handle_creating_list_of_channels, handle_channel_subscription,
-                               handle_submitting_comments, handle_change_name_description_photo)
+                               handle_submitting_comments, handle_change_name_description_photo,
+                               handle_connect_accounts)
 from src.core.views import PRIMARY_COLOR, TITLE_FONT_WEIGHT
 from src.logging_in import loging
 
@@ -77,6 +78,8 @@ class Application:
             self.create_button("🔗 Подписка на каналы", "/channel_subscription"),
             self.create_button("📂 Формирование списка каналов", "/creating_list_of_channels"),
             self.create_button("📖 Документация", "/documentation"),
+            self.create_button("🔗 Подключение аккаунтов", "/connect_accounts"),
+            self.create_button("⚙️ Настройки программы", "/settings"),
         ]
         return ft.Column(
             [title, version, date_program_change, *buttons],
@@ -125,11 +128,21 @@ class Application:
             "/channel_subscription": self._handle_channel_subscription,
             "/creating_list_of_channels": self._handle_creating_list_of_channels,
             "/documentation": self._handle_documentation,
+            "/connect_accounts": self._handle_connect_accounts,
+            "/settings": self._handle_settings,
         }
         handler = route_handlers.get(self.page.route)
         if handler:
             await handler()
         self.page.update()
+
+    async def _handle_connect_accounts(self):
+        """Страница 🔗 Подключение аккаунтов"""
+        await handle_connect_accounts(self.page)
+
+    async def _handle_settings(self):
+        """Страница ⚙️ Настройки программы"""
+        pass
 
     async def _handle_getting_list_channels(self):
         """Страница 📋 Получение списка каналов"""
