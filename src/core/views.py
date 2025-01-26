@@ -27,6 +27,7 @@ async def view_with_elements_input_field(page, title: ft.Text, buttons: list[ft.
             padding=20,  # Добавляем отступы вокруг содержимого
         ))
 
+
 async def program_title(title):
     """"Заголовок страниц программы"""
     # Создаем заголовок
