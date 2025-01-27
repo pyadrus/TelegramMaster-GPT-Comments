@@ -132,11 +132,16 @@ class Application:
             "/connect_accounts": self._handle_connect_accounts,
             "/settings": self._handle_settings,
             "/settings_proxy": self._handle_settings_proxy,
+            "/record_id_hash": self._handle_record_id_hash,
         }
         handler = route_handlers.get(self.page.route)
         if handler:
             await handler()
         self.page.update()
+
+    async def _handle_record_id_hash(self):
+        """Страница Запись id и hash"""
+        await SettingPage().writing_api_id_api_hash(self.page)
 
     async def _handle_settings_proxy(self):
         """Страница ⚙️ Настройки прокси"""
