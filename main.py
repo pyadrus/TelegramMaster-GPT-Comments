@@ -134,7 +134,7 @@ class Application:
             "/settings_proxy": self._handle_settings_proxy,
             "/record_id_hash": self._handle_record_id_hash,
             "/recording_message": self._recording_message,
-            "record_time": self._handle_record_time,
+            "/record_time": self._handle_record_time,
         }
         handler = route_handlers.get(self.page.route)
         if handler:
@@ -143,11 +143,15 @@ class Application:
 
     async def _handle_record_time(self):
         """Страница Запись времени"""
-        await SettingPage().record_setting(self.page)
+        limit_type = "time_config"
+        label = "Введите время в секундах, в цифрах"  # Подпись в поле ввода
+        await SettingPage().record_setting(self.page, limit_type, label)
 
     async def _recording_message(self):
         """Страница Запись сообщения"""
-        await SettingPage().recording_text_for_sending_messages(self.page)
+        unique_filename = "data/message/message"
+        label = "Введите сообщение, которое будет отправляться в канал"
+        await SettingPage().recording_text_for_sending_messages(self.page, label, unique_filename)
 
     async def _handle_record_id_hash(self):
         """Страница Запись id и hash"""

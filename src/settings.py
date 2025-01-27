@@ -241,7 +241,7 @@ def recording_limits_file(time_1, time_2, variable: str) -> configparser.ConfigP
 
 def write_data_to_json_file(reactions, path_to_the_file):
     """Открываем файл для записи данных в формате JSON"""
-    with open(path_to_the_file, 'w', encoding='utf-8') as file:
+    with open(f"{path_to_the_file}.json", 'w', encoding='utf-8') as file:
         json.dump(reactions, file, ensure_ascii=False, indent=4)
 
 
