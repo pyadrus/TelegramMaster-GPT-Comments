@@ -1,7 +1,7 @@
 import flet as ft
 from faker import Faker
-from telethon import functions
 from loguru import logger
+from telethon import functions
 
 about = "Мой основной проект https://t.me/+UvdDWG8iGgg1ZWUy"
 

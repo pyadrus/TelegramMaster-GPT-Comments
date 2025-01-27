@@ -6,8 +6,8 @@ import telethon
 from loguru import logger
 from rich.progress import track
 
-from src.subscribe import SUBSCRIBE
 from src.db_handler import reading_from_the_channel_list_database
+from src.subscribe import SUBSCRIBE
 
 
 class TelegramCommentator:

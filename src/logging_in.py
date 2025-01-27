@@ -1,12 +1,11 @@
 import datetime
 import json
-
-import requests
-from telethon import TelegramClient
 from urllib.request import urlopen  # Изменено с urllib2 на urllib.request
 
-from telethon.errors import FilePartsInvalidError
+import requests
 from loguru import logger
+from telethon import TelegramClient
+from telethon.errors import FilePartsInvalidError
 
 from src.config_handler import program_version, program_name, program_last_modified_date
 
