@@ -38,14 +38,10 @@ async def handle_settings(page: ft.Page):
 
     await view_with_elements(page=page, title=await program_title(title="Настройки"),
                              buttons=[
-                                 await create_buttons(text="Подключение прокси",
-                                                      on_click=action_1),
-                                 await create_buttons(text="Запись времени",
-                                                      on_click=action_2),
-                                 await create_buttons(text="Запись id и hash",
-                                                      on_click=action_3),
-                                 await create_buttons(text="Запись сообщения",
-                                                      on_click=action_4),
+                                 await create_buttons(text="Подключение прокси", on_click=action_1),
+                                 await create_buttons(text="Запись времени", on_click=action_2),
+                                 await create_buttons(text="Запись id и hash", on_click=action_3),
+                                 await create_buttons(text="Запись сообщения", on_click=action_4),
                                  await create_buttons(text="Назад", on_click=lambda _: page.go("/"))
                              ],
                              route_page="change_name_description_photo",

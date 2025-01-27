@@ -8,7 +8,8 @@ import sys
 import flet as ft  # Импортируем библиотеку flet
 from loguru import logger
 
-from src.connect import show_notification, line_width_button, height_button, done_button, back_button
+from src.connect import show_notification
+from src.core.buttons import create_buttons
 from src.db_handler import DatabaseHandler
 
 config = configparser.ConfigParser(empty_lines_in_values=False, allow_no_value=True)
@@ -177,10 +178,10 @@ class SettingPage:
             page.go("/settings")  # Изменение маршрута в представлении существующих настроек
             page.update()
 
-        self.add_view_with_fields_and_button(page, [api_id_data, api_hash_data], btn_click, lv)
+        await self.add_view_with_fields_and_button(page, [api_id_data, api_hash_data], btn_click, lv)
 
     @staticmethod
-    def add_view_with_fields_and_button(page: ft.Page, fields: list, btn_click, lv) -> None:
+    async def add_view_with_fields_and_button(page: ft.Page, fields: list, btn_click, lv) -> None:
         """
         Добавляет представление с заданными текстовыми полями и кнопкой.
 
@@ -195,11 +196,6 @@ class SettingPage:
             """Кнопка возврата в меню настроек"""
             page.go("/settings")
 
-        # Кнопка "Готово" (button) и связывает ее с функцией button_clicked.
-        button = ft.ElevatedButton(width=line_width_button, height=height_button, text=done_button, on_click=btn_click)
-        button_back = ft.ElevatedButton(width=line_width_button, height=height_button, text=back_button,
-                                        on_click=back_button_clicked)
-
         # Создание View с элементами
         page.views.append(
             ft.View(
@@ -207,7 +203,10 @@ class SettingPage:
                 controls=[
                     lv,  # отображение логов 📝
                     ft.Column(
-                        controls=fields + [button, button_back]
+                        controls=fields + [
+                            await create_buttons(text="✅ Готово", on_click=btn_click),
+                            await create_buttons(text="⬅️ Назад", on_click=back_button_clicked),
+                        ]
                     )
                 ]
             )
