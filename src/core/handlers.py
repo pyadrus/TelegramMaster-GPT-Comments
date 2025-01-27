@@ -32,6 +32,10 @@ async def handle_settings(page: ft.Page):
         """Запись id и hash"""
         page.go("/record_id_hash")
 
+    async def action_4(_):
+        """Запись сообщения"""
+        page.go("/recording_message")
+
     await view_with_elements(page=page, title=await program_title(title="Настройки"),
                              buttons=[
                                  await create_buttons(text="Подключение прокси",
@@ -40,6 +44,8 @@ async def handle_settings(page: ft.Page):
                                                       on_click=action_2),
                                  await create_buttons(text="Запись id и hash",
                                                       on_click=action_3),
+                                 await create_buttons(text="Запись сообщения",
+                                                      on_click=action_4),
                                  await create_buttons(text="Назад", on_click=lambda _: page.go("/"))
                              ],
                              route_page="change_name_description_photo",

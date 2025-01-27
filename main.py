@@ -133,11 +133,16 @@ class Application:
             "/settings": self._handle_settings,
             "/settings_proxy": self._handle_settings_proxy,
             "/record_id_hash": self._handle_record_id_hash,
+            "/recording_message": self._recording_message,
         }
         handler = route_handlers.get(self.page.route)
         if handler:
             await handler()
         self.page.update()
+
+    async def _recording_message(self):
+        """Страница Запись сообщения"""
+        await SettingPage().recording_text_for_sending_messages(self.page)
 
     async def _handle_record_id_hash(self):
         """Страница Запись id и hash"""

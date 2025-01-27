@@ -80,39 +80,6 @@ class SettingPage:
 
         self.add_view_with_fields_and_button(page, [text_to_send], btn_click, lv)
 
-    def output_the_input_field(self, page: ft.Page, label: str, table_name: str, column_name: str, route: str,
-                               into_columns: str) -> None:
-        """
-        Окно ввода для записи списка контактов telegram
-
-        :param page: Страница интерфейса Flet для отображения элементов управления.
-        :param label: Текст для отображения в поле ввода.
-        :param table_name: Имя таблицы в базе данных.
-        :param column_name: Имя столбца в таблице.
-        :param route: Маршрут для перехода после записи данных.
-        :param into_columns: Имя столбца в таблице, в который будут записаны данные.
-        """
-        text_to_send = ft.TextField(label=label, multiline=True, max_lines=19)
-        lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
-        page.controls.append(lv)  # добавляем ListView на страницу для отображения логов 📝
-
-        lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
-
-        async def btn_click(e) -> None:
-            await self.db_handler.write_to_single_column_table(
-                name_database=table_name,
-                database_columns=column_name,
-                into_columns=into_columns,
-                recorded_data=text_to_send.value.split()
-            )
-
-            await show_notification(page, "Данные успешно записаны!")
-
-            page.go(route)  # Изменение маршрута в представлении существующих настроек
-            page.update()
-
-        self.add_view_with_fields_and_button(page, [text_to_send], btn_click, lv)
-
     async def record_setting(self, page: ft.Page, limit_type: str, label: str):
         """
         Запись лимитов на аккаунт или сообщение
@@ -144,48 +111,6 @@ class SettingPage:
             page.update()
 
         self.add_view_with_fields_and_button(page, [limits], btn_click, lv)
-
-    async def recording_the_time_to_launch_an_invite_every_day(self, page: ft.Page) -> None:
-        """
-        Запись времени для запуска inviting в определенное время
-
-        :param page: Страница интерфейса Flet для отображения элементов управления.
-        """
-        lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
-        page.controls.append(lv)  # добавляем ListView на страницу для отображения логов 📝
-
-        lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
-
-        hour_textfield = ft.TextField(label="Час запуска приглашений (0-23):", autofocus=True, value="")
-        minutes_textfield = ft.TextField(label="Минуты запуска приглашений (0-59):", value="")
-
-        async def btn_click(e) -> None:
-            try:
-                hour = int(hour_textfield.value)
-                minutes = int(minutes_textfield.value)
-
-                if not 0 <= hour < 24:
-                    logger.info('Введите часы в пределах от 0 до 23!')
-                    return
-                if not 0 <= minutes < 60:
-                    logger.info('Введите минуты в пределах от 0 до 59!')
-                    return
-
-                # Предполагая, что config является объектом, похожим на словарь
-                config.get("hour_minutes_every_day", "hour")
-                config.set("hour_minutes_every_day", "hour", str(hour))
-                config.get("hour_minutes_every_day", "minutes")
-                config.set("hour_minutes_every_day", "minutes", str(minutes))
-                writing_settings_to_a_file(config)
-
-                await show_notification(page, "Данные успешно записаны!")
-
-                page.go("/settings")  # Изменение маршрута в представлении существующих настроек
-            except ValueError:
-                logger.info('Введите числовые значения для часов и минут!')
-            page.update()  # Обновляем страницу
-
-        self.add_view_with_fields_and_button(page, [hour_textfield, minutes_textfield], btn_click, lv)
 
     async def create_main_window(self, page: ft.Page, variable, time_range) -> None:
         """
