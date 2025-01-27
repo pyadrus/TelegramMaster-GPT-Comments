@@ -5,9 +5,10 @@ from src.config_handler import program_version, program_last_modified_date, prog
 from src.core.handlers import (handle_getting_list_channels, handle_documentation,
                                handle_creating_list_of_channels, handle_channel_subscription,
                                handle_submitting_comments, handle_change_name_description_photo,
-                               handle_connect_accounts)
+                               handle_connect_accounts, handle_settings)
 from src.core.views import PRIMARY_COLOR, TITLE_FONT_WEIGHT
 from src.logging_in import loging
+from src.settings import SettingPage
 
 # Настройка логирования
 logger.add("data/logs/app.log", rotation="500 KB", compression="zip", level="INFO")
@@ -130,11 +131,16 @@ class Application:
             "/documentation": self._handle_documentation,
             "/connect_accounts": self._handle_connect_accounts,
             "/settings": self._handle_settings,
+            "/settings_proxy": self._handle_settings_proxy,
         }
         handler = route_handlers.get(self.page.route)
         if handler:
             await handler()
         self.page.update()
+
+    async def _handle_settings_proxy(self):
+        """Страница ⚙️ Настройки прокси"""
+        await SettingPage().creating_the_main_window_for_proxy_data_entry(self.page)
 
     async def _handle_connect_accounts(self):
         """Страница 🔗 Подключение аккаунтов"""
@@ -142,7 +148,7 @@ class Application:
 
     async def _handle_settings(self):
         """Страница ⚙️ Настройки программы"""
-        pass
+        await handle_settings(self.page)
 
     async def _handle_getting_list_channels(self):
         """Страница 📋 Получение списка каналов"""
