@@ -134,11 +134,16 @@ class Application:
             "/settings_proxy": self._handle_settings_proxy,
             "/record_id_hash": self._handle_record_id_hash,
             "/recording_message": self._recording_message,
+            "record_time": self._handle_record_time,
         }
         handler = route_handlers.get(self.page.route)
         if handler:
             await handler()
         self.page.update()
+
+    async def _handle_record_time(self):
+        """Страница Запись времени"""
+        await SettingPage().record_setting(self.page)
 
     async def _recording_message(self):
         """Страница Запись сообщения"""

@@ -25,8 +25,8 @@ async def handle_settings(page: ft.Page):
         page.go("/settings_proxy")
 
     async def action_2(_):
-        """Выставление лимитов"""
-        pass
+        """Запись времени"""
+        page.go("/record_time")
 
     async def action_3(_):
         """Запись id и hash"""
@@ -40,7 +40,7 @@ async def handle_settings(page: ft.Page):
                              buttons=[
                                  await create_buttons(text="Подключение прокси",
                                                       on_click=action_1),
-                                 await create_buttons(text="Выставление лимитов",
+                                 await create_buttons(text="Запись времени",
                                                       on_click=action_2),
                                  await create_buttons(text="Запись id и hash",
                                                       on_click=action_3),

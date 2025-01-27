@@ -12,7 +12,7 @@ from src.connect import show_notification, line_width_button, height_button, don
 from src.db_handler import DatabaseHandler
 
 config = configparser.ConfigParser(empty_lines_in_values=False, allow_no_value=True)
-config.read("user_data/config/config.ini")
+config.read("data/config/config.ini")
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
@@ -104,7 +104,7 @@ class SettingPage:
                 await show_notification(page, "Данные успешно записаны!")
 
             except configparser.NoSectionError as error:
-                await show_notification(page, "⚠️ Поврежден файл user_data/config/config.ini")
+                await show_notification(page, "⚠️ Поврежден файл data/config/config.ini")
                 logger.error(f"Ошибка: {error}")
 
             page.go("/settings")  # Изменение маршрута в представлении существующих настроек
@@ -216,7 +216,7 @@ class SettingPage:
 
 def writing_settings_to_a_file(config) -> None:
     """Запись данных в файл user_data/config.ini"""
-    with open("user_data/config/config.ini", "w") as setup:  # Открываем файл в режиме записи
+    with open("data/config/config.ini", "w") as setup:  # Открываем файл в режиме записи
         config.write(setup)  # Записываем данные в файл
 
 
@@ -236,7 +236,7 @@ def recording_limits_file(time_1, time_2, variable: str) -> configparser.ConfigP
         return config
     except configparser.NoSectionError as error:
         logger.error(
-            f"❌ Не удалось получить значение переменной: {error}. Проверьте TelegramMaster/user_data/config/config.ini")
+            f"❌ Не удалось получить значение переменной: {error}. Проверьте TelegramMaster/data/config/config.ini")
 
 
 def write_data_to_json_file(reactions, path_to_the_file):
