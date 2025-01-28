@@ -22,6 +22,17 @@ class ConfigReader:
         self.config_gui.read('data/config/config_gui.ini')
         self.config = configparser.ConfigParser(empty_lines_in_values=False, allow_no_value=True)
         self.config.read('data/config/config.ini')
+        self.config_path = configparser.ConfigParser(empty_lines_in_values=False, allow_no_value=True)
+        self.config_path.read('data/config/config_path.ini')
+
+    def get_path_log(self):
+        """
+        Извлекает путь к папке с файлами из конфигурационного файла.
+        """
+        return (
+            self.config_path.get("log_file", "app_log", fallback=None),
+            self.config_path.get("log_file", "errors_log", fallback=None)
+        )
 
     def get_telegram_credentials(self):
         """
@@ -67,3 +78,6 @@ telegram_credentials = ConfigReader().get_telegram_credentials()
 
 # Разделение учетных данных Telegram на отдельные переменные
 api_id, api_hash = ConfigReader().get_telegram_credentials()
+
+# Путь к файлам
+app_log, errors_log = ConfigReader().get_path_log()

@@ -1,7 +1,7 @@
 import flet as ft
 from loguru import logger
 
-from src.config_handler import program_version, program_last_modified_date, program_name
+from src.config_handler import program_version, program_last_modified_date, program_name, app_log, errors_log
 from src.core.handlers import (handle_getting_list_channels, handle_documentation,
                                handle_creating_list_of_channels, handle_channel_subscription,
                                handle_submitting_comments, handle_change_name_description_photo,
@@ -11,8 +11,8 @@ from src.logging_in import loging
 from src.settings import SettingPage
 
 # Настройка логирования
-logger.add("data/logs/app.log", rotation="500 KB", compression="zip", level="INFO")
-logger.add("data/logs/errors.log", rotation="500 KB", compression="zip", level="ERROR")
+logger.add(f"{app_log}", rotation="500 KB", compression="zip", level="INFO")
+logger.add(f"{errors_log}", rotation="500 KB", compression="zip", level="ERROR")
 
 
 class Application:
