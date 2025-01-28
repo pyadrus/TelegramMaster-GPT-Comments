@@ -17,8 +17,9 @@ from telethon.errors import (AuthKeyDuplicatedError, PhoneNumberBannedError, Use
                              ApiIdInvalidError, YouBlockedUserError)
 from thefuzz import fuzz
 
-from src.config_handler import api_id, api_hash
+from src.config_handler import api_id, api_hash, folder_accounts
 from src.core.buttons import create_buttons
+from src.core.notification import show_notification
 from src.db_handler import DatabaseHandler
 from src.logging_in import get_country_flag
 
@@ -26,26 +27,10 @@ from src.logging_in import get_country_flag
 back_button: str = "⬅️ Назад"
 done_button: str = "✅ Готово"
 
-# Меню подключения аккаунтов
-connecting_accounts_by_phone_number: str = "📞 Подключение по номеру телефона"
-connecting_session_accounts: str = "🔑 Подключение session аккаунтов"
+
 
 height_button = 35
 line_width_button = 850
-
-
-async def show_notification(page: ft.Page, message: str):
-    """
-    Функция для показа уведомления
-
-    :param page: Страница интерфейса Flet для отображения элементов управления.
-    :param message: Текст уведомления.
-    """
-    # Переход обратно после закрытия диалога
-    dlg = ft.AlertDialog(title=ft.Text(message), on_dismiss=lambda e: page.go("/"))
-    page.overlay.append(dlg)
-    dlg.open = True
-    page.update()
 
 
 def getting_phone_number_data_by_phone_number(phone_numbers):
@@ -450,20 +435,18 @@ class TGConnect:
             await telegram_client.disconnect()
             logger.exception(f"❌ Ошибка: {error}")
 
-    async def connecting_number_accounts(self, page: ft.Page, account_directory: str, appointment: str):
+    async def connecting_number_accounts(self, page: ft.Page):
         """
         Подключение номера Telegram аккаунта с проверкой на валидность. Если ранее не было соединения, то запрашивается
         код.
 
         :param page: Страница интерфейса Flet для отображения элементов управления.
-        :param account_directory: Папка с аккаунтами
-        :param appointment: Назначение аккаунта
         """
         try:
-            logger.info(f"Подключение номера аккаунта Telegram для {appointment} в {account_directory}")
+            logger.info(f"Подключение номера аккаунта Telegram")
 
             # Создаем текстовый элемент и добавляем его на страницу
-            header_text = ft.Text(f"Подключение аккаунтов Telegram для {appointment}", size=15, color="pink600")
+            header_text = ft.Text(f"Подключение аккаунтов Telegram", size=15, color="pink600")
 
             phone_number = ft.TextField(label="Введите номер телефона:", multiline=False, max_lines=1)
 
@@ -473,7 +456,8 @@ class TGConnect:
 
                 # Дальнейшая обработка после записи номера телефона
                 proxy_settings = await reading_proxy_data_from_the_database(self.db_handler)  # Proxy IPV6 - НЕ РАБОТАЮТ
-                telegram_client = TelegramClient(f"user_data/accounts/{account_directory}/{phone_number_value}",
+
+                telegram_client = TelegramClient(f"{folder_accounts}/{phone_number_value}",
                                                  api_id=api_id,
                                                  api_hash=api_hash,
                                                  system_version="4.16.30-vxCUSTOM", proxy=proxy_settings)
@@ -549,18 +533,16 @@ class TGConnect:
             logger.exception(f"❌ Ошибка: {error}")
 
     @staticmethod
-    async def connecting_session_accounts(page: ft.Page, account_directory, appointment):
+    async def connecting_session_accounts(page: ft.Page):
         """
         Подключение сессии Telegram
 
         :param page: Страница интерфейса Flet для отображения элементов управления.
-        :param account_directory: Директория аккаунтов
-        :param appointment: назначение
         """
-        logger.info(f"Подключение session аккаунта Telegram для {appointment} в {account_directory}")
+        logger.info(f"Подключение session аккаунта Telegram.")
         try:
             # Создаем текстовый элемент и добавляем его на страницу
-            header_text = ft.Text(f"Подключение аккаунтов Telegram для {appointment}.\n\n Выберите session файл\n",
+            header_text = ft.Text(f"Подключение аккаунтов Telegram.\n\n Выберите session файл\n",
                                   size=15,
                                   # color="pink600"
                                   )
@@ -580,7 +562,7 @@ class TGConnect:
                         selected_files.update()
 
                         # Определяем целевой путь для копирования файла
-                        target_folder = f"{account_directory}"
+                        target_folder = f"{folder_accounts}"
                         target_path = os.path.join(target_folder, file_name)
 
                         # Создаем директорию, если она не существует

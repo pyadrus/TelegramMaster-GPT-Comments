@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from telethon.sync import TelegramClient
 
 from src.config_handler import api_id, api_hash

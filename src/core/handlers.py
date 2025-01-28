@@ -1,8 +1,8 @@
+# -*- coding: utf-8 -*-
 import flet as ft
 from loguru import logger
 
 from src.commentator import TelegramCommentator
-from src.connect import TGConnect
 from src.core.buttons import create_buttons
 from src.core.views import program_title, view_with_elements
 from src.core.views import view_with_elements_input_field
@@ -20,7 +20,7 @@ async def handle_settings(page: ft.Page):
     lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
     page.controls.append(lv)
 
-    async def action_1(_):
+    async def connection_proxy(_):
         """Подключение прокси"""
         page.go("/settings_proxy")
 
@@ -38,7 +38,7 @@ async def handle_settings(page: ft.Page):
 
     await view_with_elements(page=page, title=await program_title(title="Настройки"),
                              buttons=[
-                                 await create_buttons(text="Подключение прокси", on_click=action_1),
+                                 await create_buttons(text="Подключение прокси", on_click=connection_proxy),
                                  await create_buttons(text="Запись времени", on_click=action_2),
                                  await create_buttons(text="Запись id и hash", on_click=action_3),
                                  await create_buttons(text="Запись сообщения", on_click=action_4),
@@ -49,41 +49,7 @@ async def handle_settings(page: ft.Page):
     page.update()  # Обновляем страницу
 
 
-async def handle_connect_accounts(page: ft.Page):
-    logger.info("Пользователь перешел на страницу Подключение аккаунтов")
-    page.views.clear()
-    lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
-    page.controls.append(lv)
 
-    async def action_1(_):
-        lv.controls.append(ft.Text("Подключение session аккаунта"))
-        page.update()
-        await TGConnect().connecting_session_accounts(
-            page=page,
-            account_directory='data/accounts',
-            appointment='Комментариев'
-        )
-
-    async def action_2(_):
-        lv.controls.append(ft.Text("Подключение по номеру телефона"))
-        page.update()
-        await TGConnect().connecting_number_accounts(
-            page=page,
-            account_directory='data/accounts',
-            appointment='Комментариев'
-        )
-
-    await view_with_elements(page=page, title=await program_title(title="Подключение аккаунтов"),
-                             buttons=[
-                                 await create_buttons(text="Подключение session аккаунта",
-                                                      on_click=action_1),
-                                 await create_buttons(text="Подключение по номеру телефона",
-                                                      on_click=action_2),
-                                 await create_buttons(text="Назад", on_click=lambda _: page.go("/"))
-                             ],
-                             route_page="change_name_description_photo",
-                             lv=lv)
-    page.update()  # Обновляем страницу
 
 
 async def handle_change_name_description_photo(page: ft.Page):

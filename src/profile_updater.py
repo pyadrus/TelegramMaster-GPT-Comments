@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import flet as ft
 from faker import Faker
 from loguru import logger

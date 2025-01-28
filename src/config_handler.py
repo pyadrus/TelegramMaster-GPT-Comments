@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import configparser
 
 
@@ -24,6 +25,14 @@ class ConfigReader:
         self.config.read('data/config/config.ini')
         self.config_path = configparser.ConfigParser(empty_lines_in_values=False, allow_no_value=True)
         self.config_path.read('data/config/config_path.ini')
+
+    def get_path_account(self):
+        """
+        Извлекает путь к папке с файлами из конфигурационного файла.
+        """
+        return (
+            self.config_path.get("folder_accounts", "folder_accounts", fallback=None)
+        )
 
     def get_path_log(self):
         """
@@ -81,3 +90,5 @@ api_id, api_hash = ConfigReader().get_telegram_credentials()
 
 # Путь к файлам
 app_log, errors_log = ConfigReader().get_path_log()
+# Путь к папке с аккаунтами
+folder_accounts = ConfigReader().get_path_account()
