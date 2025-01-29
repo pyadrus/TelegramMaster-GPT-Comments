@@ -6,7 +6,7 @@ from telethon.tl.functions.channels import JoinChannelRequest
 class SUBSCRIBE:
     """Класс подписки на группы и каналы Telegram"""
 
-    async def subscribe_to_channel(self, client, channel_name, page, lv) -> None:
+    async def subscribe_to_channel(self, client, channel_name, page: ft.Page, lv) -> None:
         """
         Подписывается на Telegram-канал.
         :param channel_name: Имя канала Telegram.

@@ -154,7 +154,7 @@ class SettingPage:
 
             page.update()  # обновляем страницу
 
-        self.add_view_with_fields_and_button(page, [smaller_timex, larger_timex], btn_click, lv)
+        await self.add_view_with_fields_and_button(page, [smaller_timex, larger_timex], btn_click, lv)
 
     async def writing_api_id_api_hash(self, page: ft.Page):
         """

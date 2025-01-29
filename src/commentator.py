@@ -16,7 +16,7 @@ class TelegramCommentator:
     Класс для автоматизированной работы с комментариями в Telegram-каналах.
     """
 
-    async def write_comments_in_telegram(self, client, page, lv) -> None:
+    async def write_comments_in_telegram(self, client, page: ft.Page, lv) -> None:
         """
         Пишет комментарии в указанных Telegram-каналах.
 
