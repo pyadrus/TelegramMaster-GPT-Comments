@@ -4,22 +4,15 @@ import os
 import os.path
 import random
 import shutil
-import sqlite3
 
 import flet as ft  # Импортируем библиотеку flet
-import phonenumbers
 import requests
 from loguru import logger
-from phonenumbers import carrier, geocoder
 from telethon import TelegramClient
-from telethon.errors import (AuthKeyDuplicatedError, PhoneNumberBannedError, UserDeactivatedBanError, TimedOutError,
-                             AuthKeyNotFound, TypeNotFoundError, AuthKeyUnregisteredError, SessionPasswordNeededError,
-                             ApiIdInvalidError, YouBlockedUserError)
-from thefuzz import fuzz
+from telethon.errors import SessionPasswordNeededError, ApiIdInvalidError
 
 from src.config_handler import api_id, api_hash, folder_accounts
 from src.core.buttons import create_buttons
-from src.core.notification import show_notification
 from src.db_handler import DatabaseHandler
 from src.logging_in import get_country_flag
 
@@ -29,25 +22,6 @@ done_button: str = "✅ Готово"
 
 height_button = 35
 line_width_button = 850
-
-
-def getting_phone_number_data_by_phone_number(phone_numbers):
-    """
-    Определение страны и оператора по номеру телефона
-
-    :param phone_numbers: Номер телефона
-    :return: None
-    """
-
-    # Пример номера телефона для анализа
-    number = phonenumbers.parse(f"+{phone_numbers}", None)
-
-    # Получение информации о стране и операторе на русском языке
-    country_name = geocoder.description_for_number(number, "ru")
-    operator_name = carrier.name_for_number(number, "ru")
-
-    # Вывод информации
-    logger.info(f"Номер: {phone_numbers}, Оператор: {operator_name}, Страна: {country_name}")
 
 
 async def reading_proxy_data_from_the_database(db_handler):
@@ -123,28 +97,6 @@ async def connecting_to_proxy_with_verification(proxy_type, addr, port, username
         logger.exception(f"❌ Ошибка: {error}")
 
 
-def find_filess(directory_path, extension) -> list:
-    """
-    Поиск файлов с определенным расширением в директории. Расширение файла должно быть указанно без точки.
-
-    :param directory_path: Путь к директории
-    :param extension: Расширение файла (указанное без точки)
-    :return list: Список имен найденных файлов
-    """
-    entities = []  # Создаем словарь с именами найденных аккаунтов в папке user_data/accounts
-    try:
-        for x in os.listdir(directory_path):
-            if x.endswith(f".{extension}"):  # Проверяем, заканчивается ли имя файла на заданное расширение
-                file = os.path.splitext(x)[0]  # Разделяем имя файла на имя без расширения и расширение
-                entities.append(file)  # Добавляем информацию о файле в список
-
-        logger.info(f"🔍 Найденные файлы: {entities}")  # Выводим имена найденных аккаунтов
-
-        return entities  # Возвращаем список json файлов
-    except FileNotFoundError:
-        logger.error(f"❌ Ошибка! Директория {directory_path} не найдена!")
-
-
 def working_with_accounts(account_folder, new_account_folder) -> None:
     """
     Работа с аккаунтами
@@ -171,267 +123,6 @@ class TGConnect:
 
     def __init__(self):
         self.db_handler = DatabaseHandler()
-
-    async def verify_account(self, page: ft.Page, folder_name, session_name) -> None:
-        """
-        Проверяет и сортирует аккаунты.
-
-        :param session_name: Имя аккаунта для проверки аккаунта
-        :param folder_name: Папка с аккаунтами
-        :param page: Страница интерфейса Flet для отображения элементов управления.
-        """
-        try:
-            logger.info(f"Проверка аккаунта {session_name}. Используем API ID: {api_id}, API Hash: {api_hash}")
-            telegram_client = await self.get_telegram_client(page, session_name,
-                                                             f"user_data/accounts/{folder_name}")
-            try:
-                await telegram_client.connect()  # Подсоединяемся к Telegram аккаунта
-                if not await telegram_client.is_user_authorized():  # Если аккаунт не авторизирован
-                    await telegram_client.disconnect()
-                    await asyncio.sleep(5)
-                    working_with_accounts(f"user_data/accounts/{folder_name}/{session_name}.session",
-                                          f"user_data/accounts/banned/{session_name}.session")
-                else:
-                    logger.info(f'Аккаунт {session_name} авторизован')
-                    await telegram_client.disconnect()  # Отключаемся после проверки
-            except (PhoneNumberBannedError, UserDeactivatedBanError, AuthKeyNotFound,
-                    AuthKeyUnregisteredError, AuthKeyDuplicatedError) as e:
-                await self.handle_banned_account(telegram_client, folder_name, session_name, e)
-            except TimedOutError as error:
-                logger.exception(f"❌ Ошибка таймаута: {error}")
-                await asyncio.sleep(2)
-            except sqlite3.OperationalError:
-                await telegram_client.disconnect()
-                working_with_accounts(f"user_data/accounts/{folder_name}/{session_name}.session",
-                                      f"user_data/accounts/banned/{session_name}.session")
-        except Exception as error:
-            logger.exception(f"❌ Ошибка: {error}")
-
-    @staticmethod
-    async def handle_banned_account(telegram_client, folder_name, session_name, exception):
-        """
-        Обработка забаненных аккаунтов.
-        telegram_client.disconnect() - Отключение от Telegram.
-        working_with_accounts() - Перемещение файла. Исходный путь к файлу - account_folder. Путь к новой папке,
-        куда нужно переместить файл - new_account_folder
-
-        :param telegram_client: TelegramClient
-        :param folder_name: Папка с аккаунтами
-        :param session_name: Имя аккаунта
-        :param exception: Расширение файла
-        """
-        logger.error(f"⛔ Аккаунт забанен: {session_name}. {str(exception)}")
-        await telegram_client.disconnect()
-        working_with_accounts(f"user_data/accounts/{folder_name}/{session_name}.session",
-                              f"user_data/accounts/banned/{session_name}.session")
-
-    async def check_for_spam(self, page: ft.Page, folder_name) -> None:
-        """
-        Проверка аккаунта на спам через @SpamBot
-
-        :param folder_name: папка с аккаунтами
-        :param page: Страница интерфейса Flet для отображения элементов управления.
-        """
-        try:
-            for session_name in find_filess(directory_path=f"user_data/accounts/{folder_name}",
-                                            extension='session'):
-                telegram_client = await self.get_telegram_client(page, session_name,
-                                                                 account_directory=f"user_data/accounts/{folder_name}")
-                try:
-                    await telegram_client.send_message('SpamBot', '/start')  # Находим спам бот, и вводим команду /start
-                    for message in await telegram_client.get_messages('SpamBot'):
-                        logger.info(f"{session_name} {message.message}")
-                        similarity_ratio_ru: int = fuzz.ratio(f"{message.message}",
-                                                              "Очень жаль, что Вы с этим столкнулись. К сожалению, "
-                                                              "иногда наша антиспам-система излишне сурово реагирует на "
-                                                              "некоторые действия. Если Вы считаете, что Ваш аккаунт "
-                                                              "ограничен по ошибке, пожалуйста, сообщите об этом нашим "
-                                                              "модераторам. Пока действуют ограничения, Вы не сможете "
-                                                              "писать тем, кто не сохранил Ваш номер в список контактов, "
-                                                              "а также приглашать таких пользователей в группы или каналы. "
-                                                              "Если пользователь написал Вам первым, Вы сможете ответить, "
-                                                              "несмотря на ограничения.")
-                        if similarity_ratio_ru >= 97:
-                            logger.info('⛔ Аккаунт заблокирован')
-                            await telegram_client.disconnect()  # Отключаемся от аккаунта, для освобождения процесса session файла.
-                            logger.info(f"Проверка аккаунтов через SpamBot. {session_name}: {message.message}")
-                            # Перенос Telegram аккаунта в папку banned, если Telegram аккаунт в бане
-                            working_with_accounts(f"user_data/accounts/{folder_name}/{session_name}.session",
-                                                  f"user_data/accounts/banned/{session_name}.session")
-                        similarity_ratio_en: int = fuzz.ratio(f"{message.message}",
-                                                              "I’m very sorry that you had to contact me. Unfortunately, "
-                                                              "some account_actions can trigger a harsh response from our "
-                                                              "anti-spam systems. If you think your account was limited by "
-                                                              "mistake, you can submit a complaint to our moderators. While "
-                                                              "the account is limited, you will not be able to send messages "
-                                                              "to people who do not have your number in their phone contacts "
-                                                              "or add them to groups and channels. Of course, when people "
-                                                              "contact you first, you can always reply to them.")
-                        if similarity_ratio_en >= 97:
-                            logger.info('⛔ Аккаунт заблокирован')
-                            await telegram_client.disconnect()  # Отключаемся от аккаунта, для освобождения процесса session файла.
-                            logger.error(f"Проверка аккаунтов через SpamBot. {session_name}: {message.message}")
-                            # Перенос Telegram аккаунта в папку banned, если Telegram аккаунт в бане
-                            logger.info(session_name)
-                            working_with_accounts(f"user_data/accounts/{folder_name}/{session_name}.session",
-                                                  f"user_data/accounts/banned/{session_name}.session")
-                        logger.error(f"Проверка аккаунтов через SpamBot. {session_name}: {message.message}")
-
-                        try:
-                            await telegram_client.disconnect()  # Отключаемся от аккаунта, для освобождения процесса session файла.
-                        except sqlite3.OperationalError as e:
-                            logger.info(f"Ошибка при отключении аккаунта: {session_name}")
-
-                            await self.handle_banned_account(telegram_client, folder_name, session_name, e)
-
-                except YouBlockedUserError:
-                    continue  # Записываем ошибку в software_database.db и продолжаем работу
-                except (AttributeError, AuthKeyUnregisteredError) as e:
-                    logger.error(e)
-                    continue
-
-        except Exception as error:
-            logger.exception(f"❌ Ошибка: {error}")
-
-    async def verify_all_accounts(self, page: ft.Page, folder_name) -> None:
-        """
-        Проверяет все аккаунты Telegram в указанной директории.
-
-        :param folder_name: Имя каталога с аккаунтами
-        :param page: Страница интерфейса Flet для отображения элементов управления.
-        """
-        try:
-            logger.info(f"Запуск проверки аккаунтов Telegram из папки 📁: {folder_name}")
-            await checking_the_proxy_for_work()  # Проверка proxy
-            # Сканирование каталога с аккаунтами
-            for session_file in find_filess(directory_path=f"user_data/accounts/{folder_name}",
-                                            extension='session'):
-                logger.info(f"⚠️ Проверяемый аккаунт: user_data/accounts/{session_file}")
-                # Проверка аккаунтов
-                await self.verify_account(page=page, folder_name=folder_name, session_name=session_file)
-            logger.info(f"Окончание проверки аккаунтов Telegram из папки 📁: {folder_name}")
-        except Exception as error:
-            logger.exception(f"❌ Ошибка: {error}")
-
-    async def get_account_details(self, page: ft.Page, folder_name):
-        """
-        Получает информацию о Telegram аккаунте.
-
-        :param folder_name: Имя каталога
-        :param page: Страница интерфейса Flet для отображения элементов управления.
-        """
-        try:
-            logger.info(f"Запуск переименования аккаунтов Telegram из папки 📁: {folder_name}")
-            await checking_the_proxy_for_work()  # Проверка proxy
-            # Сканирование каталога с аккаунтами
-            for session_name in find_filess(directory_path=f"user_data/accounts/{folder_name}",
-                                            extension='session'):
-                logger.info(f"⚠️ Переименовываемый аккаунт: user_data/accounts/{session_name}")
-                # Переименовывание аккаунтов
-                logger.info(
-                    f"Переименовывание аккаунта {session_name}. Используем API ID: {api_id}, API Hash: {api_hash}")
-
-                telegram_client = await self.get_telegram_client(page, session_name,
-                                                                 account_directory=f"user_data/accounts/{folder_name}")
-
-                try:
-                    me = await telegram_client.get_me()
-                    phone = me.phone
-                    await self.rename_session_file(telegram_client, session_name, phone, folder_name)
-
-                except AttributeError:  # Если в get_me приходит NoneType (None)
-                    pass
-
-                except TypeNotFoundError:
-                    await telegram_client.disconnect()  # Разрываем соединение Telegram, для удаления session файла
-                    logger.error(
-                        f"⛔ Битый файл или аккаунт забанен: {session_name}.session. Возможно, запущен под другим IP")
-                    working_with_accounts(f"user_data/accounts/{folder_name}/{session_name}.session",
-                                          f"user_data/accounts/banned/{session_name}.session")
-                except AuthKeyUnregisteredError:
-                    await telegram_client.disconnect()  # Разрываем соединение Telegram, для удаления session файла
-                    logger.error(
-                        f"⛔ Битый файл или аккаунт забанен: {session_name}.session. Возможно, запущен под другим IP")
-                    working_with_accounts(f"user_data/accounts/{folder_name}/{session_name}.session",
-                                          f"user_data/accounts/banned/{session_name}.session")
-        except Exception as error:
-            logger.exception(f"❌ Ошибка: {error}")
-
-    @staticmethod
-    async def rename_session_file(telegram_client, phone_old, phone, folder_name) -> None:
-        """
-        Переименовывает session файлы.
-
-        :param telegram_client: Клиент для работы с Telegram
-        :param phone_old: Номер телефона для переименования
-        :param phone: Номер телефона для переименования (новое название для session файла)
-        :param folder_name: Папка с аккаунтами
-        """
-        await telegram_client.disconnect()  # Отключаемся от аккаунта для освобождения session файла
-        try:
-            # Переименование session файла
-            os.rename(f"user_data/accounts/{folder_name}/{phone_old}.session",
-                      f"user_data/accounts/{folder_name}/{phone}.session", )
-        except FileExistsError:
-            # Если файл существует, то удаляем дубликат
-            os.remove(f"user_data/accounts/{folder_name}/{phone_old}.session")
-        except Exception as error:
-            logger.exception(f"❌ Ошибка: {error}")
-
-        getting_phone_number_data_by_phone_number(phone)  # Выводим информацию о номере телефона
-
-    async def get_telegram_client(self, page, session_name, account_directory):
-        """
-        Подключение к Telegram, используя файл session.
-        Имя файла сессии file[0] - session файл
-
-        :param account_directory: Путь к директории
-        :param session_name: Файл сессии (file[0] - session файл)
-        :param page: Страница интерфейса Flet для отображения элементов управления.
-        :return TelegramClient: TelegramClient
-        """
-        logger.info(
-            f"Подключение к аккаунту: {account_directory}/{session_name}. Используем API ID: {api_id}, API Hash: {api_hash}")  # Имя файла сессии file[0] - session файл
-        telegram_client = None  # Инициализируем переменную
-        try:
-            telegram_client = TelegramClient(f"{account_directory}/{session_name}", api_id=api_id,
-                                             api_hash=api_hash,
-                                             system_version="4.16.30-vxCUSTOM",
-                                             proxy=await reading_proxy_data_from_the_database(self.db_handler))
-
-            await telegram_client.connect()
-            return telegram_client
-
-        except sqlite3.OperationalError:
-
-            logger.info(f"❌ Аккаунт {account_directory}/{session_name} поврежден.")
-            await show_notification(
-                page,
-                f"⚠️ У нас возникла проблема с аккаунтом {account_directory}/{session_name}.\n\n"
-                f"Чтобы избежать дальнейших ошибок, пожалуйста, удалите этот аккаунт вручную и попробуйте снова. 🔄"
-            )
-
-        except sqlite3.DatabaseError:
-
-            logger.info(f"❌ Аккаунт {session_name} поврежден.")
-            await show_notification(
-                page,
-                f"⚠️ У нас возникла проблема с аккаунтом {account_directory}/{session_name}.\n\n"
-                f"Чтобы избежать дальнейших ошибок, пожалуйста, удалите этот аккаунт вручную и попробуйте снова. 🔄"
-            )
-
-        except AuthKeyDuplicatedError:
-            await telegram_client.disconnect()  # Отключаемся от аккаунта, для освобождения процесса session файла.
-            logger.info(f"❌ На данный момент аккаунт {session_name} запущен под другим ip")
-            working_with_accounts(f"{account_directory}/{session_name}.session",
-                                  f"user_data/accounts/banned/{session_name}.session")
-        except AttributeError as error:
-            logger.error(f"❌ Ошибка: {error}")
-        except ValueError:
-            logger.info(f"❌ Ошибка подключения прокси к аккаунту {session_name}.")
-        except Exception as error:
-            await telegram_client.disconnect()
-            logger.exception(f"❌ Ошибка: {error}")
 
     async def connecting_number_accounts(self, page: ft.Page):
         """
