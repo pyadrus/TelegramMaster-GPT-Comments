@@ -1,41 +1,55 @@
 # -*- coding: utf-8 -*-
 import sqlite3
 
+import aiosqlite
 from loguru import logger
 
-# Путь к файлу базы данных SQLite
-db_path = 'data/database/app.db'
+from src.config_handler import db_path
 
 
-async def save_channels_to_db(channels_data: str):
+async def save_channels_to_db(channels_data: str, db_path: str= db_path) -> None:
     """
     Сохраняет список каналов, введенный пользователем, в базу данных SQLite.
 
     :param channels_data: Строка с данными, введенными пользователем (список каналов).
+    :param db_path: Путь к файлу базы данных SQLite.
     :return: None
     """
-    # Разделяем введенные данные на отдельные каналы (предполагаем, что каналы разделены запятыми или переносами строк)
-    channels_list = [channel.strip() for channel in channels_data.split(",")]  # Разделитель - запятая
-    # Если каналы вводятся через перенос строки, можно использовать:
+    # Разделяем введенные данные на отдельные каналы
+    # Учитываем запятые, пробелы и переносы строк
+    channels_list = [
+        channel.strip() for channel in channels_data.replace("\n", ",").split(",") if channel.strip()
+    ]
 
-    # Подключаемся к базе данных
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
+    if not channels_list:
+        logger.warning("❌ Список каналов пуст.")
+        return
 
-    # Создаем таблицу для хранения информации о каналах, если она еще не существует
-    cursor.execute('''CREATE TABLE IF NOT EXISTS user_channels (
-                        id INTEGER PRIMARY KEY,
-                        channel_name TEXT
-                    )''')
+    try:
+        # Подключаемся к базе данных асинхронно
+        async with aiosqlite.connect(db_path) as conn:
+            cursor = await conn.cursor()
 
-    # Записываем каждый канал в базу данных
-    for channel in channels_list:
-        if channel:  # Проверяем, что строка не пустая
-            cursor.execute('INSERT INTO user_channels (channel_name) VALUES (?)', (channel,))
+            # Создаем таблицу для хранения информации о каналах, если она еще не существует
+            await cursor.execute('''CREATE TABLE IF NOT EXISTS user_channels (
+                                    id INTEGER PRIMARY KEY,
+                                    channel_name TEXT UNIQUE
+                                )''')
 
-    # Сохраняем изменения и закрываем соединение
-    conn.commit()
-    conn.close()
+            # Записываем каждый канал в базу данных
+            for channel in channels_list:
+                try:
+                    await cursor.execute(
+                        'INSERT OR IGNORE INTO user_channels (channel_name) VALUES (?)', (channel,)
+                    )
+                except aiosqlite.Error as e:
+                    logger.error(f"❌ Ошибка при добавлении канала {channel}: {e}")
+
+            # Сохраняем изменения
+            await conn.commit()
+            logger.info(f"✅ Успешно сохранено {len(channels_list)} каналов.")
+    except aiosqlite.Error as e:
+        logger.error(f"❌ Ошибка при работе с базой данных: {e}")
 
 
 async def creating_a_channel_list(dialogs):

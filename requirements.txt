@@ -9,3 +9,4 @@ flet~=0.24.1
 thefuzz~=0.22.1
 peewee~=3.17.8
 phonenumbers~=8.13.51
+aiosqlite~=0.20.0
