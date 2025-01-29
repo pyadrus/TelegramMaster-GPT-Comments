@@ -47,7 +47,7 @@ async def connect_telegram_account() -> TelegramClient:
             api_id=api_id,  # Идентификатор API Telegram
             api_hash=api_hash,  # Ключ API Telegram
             system_version="4.16.30-vxCUSTOM",
-            proxy=await reading_proxy_data_from_the_database(db_handler)
+            proxy=await reading_proxy_data_from_the_database()
 
         )
         logger.info(f'Попытка подключения к {session_file}')

@@ -8,8 +8,8 @@ import sys
 import flet as ft  # Импортируем библиотеку flet
 from loguru import logger
 
-from src.connect import show_notification
 from src.core.buttons import create_buttons
+from src.core.notification import show_notification
 from src.db_handler import DatabaseHandler
 
 config = configparser.ConfigParser(empty_lines_in_values=False, allow_no_value=True)
