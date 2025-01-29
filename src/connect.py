@@ -14,13 +14,6 @@ from src.config_handler import api_id, api_hash, folder_accounts
 from src.core.buttons import create_buttons
 from src.db_handler import DatabaseHandler
 
-# Наименование кнопок
-back_button: str = "⬅️ Назад"
-done_button: str = "✅ Готово"
-
-height_button = 35
-line_width_button = 850
-
 
 async def reading_proxy_data_from_the_database():
     """
@@ -43,9 +36,6 @@ async def reading_proxy_data_from_the_database():
 
 
 class TGConnect:
-
-    def __init__(self):
-        self.db_handler = DatabaseHandler()
 
     async def connecting_number_accounts(self, page: ft.Page):
         """
@@ -156,7 +146,6 @@ class TGConnect:
             # Создаем текстовый элемент и добавляем его на страницу
             header_text = ft.Text(f"Подключение аккаунтов Telegram.\n\n Выберите session файл\n",
                                   size=15,
-                                  # color="pink600"
                                   )
 
             # Поле для отображения выбранного файла
