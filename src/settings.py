@@ -51,8 +51,9 @@ class SettingPage:
             page.go("/settings")  # Изменение маршрута в представлении существующих настроек
             page.update()
 
-        await self.add_view_with_fields_and_button(page, [proxy_type, addr_type, port_type, username_type, password_type],
-                                             btn_click, lv)
+        await self.add_view_with_fields_and_button(page,
+                                                   [proxy_type, addr_type, port_type, username_type, password_type],
+                                                   btn_click, lv)
 
     async def recording_text_for_sending_messages(self, page: ft.Page, label, unique_filename) -> None:
         """

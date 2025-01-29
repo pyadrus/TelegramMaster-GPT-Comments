@@ -27,8 +27,6 @@ from src.logging_in import get_country_flag
 back_button: str = "⬅️ Назад"
 done_button: str = "✅ Готово"
 
-
-
 height_button = 35
 line_width_button = 850
 
