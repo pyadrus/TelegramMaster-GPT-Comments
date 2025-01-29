@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import os
+
 from loguru import logger
 from telethon import TelegramClient
 
-from src import db_handler
 from src.config_handler import api_id, api_hash
 from src.connect import reading_proxy_data_from_the_database
 

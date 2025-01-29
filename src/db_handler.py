@@ -2,11 +2,9 @@
 import sqlite3
 
 from loguru import logger
-from peewee import SqliteDatabase
 
 # Путь к файлу базы данных SQLite
 db_path = 'data/database/app.db'
-db = SqliteDatabase('data/database/app.db')
 
 
 async def save_channels_to_db(channels_data: str):
@@ -168,3 +166,4 @@ class DatabaseHandler:
 
 if __name__ == "__main__":
     reading_from_the_channel_list_database()
+    read_channel_list_from_database()

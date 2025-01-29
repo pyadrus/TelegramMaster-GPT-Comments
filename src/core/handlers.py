@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import flet as ft
 from loguru import logger
+from telethon.helpers import TotalList
 
 from src.commentator import TelegramCommentator
 from src.core.buttons import create_buttons
@@ -241,9 +242,8 @@ async def handle_getting_list_channels(page: ft.Page):
             lv.controls.append(ft.Text("Получение списка каналов..."))  # отображаем сообщение в ListView
             page.update()  # Обновляем страницу
             client = await connect_telegram_account()
-            dialogs = await client.get_dialogs()
-            username_diclist = await creating_a_channel_list(
-                dialogs)  # Создаем или подключаемся к базе данных SQLite
+            dialogs: TotalList = await client.get_dialogs()
+            username_diclist = await creating_a_channel_list(dialogs)  # Создаем или подключаемся к базе данных SQLite
             for username in username_diclist:
                 logger.info(username)
                 lv.controls.append(ft.Text(f"Найден канал: {username}"))  # отображаем сообщение в ListView
