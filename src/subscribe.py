@@ -29,7 +29,7 @@ class SUBSCRIBE:
             lv.controls.append(ft.Text(f"Успешная подписка на {channel_name}", color=ft.colors.RED))
             page.update()
         except FloodWaitError as e:
-                lv.controls.append(ft.Text(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}',
-                                           color=ft.colors.RED))  # отображаем сообщение в ListView
-                page.update()  # Обновляем страницу
-                time.sleep(e.seconds)
+            lv.controls.append(ft.Text(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}',
+                                       color=ft.colors.RED))  # отображаем сообщение в ListView
+            page.update()  # Обновляем страницу
+            time.sleep(e.seconds)

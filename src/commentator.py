@@ -46,8 +46,6 @@ class TelegramCommentator:
         conn.close()
         return exists
 
-
-
     async def write_comments_in_telegram(self, client, page: ft.Page, lv) -> None:
         """
         Пишет комментарии в указанных Telegram-каналах.
@@ -73,7 +71,8 @@ class TelegramCommentator:
                     message_id = message.id
                     message_peer_id = message.peer_id
 
-                    lv.controls.append(ft.Text(f"ID сообщения: {message.id} ID: {message.peer_id} Дата: {message.date}"))  # отображаем сообщение в ListView
+                    lv.controls.append(ft.Text(
+                        f"ID сообщения: {message.id} ID: {message.peer_id} Дата: {message.date}"))  # отображаем сообщение в ListView
                     page.update()  # Обновляем страницу
 
                     if messages:
@@ -88,12 +87,16 @@ class TelegramCommentator:
                                     # Проверяем существование записи в БД
                                     if not await self.check_message_exists(message_id, channel_id):
 
-                                        await client.send_message(entity=name[0], message='Россия лучшая страна!', comment_to=post.id)
-                                        lv.controls.append(ft.Text(f'Наш комментарий: Россия лучшая страна!'))  # отображаем сообщение в ListView
+                                        await client.send_message(entity=name[0], message='Россия лучшая страна!',
+                                                                  comment_to=post.id)
+                                        lv.controls.append(ft.Text(
+                                            f'Наш комментарий: Россия лучшая страна!'))  # отображаем сообщение в ListView
                                         page.update()  # Обновляем страницу
 
                                     else:
-                                        lv.controls.append(ft.Text(f"Комментарий к сообщению {message_id} уже был отправлен", color=ft.colors.GREEN))
+                                        lv.controls.append(
+                                            ft.Text(f"Комментарий к сообщению {message_id} уже был отправлен",
+                                                    color=ft.colors.GREEN))
                                         page.update()
 
                                 if isinstance(message_peer_id, PeerChannel):
@@ -103,32 +106,48 @@ class TelegramCommentator:
                                     await self.record_bottom_messages_database(message_id, channel_id)
 
                             except ChatWriteForbiddenError:
-                                lv.controls.append(ft.Text(f"Вы не можете отправлять сообщения в: {name[0]}"))  # отображаем сообщение в ListView
+                                lv.controls.append(ft.Text(
+                                    f"Вы не можете отправлять сообщения в: {name[0]}"))  # отображаем сообщение в ListView
                                 page.update()  # Обновляем страницу
 
                             except MsgIdInvalidError:
-                                lv.controls.append(ft.Text("Возможно пост был изменен или удален"))  # отображаем сообщение в ListView
+                                lv.controls.append(
+                                    ft.Text("Возможно пост был изменен или удален"))  # отображаем сообщение в ListView
                                 page.update()  # Обновляем страницу
 
                             except UserBannedInChannelError:
-                                lv.controls.append(ft.Text(f"Вам запрещено отправлять сообщения в супергруппы/каналы", color=ft.colors.RED))
+                                lv.controls.append(ft.Text(f"Вам запрещено отправлять сообщения в супергруппы/каналы",
+                                                           color=ft.colors.RED))
                                 page.update()  # Обновляем страницу
 
                             except SlowModeWaitError as e:
-                                lv.controls.append(ft.Text(f"Вы не можете отправлять сообщения в супергруппы/каналы. Попробуйте позже через {str(datetime.timedelta(seconds=e.seconds))}", color=ft.colors.RED))
+                                lv.controls.append(ft.Text(
+                                    f"Вы не можете отправлять сообщения в супергруппы/каналы. Попробуйте позже через {str(datetime.timedelta(seconds=e.seconds))}",
+                                    color=ft.colors.RED))
                                 page.update()
+                                lv.controls.append(
+                                    ft.Text(f"Спим {str(datetime.timedelta(seconds=e.seconds))}", color=ft.colors.RED))
+                                page.update()
+                                time.sleep(e.seconds)
 
                             except FloodWaitError as e:
-                                lv.controls.append(ft.Text(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}', color=ft.colors.RED))  # отображаем сообщение в ListView
+                                lv.controls.append(
+                                    ft.Text(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}',
+                                            color=ft.colors.RED))  # отображаем сообщение в ListView
                                 page.update()  # Обновляем страницу
+                                lv.controls.append(
+                                    ft.Text(f"Спим {str(datetime.timedelta(seconds=e.seconds))}", color=ft.colors.RED))
+                                page.update()
                                 time.sleep(e.seconds)
 
                             except ChatGuestSendForbiddenError:
-                                lv.controls.append(ft.Text(f"Вы не можете отправлять сообщения в супергруппы/каналы", color=ft.colors.RED))
+                                lv.controls.append(ft.Text(f"Вы не можете отправлять сообщения в супергруппы/каналы",
+                                                           color=ft.colors.RED))
                                 page.update()  # Обновляем страницу
 
                             except ChannelPrivateError:
-                                lv.controls.append(ft.Text(f"Канал {name[0]} закрыт", color=ft.colors.RED))  # отображаем сообщение в ListView
+                                lv.controls.append(ft.Text(f"Канал {name[0]} закрыт",
+                                                           color=ft.colors.RED))  # отображаем сообщение в ListView
                                 page.update()  # Обновляем страницу
 
                             except PeerIdInvalidError:
@@ -136,11 +155,13 @@ class TelegramCommentator:
                                 page.update()
 
             except FloodWaitError as e:  # Если ошибка при подписке
-                lv.controls.append(ft.Text(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}', color=ft.colors.RED))  # отображаем сообщение в ListView
+                lv.controls.append(ft.Text(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}',
+                                           color=ft.colors.RED))  # отображаем сообщение в ListView
                 page.update()  # Обновляем страницу
                 time.sleep(e.seconds)
 
             except AuthKeyUnregisteredError:  # Если аккаунт заблочен
-                lv.controls.append(ft.Text("Аккаунт заблокирован", color=ft.colors.RED))  # отображаем сообщение в ListView
+                lv.controls.append(
+                    ft.Text("Аккаунт заблокирован", color=ft.colors.RED))  # отображаем сообщение в ListView
                 page.update()  # Обновляем страницу
                 break
