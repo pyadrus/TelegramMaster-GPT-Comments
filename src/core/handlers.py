@@ -238,12 +238,16 @@ async def handle_getting_list_channels(page: ft.Page):
     page.views.clear()  # Очищаем страницу и добавляем новый View
 
     async def action_1(_):
+        """"Получение списка каналов"""
         try:
             lv.controls.append(ft.Text("Получение списка каналов..."))  # отображаем сообщение в ListView
             page.update()  # Обновляем страницу
             client = await connect_telegram_account()
             dialogs: TotalList = await client.get_dialogs()
+
+            # Запись полученных каналов и групп в базу данных
             username_diclist = await creating_a_channel_list(dialogs)  # Создаем или подключаемся к базе данных SQLite
+
             for username in username_diclist:
                 logger.info(username)
                 lv.controls.append(ft.Text(f"Найден канал: {username}"))  # отображаем сообщение в ListView
