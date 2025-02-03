@@ -53,29 +53,28 @@ class TelegramCommentator:
                                 for i in track(range(400), description="Перерыв в рассылке..."):
                                     time.sleep(1)
                             except telethon.errors.rpcerrorlist.ChatWriteForbiddenError:
-                                lv.controls.append(ft.Text(
-                                    f"Вы не можете отправлять сообщения в: {name[0]}"))  # отображаем сообщение в ListView
+                                lv.controls.append(ft.Text(f"Вы не можете отправлять сообщения в: {name[0]}"))  # отображаем сообщение в ListView
                                 page.update()  # Обновляем страницу
                             except telethon.errors.rpcerrorlist.MsgIdInvalidError:
                                 lv.controls.append(
                                     ft.Text("Возможно пост был изменен или удален"))  # отображаем сообщение в ListView
                                 page.update()  # Обновляем страницу
                             except telethon.errors.rpcerrorlist.UserBannedInChannelError:
-                                lv.controls.append(ft.Text(
-                                    "Вам запрещено отправлять сообщения в супергруппы/каналы (вызвано SendMessageRequest)"))  # отображаем сообщение в ListView
+                                lv.controls.append(ft.Text("Вам запрещено отправлять сообщения в супергруппы/каналы (вызвано SendMessageRequest)"))  # отображаем сообщение в ListView
                                 page.update()  # Обновляем страницу
                             except telethon.errors.rpcerrorlist.FloodWaitError as e:
-                                lv.controls.append(ft.Text(
-                                    f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}'))  # отображаем сообщение в ListView
+                                lv.controls.append(ft.Text(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}'))  # отображаем сообщение в ListView
                                 page.update()  # Обновляем страницу
                                 time.sleep(e.seconds)
                             except telethon.errors.rpcerrorlist.ChatGuestSendForbiddenError as e:
                                 lv.controls.append(ft.Text(str(e)))  # отображаем сообщение в ListView
                                 page.update()  # Обновляем страницу
                             except telethon.errors.rpcerrorlist.ChannelPrivateError:
-                                lv.controls.append(
-                                    ft.Text(f"Канал {name[0]} закрыт"))  # отображаем сообщение в ListView
+                                lv.controls.append(ft.Text(f"Канал {name[0]} закрыт"))  # отображаем сообщение в ListView
                                 page.update()  # Обновляем страницу
+                            except telethon.errors.rpcerrorlist.PeerIdInvalidError:
+                                lv.controls.append(ft.Text(f"Неверный ID канала: {name[0]}"))
+                                page.update()
             except telethon.errors.rpcerrorlist.FloodWaitError as e:  # Если ошибка при подписке
                 lv.controls.append(ft.Text(
                     f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}'))  # отображаем сообщение в ListView
