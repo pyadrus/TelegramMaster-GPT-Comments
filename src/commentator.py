@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
+import asyncio
 import datetime
 import sqlite3
-import time
 
 import flet as ft
 from loguru import logger
 from telethon.errors import (UserBannedInChannelError, PeerIdInvalidError, MsgIdInvalidError, SlowModeWaitError,
                              ChatWriteForbiddenError, ChatGuestSendForbiddenError, FloodWaitError, ChannelPrivateError,
                              AuthKeyUnregisteredError)
-
 from telethon.tl.types import PeerChannel
 
 from src.config_handler import db_path
@@ -89,15 +88,19 @@ class TelegramCommentator:
 
                                         await client.send_message(entity=name[0], message='Россия лучшая страна!',
                                                                   comment_to=post.id)
-                                        lv.controls.append(ft.Text(
-                                            f'Наш комментарий: Россия лучшая страна!'))  # отображаем сообщение в ListView
+                                        lv.controls.append(ft.Text(f'Наш комментарий: Россия лучшая страна!'))  # отображаем сообщение в ListView
                                         page.update()  # Обновляем страницу
 
+                                        lv.controls.append(ft.Text("Спим 5 секунд"))  # отображаем сообщение в ListView
+                                        page.update()  # Обновляем страницу
+                                        await asyncio.sleep(5)
+
                                     else:
-                                        lv.controls.append(
-                                            ft.Text(f"Комментарий к сообщению {message_id} уже был отправлен",
-                                                    color=ft.colors.GREEN))
+                                        lv.controls.append(ft.Text(f"Комментарий к сообщению {message_id} уже был отправлен", color=ft.colors.GREEN))
                                         page.update()
+                                        lv.controls.append(ft.Text("Спим 5 секунд"))  # отображаем сообщение в ListView
+                                        page.update()  # Обновляем страницу
+                                        await asyncio.sleep(5)
 
                                 if isinstance(message_peer_id, PeerChannel):
                                     channel_id = message_peer_id.channel_id
@@ -125,10 +128,9 @@ class TelegramCommentator:
                                     f"Вы не можете отправлять сообщения в супергруппы/каналы. Попробуйте позже через {str(datetime.timedelta(seconds=e.seconds))}",
                                     color=ft.colors.RED))
                                 page.update()
-                                lv.controls.append(
-                                    ft.Text(f"Спим {str(datetime.timedelta(seconds=e.seconds))}", color=ft.colors.RED))
+                                lv.controls.append(ft.Text(f"Спим {str(datetime.timedelta(seconds=e.seconds))}", color=ft.colors.RED))
                                 page.update()
-                                time.sleep(e.seconds)
+                                await asyncio.sleep(e.seconds)
 
                             except FloodWaitError as e:
                                 lv.controls.append(
@@ -138,7 +140,7 @@ class TelegramCommentator:
                                 lv.controls.append(
                                     ft.Text(f"Спим {str(datetime.timedelta(seconds=e.seconds))}", color=ft.colors.RED))
                                 page.update()
-                                time.sleep(e.seconds)
+                                await asyncio.sleep(5)
 
                             except ChatGuestSendForbiddenError:
                                 lv.controls.append(ft.Text(f"Вы не можете отправлять сообщения в супергруппы/каналы",
@@ -158,7 +160,9 @@ class TelegramCommentator:
                 lv.controls.append(ft.Text(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}',
                                            color=ft.colors.RED))  # отображаем сообщение в ListView
                 page.update()  # Обновляем страницу
-                time.sleep(e.seconds)
+                lv.controls.append(ft.Text(f"Спим {str(datetime.timedelta(seconds=e.seconds))}", color=ft.colors.RED))
+                page.update()
+                await asyncio.sleep(5)
 
             except AuthKeyUnregisteredError:  # Если аккаунт заблочен
                 lv.controls.append(
