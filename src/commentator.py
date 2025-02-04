@@ -11,8 +11,11 @@ from telethon.errors import (UserBannedInChannelError, PeerIdInvalidError, MsgId
 from telethon.tl.types import PeerChannel
 
 from src.config_handler import db_path
+from src.core.buttons import create_buttons
+from src.core.views import program_title, view_with_elements
 from src.db_handler import reading_from_the_channel_list_database
 from src.subscribe import SUBSCRIBE
+from src.telegram_client import connect_telegram_account
 from src.telegram_client import find_files
 
 
@@ -20,6 +23,35 @@ class TelegramCommentator:
     """
     Класс для автоматизированной работы с комментариями в Telegram-каналах.
     """
+
+    async def handle_submitting_comments(self, page: ft.Page):
+        """Создает страницу Отправка комментариев"""
+        try:
+            logger.info("Пользователь перешел на страницу Отправка комментариев")
+            page.views.clear()  # Очищаем страницу и добавляем новый View
+            lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
+            page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
+
+            async def action_1(_):
+                lv.controls.append(ft.Text("Отправка комментариев"))  # отображаем сообщение в ListView
+                page.update()  # Обновляем страницу
+                client = await connect_telegram_account()
+                await self.write_comments_in_telegram(client, page, lv)
+
+            await view_with_elements(page=page, title=await program_title(title="Отправка комментариев"),
+                                     buttons=[
+                                         await create_buttons(text="Отправка комментариев", on_click=action_1),
+                                         await create_buttons(text="Назад", on_click=lambda _: page.go("/"))
+                                     ],
+                                     route_page="submitting_comments", lv=lv)
+            page.update()  # Обновляем страницу
+        except Exception as e:
+            logger.exception(e)
+
+    async def message_output_program_window(self, lv, page, message_program):
+        """"Вывод сообщений в окно программы."""
+        lv.controls.append(ft.Text(f"{message_program}", color=ft.colors.RED))  # отображаем сообщение в ListView
+        page.update()  # Обновляем страницу
 
     async def reading_json_file(self):
         """Чтение данных из json файла."""
@@ -81,10 +113,8 @@ class TelegramCommentator:
                     message_id = message.id
                     message_peer_id = message.peer_id
 
-                    lv.controls.append(ft.Text(
-                        f"ID сообщения: {message.id} ID: {message.peer_id} Дата: {message.date}"))  # отображаем сообщение в ListView
-                    page.update()  # Обновляем страницу
-
+                    await self.message_output_program_window(lv=lv, page=page,
+                                                             message_program=f"ID сообщения: {message.id} ID: {message.peer_id} Дата: {message.date}")
                     if messages:
                         post = messages[0]
                         if post.id != last_message_ids.get(name[0], None):
@@ -97,21 +127,18 @@ class TelegramCommentator:
                                     # Проверяем существование записи в БД
                                     if not await self.check_message_exists(message_id, channel_id):
                                         data = await self.reading_json_file()
-                                        logger.info(f"Сообщение для рассылки: {data}")
                                         await client.send_message(entity=name[0], message=f'{data}',
                                                                   comment_to=post.id)
-                                        lv.controls.append(ft.Text(f'Наш комментарий: {data}'))  # отображаем сообщение в ListView
-                                        page.update()  # Обновляем страницу
-
-                                        lv.controls.append(ft.Text("Спим 5 секунд"))  # отображаем сообщение в ListView
-                                        page.update()  # Обновляем страницу
+                                        await self.message_output_program_window(lv=lv, page=page,
+                                                                                 message_program=f"Наш комментарий: {data}")
+                                        await self.message_output_program_window(lv=lv, page=page,
+                                                                                 message_program=f"Спим 5 секунд")
                                         await asyncio.sleep(5)
-
                                     else:
-                                        lv.controls.append(ft.Text(f"Комментарий к сообщению {message_id} уже был отправлен", color=ft.colors.GREEN))
-                                        page.update()
-                                        lv.controls.append(ft.Text("Спим 5 секунд"))  # отображаем сообщение в ListView
-                                        page.update()  # Обновляем страницу
+                                        await self.message_output_program_window(lv=lv, page=page,
+                                                                                 message_program=f"Комментарий к сообщению {message_id} уже был отправлен")
+                                        await self.message_output_program_window(lv=lv, page=page,
+                                                                                 message_program=f"Спим 5 секунд")
                                         await asyncio.sleep(5)
 
                                 if isinstance(message_peer_id, PeerChannel):
@@ -121,69 +148,45 @@ class TelegramCommentator:
                                     await self.record_bottom_messages_database(message_id, channel_id)
 
                             except ChatWriteForbiddenError:
-                                lv.controls.append(ft.Text(
-                                    f"Вы не можете отправлять сообщения в: {name[0]}"))  # отображаем сообщение в ListView
-                                page.update()  # Обновляем страницу
-
+                                await self.message_output_program_window(lv=lv, page=page,
+                                                                         message_program=f"Вы не можете отправлять сообщения в: {name[0]}")
                             except MsgIdInvalidError:
-                                lv.controls.append(
-                                    ft.Text("Возможно пост был изменен или удален"))  # отображаем сообщение в ListView
-                                page.update()  # Обновляем страницу
-
+                                await self.message_output_program_window(lv=lv, page=page,
+                                                                         message_program=f"Возможно пост был изменен или удален")
                             except UserBannedInChannelError:
-                                lv.controls.append(ft.Text(f"Вам запрещено отправлять сообщения в супергруппы/каналы",
-                                                           color=ft.colors.RED))
-                                page.update()  # Обновляем страницу
-
+                                await self.message_output_program_window(lv=lv, page=page,
+                                                                         message_program=f"Вам запрещено отправлять сообщения в супергруппы/каналы")
                             except SlowModeWaitError as e:
-                                lv.controls.append(ft.Text(
-                                    f"Вы не можете отправлять сообщения в супергруппы/каналы. Попробуйте позже через {str(datetime.timedelta(seconds=e.seconds))}",
-                                    color=ft.colors.RED))
-                                page.update()
-                                lv.controls.append(ft.Text(f"Спим {str(datetime.timedelta(seconds=e.seconds))}", color=ft.colors.RED))
-                                page.update()
+                                await self.message_output_program_window(lv=lv, page=page,
+                                                                         message_program=f"Вы не можете отправлять сообщения в супергруппы/каналы. Попробуйте позже через {str(datetime.timedelta(seconds=e.seconds))}")
+                                await self.message_output_program_window(lv=lv, page=page,
+                                                                         message_program=f"Спим {str(datetime.timedelta(seconds=e.seconds))}")
                                 await asyncio.sleep(e.seconds)
-
                             except FloodWaitError as e:
-                                lv.controls.append(
-                                    ft.Text(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}',
-                                            color=ft.colors.RED))  # отображаем сообщение в ListView
-                                page.update()  # Обновляем страницу
-                                lv.controls.append(
-                                    ft.Text(f"Спим {str(datetime.timedelta(seconds=e.seconds))}", color=ft.colors.RED))
-                                page.update()
+                                await self.message_output_program_window(lv=lv, page=page,
+                                                                         message_program=f"Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}")
+                                await self.message_output_program_window(lv=lv, page=page,
+                                                                         message_program=f"Спим {str(datetime.timedelta(seconds=e.seconds))}")
                                 await asyncio.sleep(5)
-
                             except ChatGuestSendForbiddenError:
-                                lv.controls.append(ft.Text(f"Вы не можете отправлять сообщения в супергруппы/каналы",
-                                                           color=ft.colors.RED))
-                                page.update()  # Обновляем страницу
-
+                                await self.message_output_program_window(lv=lv, page=page,
+                                                                         message_program=f"Вы не можете отправлять сообщения в супергруппы/каналы")
                             except ChannelPrivateError:
-                                lv.controls.append(ft.Text(f"Канал {name[0]} закрыт",
-                                                           color=ft.colors.RED))  # отображаем сообщение в ListView
-                                page.update()  # Обновляем страницу
-
+                                await self.message_output_program_window(lv=lv, page=page,
+                                                                         message_program=f"Канал {name[0]} закрыт")
                             except PeerIdInvalidError:
-                                lv.controls.append(ft.Text(f"Неверный ID канала: {name[0]}"))
-                                page.update()
-
-
+                                await self.message_output_program_window(lv=lv, page=page,
+                                                                         message_program=f"Неверный ID канала: {name[0]}")
             except FloodWaitError as e:  # Если ошибка при подписке
-                lv.controls.append(ft.Text(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}',
-                                           color=ft.colors.RED))  # отображаем сообщение в ListView
-                page.update()  # Обновляем страницу
-                lv.controls.append(ft.Text(f"Спим {str(datetime.timedelta(seconds=e.seconds))}", color=ft.colors.RED))
-                page.update()
+                await self.message_output_program_window(lv=lv, page=page,
+                                                         message_program=f"Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}")
+                await self.message_output_program_window(lv=lv, page=page,
+                                                         message_program=f"Спим {str(datetime.timedelta(seconds=e.seconds))}")
                 await asyncio.sleep(5)
-
             except AuthKeyUnregisteredError:  # Если аккаунт заблочен
-                lv.controls.append(
-                    ft.Text("Аккаунт заблокирован", color=ft.colors.RED))  # отображаем сообщение в ListView
-                page.update()  # Обновляем страницу
+                await self.message_output_program_window(lv=lv, page=page,
+                                                         message_program=f"Аккаунт заблокирован")
                 break
 
             except ChannelPrivateError:
-                lv.controls.append(ft.Text(f"Канал {name[0]} закрыт",
-                                           color=ft.colors.RED))  # отображаем сообщение в ListView
-                page.update()  # Обновляем страницу
+                await self.message_output_program_window(lv=lv, page=page, message_program=f"Канал {name[0]} закрыт")

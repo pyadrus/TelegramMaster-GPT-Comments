@@ -2,11 +2,12 @@
 import flet as ft
 from loguru import logger
 
+from src.commentator import TelegramCommentator
 from src.config_handler import program_version, program_last_modified_date, program_name, app_log, errors_log
 from src.core.handle_connect_accounts import handle_connect_accounts
 from src.core.handlers import (handle_getting_list_channels, handle_documentation,
                                handle_creating_list_of_channels, handle_channel_subscription,
-                               handle_submitting_comments, handle_change_name_description_photo,
+                               handle_change_name_description_photo,
                                handle_settings)
 from src.core.views import PRIMARY_COLOR, TITLE_FONT_WEIGHT
 from src.logging_in import loging
@@ -177,7 +178,7 @@ class Application:
 
     async def _handle_submitting_comments(self):
         """Страница 💬 Отправка комментариев"""
-        await handle_submitting_comments(self.page)
+        await TelegramCommentator().handle_submitting_comments(self.page)
 
     async def _handle_change_name_description_photo(self):
         """Страница 🖼️ Смена имени, описания, фото"""

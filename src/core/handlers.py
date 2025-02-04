@@ -3,7 +3,6 @@ import flet as ft
 from loguru import logger
 from telethon.helpers import TotalList
 
-from src.commentator import TelegramCommentator
 from src.core.buttons import create_buttons
 from src.core.views import program_title, view_with_elements
 from src.core.views import view_with_elements_input_field
@@ -25,24 +24,24 @@ async def handle_settings(page: ft.Page):
         """Подключение прокси"""
         page.go("/settings_proxy")
 
-    async def action_2(_):
+    async def record_time(_):
         """Запись времени"""
         page.go("/record_time")
 
-    async def action_3(_):
+    async def record_id_hash(_):
         """Запись id и hash"""
         page.go("/record_id_hash")
 
-    async def action_4(_):
+    async def recording_message(_):
         """Запись сообщения"""
         page.go("/recording_message")
 
     await view_with_elements(page=page, title=await program_title(title="Настройки"),
                              buttons=[
                                  await create_buttons(text="Подключение прокси", on_click=connection_proxy),
-                                 await create_buttons(text="Запись времени", on_click=action_2),
-                                 await create_buttons(text="Запись id и hash", on_click=action_3),
-                                 await create_buttons(text="Запись сообщения", on_click=action_4),
+                                 await create_buttons(text="Запись времени", on_click=record_time),
+                                 await create_buttons(text="Запись id и hash", on_click=record_id_hash),
+                                 await create_buttons(text="Запись сообщения", on_click=recording_message),
                                  await create_buttons(text="Назад", on_click=lambda _: page.go("/"))
                              ],
                              route_page="change_name_description_photo",
@@ -78,31 +77,6 @@ async def handle_change_name_description_photo(page: ft.Page):
                              route_page="change_name_description_photo",
                              lv=lv)
     page.update()  # Обновляем страницу
-
-
-async def handle_submitting_comments(page: ft.Page):
-    """Создает страницу Отправка комментариев"""
-    try:
-        logger.info("Пользователь перешел на страницу Отправка комментариев")
-        page.views.clear()  # Очищаем страницу и добавляем новый View
-        lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
-        page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
-
-        async def action_1(_):
-            lv.controls.append(ft.Text("Отправка комментариев"))  # отображаем сообщение в ListView
-            page.update()  # Обновляем страницу
-            client = await connect_telegram_account()
-            await TelegramCommentator().write_comments_in_telegram(client, page, lv)
-
-        await view_with_elements(page=page, title=await program_title(title="Отправка комментариев"),
-                                 buttons=[
-                                     await create_buttons(text="Отправка комментариев", on_click=action_1),
-                                     await create_buttons(text="Назад", on_click=lambda _: page.go("/"))
-                                 ],
-                                 route_page="submitting_comments", lv=lv)
-        page.update()  # Обновляем страницу
-    except Exception as e:
-        logger.exception(e)
 
 
 async def handle_channel_subscription(page: ft.Page):
