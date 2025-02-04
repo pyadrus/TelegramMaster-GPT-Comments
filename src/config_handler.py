@@ -37,6 +37,7 @@ class ConfigReader:
         Извлекает путь к папке с базой данных из конфигурационного файла.
         """
         return self.config_path.get("db_path", "db_path", fallback=None)
+
     def get_path_account(self):
         """
         Извлекает путь к папке с файлами из конфигурационного файла.

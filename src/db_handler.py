@@ -89,7 +89,6 @@ async def creating_a_channel_list(dialogs):
     return username_diclist
 
 
-
 async def reading_from_the_channel_list_database():
     """
     Считывает список имен пользователей (username) каналов из базы данных SQLite.
