@@ -17,29 +17,39 @@ async def handle_settings(page: ft.Page):
     lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
     page.controls.append(lv)
 
+    lv.controls.append(
+        ft.Text(
+            "🔗 Подключение прокси — настройка подключения через прокси (SOCKS5). Вам потребуется указать IP-адрес, порт, а также логин и пароль.\n\n"
+            "⏳ Запись времени — настройка задержек между отправкой сообщений и подпиской на каналы. Укажите время в секундах для безопасной работы.\n\n"
+            "🆔 Запись ID и Hash — ввод API ID и API Hash для авторизации в Telegram. Можно получить в https://my.telegram.org/apps.\n\n"
+            "✉️ Запись сообщения — настройка текста, который будет отправляться в комментариях. Можно задать любой текст для автоматической рассылки.\n\n"
+        )
+    )
+    page.update()
+
     async def connection_proxy(_):
-        """Подключение прокси"""
+        """🔗 Подключение прокси"""
         page.go("/settings_proxy")
 
     async def record_time(_):
-        """Запись времени"""
+        """⏳ Запись времени"""
         page.go("/record_time")
 
     async def record_id_hash(_):
-        """Запись id и hash"""
+        """🆔 Запись ID и Hash"""
         page.go("/record_id_hash")
 
     async def recording_message(_):
-        """Запись сообщения"""
+        """✉️ Запись сообщения"""
         page.go("/recording_message")
 
-    await view_with_elements(page=page, title=await program_title(title="Настройки"),
+    await view_with_elements(page=page, title=await program_title(title="⚙️ Настройки"),
                              buttons=[
-                                 await create_buttons(text="Подключение прокси", on_click=connection_proxy),
-                                 await create_buttons(text="Запись времени", on_click=record_time),
-                                 await create_buttons(text="Запись id и hash", on_click=record_id_hash),
-                                 await create_buttons(text="Запись сообщения", on_click=recording_message),
-                                 await create_buttons(text="Назад", on_click=lambda _: page.go("/"))
+                                 await create_buttons(text="🔗 Подключение прокси", on_click=connection_proxy),
+                                 await create_buttons(text="⏳ Запись времени", on_click=record_time),
+                                 await create_buttons(text="🆔 Запись ID и Hash", on_click=record_id_hash),
+                                 await create_buttons(text="✉️ Запись сообщения", on_click=recording_message),
+                                 await create_buttons(text="⬅️ Назад", on_click=lambda _: page.go("/"))
                              ],
                              route_page="change_name_description_photo",
                              lv=lv)
