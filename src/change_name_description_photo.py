@@ -5,7 +5,7 @@ from loguru import logger
 from telethon import functions
 
 from src.core.buttons import create_buttons
-from src.core.views import view_with_elements, program_title
+from src.core.views import program_title, view_with_elements_input_field
 from src.telegram_client import connect_telegram_account
 
 
@@ -16,38 +16,41 @@ async def handle_change_name_description_photo(page: ft.Page):
     lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
     page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
 
+    about_field = ft.TextField(label="Введите описание профиля", multiline=True, max_lines=19)
+
     async def action_1(_):
         try:
             lv.controls.append(ft.Text("🖼️ Смена имени, описания"))  # отображаем сообщение в ListView
             page.update()  # Обновляем страницу
             client = await connect_telegram_account()
-            await change_profile_descriptions(client, lv)
+            await change_profile_descriptions(client, lv, about_field.value)
             page.update()  # Обновляем страницу
         except Exception as e:
             logger.error(e)
             lv.controls.append(ft.Text(f"Ошибка: {str(e)}"))  # отображаем ошибку в ListView
             page.update()  # Обновляем страницу
 
-    await view_with_elements(page=page, title=await program_title(title="🖼️ Смена имени, описания"),
-                             buttons=[
-                                 await create_buttons(text="🖼️ Смена имени, описания",
-                                                      on_click=action_1),
-                                 await create_buttons(text="Назад", on_click=lambda _: page.go("/"))
-                             ],
-                             route_page="change_name_description_photo",
-                             lv=lv)
+    await view_with_elements_input_field(page=page,
+                                         title=await program_title(title="🖼️ Смена имени, описания"),
+                                         buttons=[
+                                             await create_buttons(text="🖼️ Смена имени, описания",
+                                                                  on_click=action_1),
+                                             await create_buttons(text="Назад", on_click=lambda _: page.go("/"))
+                                         ],
+                                         route_page="change_name_description_photo",
+                                         lv=lv,
+                                         text_field=about_field  # Создаем TextField поле ввода
+                                         )
     page.update()  # Обновляем страницу
 
 
-about = "Мой основной проект https://t.me/+UvdDWG8iGgg1ZWUy"
-
-
-async def change_profile_descriptions(client, lv: ft.ListView) -> None:
+async def change_profile_descriptions(client, lv: ft.ListView, about) -> None:
     """
     Обновляет описание профиля Telegram и имя со случайными данными с помощью библиотеки Faker.
 
     :param client: TelegramClient объект.
     :param lv: ListView объект.
+    :param about: Описание профиля.
     :return: None
     """
     fake = Faker('ru_RU')  # Устанавливаем локаль для генерации русских имен
