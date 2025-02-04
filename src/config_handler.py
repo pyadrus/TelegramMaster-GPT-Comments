@@ -26,6 +26,12 @@ class ConfigReader:
         self.config_path = configparser.ConfigParser(empty_lines_in_values=False, allow_no_value=True)
         self.config_path.read('data/config/config_path.ini')
 
+    def get_time_config_settings(self):
+        """
+        Извлекает введенное время пользователем из конфигурационного файла.
+        """
+        return self.config.get("time_config", "time_config", fallback=None)
+
     def get_path_db(self):
         """
         Извлекает путь к папке с базой данных из конфигурационного файла.
@@ -99,3 +105,5 @@ app_log, errors_log = ConfigReader().get_path_log()
 folder_accounts = ConfigReader().get_path_account()
 # Путь к базе данных
 db_path = ConfigReader().get_path_db()
+# Извлечение времени задержки в секундах
+time_config = ConfigReader().get_time_config_settings()

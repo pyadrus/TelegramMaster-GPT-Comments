@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
+import asyncio
 import datetime
 import time
 
 import flet as ft
 from telethon.errors import FloodWaitError, ChannelPrivateError
 from telethon.tl.functions.channels import JoinChannelRequest
+
+from src.config_handler import time_config
 
 
 class SUBSCRIBE:
@@ -28,6 +31,7 @@ class SUBSCRIBE:
             await client(JoinChannelRequest(channel_name))
             lv.controls.append(ft.Text(f"Успешная подписка на {channel_name}", color=ft.colors.RED))
             page.update()
+            await asyncio.sleep(int(time_config))
 
         except ChannelPrivateError:
             lv.controls.append(ft.Text(f"Канал {channel_name} закрыт",

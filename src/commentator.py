@@ -10,7 +10,7 @@ from telethon.errors import (UserBannedInChannelError, PeerIdInvalidError, MsgId
                              AuthKeyUnregisteredError)
 from telethon.tl.types import PeerChannel
 
-from src.config_handler import db_path
+from src.config_handler import db_path, time_config
 from src.core.buttons import create_buttons
 from src.core.views import program_title, view_with_elements
 from src.db_handler import reading_from_the_channel_list_database
@@ -133,13 +133,13 @@ class TelegramCommentator:
                                                                                  message_program=f"Наш комментарий: {data}")
                                         await self.message_output_program_window(lv=lv, page=page,
                                                                                  message_program=f"Спим 5 секунд")
-                                        await asyncio.sleep(5)
+                                        await asyncio.sleep(int(time_config))
                                     else:
                                         await self.message_output_program_window(lv=lv, page=page,
                                                                                  message_program=f"Комментарий к сообщению {message_id} уже был отправлен")
                                         await self.message_output_program_window(lv=lv, page=page,
                                                                                  message_program=f"Спим 5 секунд")
-                                        await asyncio.sleep(5)
+                                        await asyncio.sleep(int(time_config))
 
                                 if isinstance(message_peer_id, PeerChannel):
                                     channel_id = message_peer_id.channel_id
@@ -167,7 +167,7 @@ class TelegramCommentator:
                                                                          message_program=f"Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}")
                                 await self.message_output_program_window(lv=lv, page=page,
                                                                          message_program=f"Спим {str(datetime.timedelta(seconds=e.seconds))}")
-                                await asyncio.sleep(5)
+                                await asyncio.sleep(int(time_config))
                             except ChatGuestSendForbiddenError:
                                 await self.message_output_program_window(lv=lv, page=page,
                                                                          message_program=f"Вы не можете отправлять сообщения в супергруппы/каналы")
@@ -182,7 +182,7 @@ class TelegramCommentator:
                                                          message_program=f"Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}")
                 await self.message_output_program_window(lv=lv, page=page,
                                                          message_program=f"Спим {str(datetime.timedelta(seconds=e.seconds))}")
-                await asyncio.sleep(5)
+                await asyncio.sleep(int(time_config))
             except AuthKeyUnregisteredError:  # Если аккаунт заблочен
                 await self.message_output_program_window(lv=lv, page=page,
                                                          message_program=f"Аккаунт заблокирован")
