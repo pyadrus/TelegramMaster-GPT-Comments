@@ -132,13 +132,13 @@ class TelegramCommentator:
                                         await self.message_output_program_window(lv=lv, page=page,
                                                                                  message_program=f"Наш комментарий: {data}")
                                         await self.message_output_program_window(lv=lv, page=page,
-                                                                                 message_program=f"Спим 5 секунд")
+                                                                                 message_program=f"Спим {time_config} секунд")
                                         await asyncio.sleep(int(time_config))
                                     else:
                                         await self.message_output_program_window(lv=lv, page=page,
                                                                                  message_program=f"Комментарий к сообщению {message_id} уже был отправлен")
                                         await self.message_output_program_window(lv=lv, page=page,
-                                                                                 message_program=f"Спим 5 секунд")
+                                                                                 message_program=f"Спим {time_config} секунд")
                                         await asyncio.sleep(int(time_config))
 
                                 if isinstance(message_peer_id, PeerChannel):

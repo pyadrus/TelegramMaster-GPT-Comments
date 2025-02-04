@@ -7,7 +7,6 @@ from src.core.views import program_title, view_with_elements
 from src.core.views import view_with_elements_input_field
 from src.db_handler import read_channel_list_from_database
 from src.db_handler import save_channels_to_db
-from src.profile_updater import change_profile_descriptions
 from src.subscribe import SUBSCRIBE
 from src.telegram_client import connect_telegram_account
 
@@ -40,36 +39,6 @@ async def handle_settings(page: ft.Page):
                                  await create_buttons(text="Запись времени", on_click=record_time),
                                  await create_buttons(text="Запись id и hash", on_click=record_id_hash),
                                  await create_buttons(text="Запись сообщения", on_click=recording_message),
-                                 await create_buttons(text="Назад", on_click=lambda _: page.go("/"))
-                             ],
-                             route_page="change_name_description_photo",
-                             lv=lv)
-    page.update()  # Обновляем страницу
-
-
-async def handle_change_name_description_photo(page: ft.Page):
-    """Создает страницу 🖼️ Смена имени, описания, фото"""
-    logger.info("Пользователь перешел на страницу Смена имени, описания, фото")
-    page.views.clear()  # Очищаем страницу и добавляем новый View
-    lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
-    page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
-
-    async def action_1(_):
-        try:
-            lv.controls.append(ft.Text("🖼️ Смена имени, описания, фото"))  # отображаем сообщение в ListView
-            page.update()  # Обновляем страницу
-            client = await connect_telegram_account()
-            await change_profile_descriptions(client, lv)
-            page.update()  # Обновляем страницу
-        except Exception as e:
-            logger.error(e)
-            lv.controls.append(ft.Text(f"Ошибка: {str(e)}"))  # отображаем ошибку в ListView
-            page.update()  # Обновляем страницу
-
-    await view_with_elements(page=page, title=await program_title(title="🖼️ Смена имени, описания, фото"),
-                             buttons=[
-                                 await create_buttons(text="🖼️ Смена имени, описания, фото",
-                                                      on_click=action_1),
                                  await create_buttons(text="Назад", on_click=lambda _: page.go("/"))
                              ],
                              route_page="change_name_description_photo",

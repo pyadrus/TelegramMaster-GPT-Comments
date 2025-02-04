@@ -4,6 +4,41 @@ from faker import Faker
 from loguru import logger
 from telethon import functions
 
+from src.core.buttons import create_buttons
+from src.core.views import view_with_elements, program_title
+from src.telegram_client import connect_telegram_account
+
+
+async def handle_change_name_description_photo(page: ft.Page):
+    """Создает страницу 🖼️ Смена имени, описания"""
+    logger.info("Пользователь перешел на страницу Смена имени, описания")
+    page.views.clear()  # Очищаем страницу и добавляем новый View
+    lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
+    page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
+
+    async def action_1(_):
+        try:
+            lv.controls.append(ft.Text("🖼️ Смена имени, описания"))  # отображаем сообщение в ListView
+            page.update()  # Обновляем страницу
+            client = await connect_telegram_account()
+            await change_profile_descriptions(client, lv)
+            page.update()  # Обновляем страницу
+        except Exception as e:
+            logger.error(e)
+            lv.controls.append(ft.Text(f"Ошибка: {str(e)}"))  # отображаем ошибку в ListView
+            page.update()  # Обновляем страницу
+
+    await view_with_elements(page=page, title=await program_title(title="🖼️ Смена имени, описания"),
+                             buttons=[
+                                 await create_buttons(text="🖼️ Смена имени, описания",
+                                                      on_click=action_1),
+                                 await create_buttons(text="Назад", on_click=lambda _: page.go("/"))
+                             ],
+                             route_page="change_name_description_photo",
+                             lv=lv)
+    page.update()  # Обновляем страницу
+
+
 about = "Мой основной проект https://t.me/+UvdDWG8iGgg1ZWUy"
 
 

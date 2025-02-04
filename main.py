@@ -2,12 +2,11 @@
 import flet as ft
 from loguru import logger
 
+from src.change_name_description_photo import handle_change_name_description_photo
 from src.commentator import TelegramCommentator
 from src.config_handler import program_version, program_last_modified_date, program_name, app_log, errors_log
 from src.core.handle_connect_accounts import handle_connect_accounts
-from src.core.handlers import (handle_documentation,
-                               handle_creating_list_of_channels, handle_channel_subscription,
-                               handle_change_name_description_photo,
+from src.core.handlers import (handle_documentation, handle_creating_list_of_channels, handle_channel_subscription,
                                handle_settings)
 from src.core.views import PRIMARY_COLOR, TITLE_FONT_WEIGHT
 from src.getting_list_channels import handle_getting_list_channels
@@ -79,7 +78,7 @@ class Application:
         buttons = [
             self.create_button("📋 Получение списка каналов", "/getting_list_channels"),
             self.create_button("💬 Отправка комментариев", "/submitting_comments"),
-            self.create_button("🖼️ Смена имени, описания, фото", "/change_name_description_photo"),
+            self.create_button("🖼️ Смена имени, описания", "/change_name_description_photo"),
             self.create_button("🔗 Подписка на каналы", "/channel_subscription"),
             self.create_button("📂 Формирование списка каналов", "/creating_list_of_channels"),
             self.create_button("📖 Документация", "/documentation"),
@@ -182,7 +181,7 @@ class Application:
         await TelegramCommentator().handle_submitting_comments(self.page)
 
     async def _handle_change_name_description_photo(self):
-        """Страница 🖼️ Смена имени, описания, фото"""
+        """Страница 🖼️ Смена имени, описания"""
         await handle_change_name_description_photo(self.page)
 
     async def _handle_channel_subscription(self):
