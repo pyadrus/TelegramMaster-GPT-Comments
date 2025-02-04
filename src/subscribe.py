@@ -13,7 +13,7 @@ from src.config_handler import time_config
 class SUBSCRIBE:
     """Класс подписки на группы и каналы Telegram"""
 
-    async def subscribe_to_channel(self, client, channel_name, page: ft.Page, lv) -> None:
+    async def subscribe_to_channel(self, client, channel_name, page: ft.Page, lv: ft.ListView) -> None:
         """
         Подписывается на Telegram-канал.
         :param channel_name: Имя канала Telegram.

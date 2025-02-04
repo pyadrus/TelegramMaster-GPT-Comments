@@ -48,7 +48,7 @@ class TelegramCommentator:
         except Exception as e:
             logger.exception(e)
 
-    async def message_output_program_window(self, lv, page, message_program):
+    async def message_output_program_window(self, lv: ft.ListView, page: ft.Page, message_program):
         """"Вывод сообщений в окно программы."""
         lv.controls.append(ft.Text(f"{message_program}", color=ft.colors.RED))  # отображаем сообщение в ListView
         page.update()  # Обновляем страницу
@@ -88,7 +88,7 @@ class TelegramCommentator:
         conn.close()
         return exists
 
-    async def write_comments_in_telegram(self, client, page: ft.Page, lv) -> None:
+    async def write_comments_in_telegram(self, client, page: ft.Page, lv: ft.ListView) -> None:
         """
         Пишет комментарии в указанных Telegram-каналах.
 
