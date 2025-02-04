@@ -58,7 +58,7 @@ async def creating_a_channel_list(dialogs):
     cursor = conn.cursor()
 
     cursor.execute('''CREATE TABLE IF NOT EXISTS channels 
-                    (id INTEGER PRIMARY KEY, title TEXT, username TEXT)''')
+                    (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, username TEXT)''')
 
     # Удаляем записи с числовыми username
     cursor.execute("DELETE FROM channels WHERE username GLOB '[0-9]*'")
@@ -72,13 +72,22 @@ async def creating_a_channel_list(dialogs):
             if username and not username.isdigit():
                 username_diclist.append(username)
                 cursor.execute('''
-                    INSERT OR IGNORE INTO channels (title, username) 
+                    INSERT INTO channels (title, username) 
                     VALUES (?, ?)
                 ''', (title, username))
+
+    # Удаляем дубликаты по username, оставляя только одну запись
+    cursor.execute('''
+        DELETE FROM channels 
+        WHERE id NOT IN (
+            SELECT MIN(id) FROM channels GROUP BY username
+        )
+    ''')
 
     conn.commit()
     conn.close()
     return username_diclist
+
 
 
 async def reading_from_the_channel_list_database():
@@ -176,8 +185,3 @@ class DatabaseHandler:
                                 "VALUES (?, ?, ?, ?, ?, ?)", (proxy,), )
         self.sqlite_connection.commit()
         self.close()  # cursor_members.close() – закрытие соединения с БД.
-
-
-if __name__ == "__main__":
-    reading_from_the_channel_list_database()
-    read_channel_list_from_database()

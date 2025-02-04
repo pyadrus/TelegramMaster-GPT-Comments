@@ -84,5 +84,4 @@ async def loging():
 
 
 if __name__ == "__main__":
-    loging()
     get_external_ip()
