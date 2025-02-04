@@ -3,7 +3,7 @@ import datetime
 import time
 
 import flet as ft
-from telethon.errors import FloodWaitError
+from telethon.errors import FloodWaitError, ChannelPrivateError
 from telethon.tl.functions.channels import JoinChannelRequest
 
 
@@ -28,6 +28,13 @@ class SUBSCRIBE:
             await client(JoinChannelRequest(channel_name))
             lv.controls.append(ft.Text(f"Успешная подписка на {channel_name}", color=ft.colors.RED))
             page.update()
+
+        except ChannelPrivateError:
+            lv.controls.append(ft.Text(f"Канал {channel_name} закрыт",
+                                       color=ft.colors.RED))  # отображаем сообщение в ListView
+            page.update()  # Обновляем страницу
+
+
         except FloodWaitError as e:
             lv.controls.append(ft.Text(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}',
                                        color=ft.colors.RED))  # отображаем сообщение в ListView

@@ -13,12 +13,23 @@ from telethon.tl.types import PeerChannel
 from src.config_handler import db_path
 from src.db_handler import reading_from_the_channel_list_database
 from src.subscribe import SUBSCRIBE
+from src.telegram_client import find_files
 
 
 class TelegramCommentator:
     """
     Класс для автоматизированной работы с комментариями в Telegram-каналах.
     """
+
+    async def reading_json_file(self):
+        """Чтение данных из json файла."""
+
+        json_files = find_files(directory_path="data/message/", extension='json')
+
+        with open(f'{json_files[0]}', 'r', encoding='utf-8') as file:
+            data = file.read()
+            logger.info(data)
+        return data
 
     async def record_bottom_messages_database(self, message_id, channel_id) -> None:
         """Запись данных сообщения в базу данных."""
@@ -85,10 +96,11 @@ class TelegramCommentator:
 
                                     # Проверяем существование записи в БД
                                     if not await self.check_message_exists(message_id, channel_id):
-
-                                        await client.send_message(entity=name[0], message='Россия лучшая страна!',
+                                        data = await self.reading_json_file()
+                                        logger.info(f"Сообщение для рассылки: {data}")
+                                        await client.send_message(entity=name[0], message=f'{data}',
                                                                   comment_to=post.id)
-                                        lv.controls.append(ft.Text(f'Наш комментарий: Россия лучшая страна!'))  # отображаем сообщение в ListView
+                                        lv.controls.append(ft.Text(f'Наш комментарий: {data}'))  # отображаем сообщение в ListView
                                         page.update()  # Обновляем страницу
 
                                         lv.controls.append(ft.Text("Спим 5 секунд"))  # отображаем сообщение в ListView
@@ -156,6 +168,7 @@ class TelegramCommentator:
                                 lv.controls.append(ft.Text(f"Неверный ID канала: {name[0]}"))
                                 page.update()
 
+
             except FloodWaitError as e:  # Если ошибка при подписке
                 lv.controls.append(ft.Text(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}',
                                            color=ft.colors.RED))  # отображаем сообщение в ListView
@@ -169,3 +182,8 @@ class TelegramCommentator:
                     ft.Text("Аккаунт заблокирован", color=ft.colors.RED))  # отображаем сообщение в ListView
                 page.update()  # Обновляем страницу
                 break
+
+            except ChannelPrivateError:
+                lv.controls.append(ft.Text(f"Канал {name[0]} закрыт",
+                                           color=ft.colors.RED))  # отображаем сообщение в ListView
+                page.update()  # Обновляем страницу
