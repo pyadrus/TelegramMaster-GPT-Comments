@@ -116,6 +116,33 @@ async def read_channel_list_from_database():
     return results
 
 
+async def record_bottom_messages_database(message_id, channel_id) -> None:
+    """Запись данных сообщения в базу данных."""
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    # Создаем таблицу для хранения информации о каналах, если она еще не существует
+    cursor.execute(
+        '''CREATE TABLE IF NOT EXISTS messages_channels (message_id, message_peer_id)''')
+    cursor.execute('INSERT INTO messages_channels (message_id, message_peer_id) VALUES (?, ?)',
+                   (message_id, channel_id))
+    # Сохраняем изменения и закрываем соединение
+    conn.commit()
+    conn.close()
+
+
+async def check_message_exists(message_id, channel_id) -> bool:
+    """Проверяет существование сообщения в базе данных."""
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute(
+        'SELECT 1 FROM messages_channels WHERE message_id = ? AND message_peer_id = ?',
+        (message_id, channel_id)
+    )
+    exists = cursor.fetchone() is not None
+    conn.close()
+    return exists
+
+
 class DatabaseHandler:
 
     def __init__(self, db_file="data/database/app.db"):
