@@ -4,10 +4,54 @@ import datetime
 import time
 
 import flet as ft
+from loguru import logger
 from telethon.errors import FloodWaitError, ChannelPrivateError
 from telethon.tl.functions.channels import JoinChannelRequest
 
 from src.config_handler import time_config
+from src.core.buttons import create_buttons
+from src.core.views import program_title, view_with_elements
+from src.db_handler import read_channel_list_from_database
+from src.telegram_client import connect_telegram_account
+
+
+async def handle_channel_subscription(page: ft.Page):
+    """Создает страницу Подписка на каналы"""
+    logger.info("Пользователь перешел на страницу Подписка на каналы")
+    page.views.clear()  # Очищаем страницу и добавляем новый View
+    lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
+
+    # Добавляем пояснительный текст
+    lv.controls.append(ft.Text(
+        "🔗 Перед началом работы сформируйте список каналов для подписки\n\n"
+        "🔄 В процессе работы программа будет подписываться на каналы и отображать важную информацию для пользователя.\n\n"
+    ))
+
+    page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
+
+    async def action_1(_):
+        lv.controls.append(ft.Text("Подписка на каналы / группы"))  # отображаем сообщение в ListView
+        page.update()  # Обновляем страницу
+        client = await connect_telegram_account()
+
+        channel_name = await read_channel_list_from_database()
+        lv.controls.append(
+            ft.Text(f"Группы и каналы из базы данных {channel_name}"))  # отображаем сообщение в ListView
+        page.update()  # Обновляем страницу
+        for channel in channel_name:
+            lv.controls.append(ft.Text(f"Подписка на: {channel[0]}"))  # отображаем сообщение в ListView
+            page.update()  # Обновляем страницу
+            await SUBSCRIBE().subscribe_to_channel(client, channel[0], page, lv)
+        lv.controls.append(ft.Text(f"Подписка завершена"))  # отображаем сообщение в ListView
+        page.update()  # Обновляем страницу
+
+    await view_with_elements(page=page, title=await program_title(title="Подписка на каналы"),
+                             buttons=[
+                                 await create_buttons(text="Подписка", on_click=action_1),
+                                 await create_buttons(text="Назад", on_click=lambda _: page.go("/"))
+                             ],
+                             route_page="channel_subscription", lv=lv)
+    page.update()  # Обновляем страницу
 
 
 class SUBSCRIBE:
