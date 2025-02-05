@@ -167,10 +167,15 @@ async def handle_documentation(page: ft.Page):
         on_tap_link=lambda e: page.launch_url(e.data),  # Открываем ссылки в браузере
     )
 
+    async def open_website(_):
+        """Открывает веб-версию документации"""
+        page.launch_url("https://github.com/pyadrus/TelegramMaster_Commentator/blob/master/doc/doc.md")
+
     # Добавляем элементы на страницу
     await view_with_elements(page=page,
                              title=await program_title(title="Документация"),  # Создаем заголовок страницы
                              buttons=[
+                                 await create_buttons(text="🌐 Открыть сайт", on_click=open_website),
                                  await create_buttons(text="Назад", on_click=lambda _: page.go("/"))
                              ],
                              route_page="documentation",
