@@ -5,14 +5,13 @@ import time
 
 import flet as ft
 from loguru import logger
-from telethon.errors import FloodWaitError, ChannelPrivateError
-from telethon.tl.functions.channels import JoinChannelRequest
-
 from src.config_handler import time_config
 from src.core.buttons import create_buttons
 from src.core.views import program_title, view_with_elements
 from src.db_handler import read_channel_list_from_database
 from src.telegram_client import connect_telegram_account
+from telethon.errors import FloodWaitError, ChannelPrivateError
+from telethon.tl.functions.channels import JoinChannelRequest
 
 
 async def handle_channel_subscription(page: ft.Page):

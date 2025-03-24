@@ -4,11 +4,6 @@ import datetime
 
 import flet as ft
 from loguru import logger
-from telethon.errors import (UserBannedInChannelError, PeerIdInvalidError, MsgIdInvalidError, SlowModeWaitError,
-                             ChatWriteForbiddenError, ChatGuestSendForbiddenError, FloodWaitError, ChannelPrivateError,
-                             AuthKeyUnregisteredError)
-from telethon.tl.types import PeerChannel
-
 from src.config_handler import time_config
 from src.core.buttons import create_buttons
 from src.core.views import program_title, view_with_elements, message_output_program_window
@@ -16,6 +11,10 @@ from src.db_handler import reading_from_the_channel_list_database, check_message
 from src.subscribe import SUBSCRIBE
 from src.telegram_client import connect_telegram_account
 from src.working_with_files import reading_json_file
+from telethon.errors import (UserBannedInChannelError, PeerIdInvalidError, MsgIdInvalidError, SlowModeWaitError,
+                             ChatWriteForbiddenError, ChatGuestSendForbiddenError, FloodWaitError, ChannelPrivateError,
+                             AuthKeyUnregisteredError)
+from telethon.tl.types import PeerChannel
 
 
 class TelegramCommentator:

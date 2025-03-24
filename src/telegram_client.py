@@ -2,10 +2,9 @@
 import os
 
 from loguru import logger
-from telethon import TelegramClient
-
 from src.config_handler import api_id, api_hash
 from src.connect import reading_proxy_data_from_the_database
+from telethon import TelegramClient
 
 
 def find_files(directory_path: str, extension: str) -> list:

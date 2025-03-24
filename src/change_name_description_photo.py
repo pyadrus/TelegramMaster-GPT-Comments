@@ -2,11 +2,10 @@
 import flet as ft
 from faker import Faker
 from loguru import logger
-from telethon import functions
-
 from src.core.buttons import create_buttons
 from src.core.views import program_title, view_with_elements_input_field
 from src.telegram_client import connect_telegram_account
+from telethon import functions
 
 
 async def handle_change_name_description_photo(page: ft.Page):
