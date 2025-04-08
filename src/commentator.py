@@ -9,6 +9,7 @@ from telethon.errors import (UserBannedInChannelError, PeerIdInvalidError, MsgId
                              AuthKeyUnregisteredError)
 from telethon.tl.types import PeerChannel
 
+from src.ai import get_groq_response
 from src.config_handler import time_config
 from src.core.buttons import create_buttons
 from src.core.views import program_title, view_with_elements, message_output_program_window
@@ -70,17 +71,15 @@ class TelegramCommentator:
         last_message_ids = {name: 0 for name in channels}
         for name in channels:
             logger.info(name)
-            await SUBSCRIBE().subscribe_to_channel(client, name[0], page,
-                                                   lv)  # Подписываемся на канал перед отправкой комментария
+            await SUBSCRIBE().subscribe_to_channel(client, name[0], page, lv)  # Подписываемся на канал перед отправкой комментария
             try:
-                channel_entity = await client.get_entity(name[0])
-                messages = await client.get_messages(channel_entity, limit=1)
+                messages = await client.get_messages(await client.get_entity(name[0]), limit=1)
                 for message in messages:
 
                     # Получаем ID сообщения и ID канала, чтобы записать данные в базу данных
                     message_id = message.id
                     message_peer_id = message.peer_id
-
+                    message_text = message.text
                     await message_output_program_window(lv=lv, page=page,
                                                         message_program=f"ID сообщения: {message.id} ID: {message.peer_id} Дата: {message.date}")
                     if messages:
@@ -94,7 +93,13 @@ class TelegramCommentator:
 
                                     # Проверяем существование записи в БД
                                     if not await check_message_exists(message_id, channel_id):
-                                        data = await reading_json_file()
+                                        # Если записи нет, отправляем комментарий и записываем его в БД
+
+                                        # Заранее заготовленное сообщение
+                                        # data = await reading_json_file()
+                                        # Получаем текст сообщения от ИИ
+                                        data = await get_groq_response(message_text)
+
                                         await client.send_message(entity=name[0], message=f'{data}',
                                                                   comment_to=post.id)
                                         await message_output_program_window(lv=lv, page=page,
