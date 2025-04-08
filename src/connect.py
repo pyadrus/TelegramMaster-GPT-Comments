@@ -7,11 +7,12 @@ import shutil
 
 import flet as ft  # Импортируем библиотеку flet
 from loguru import logger
+from telethon import TelegramClient
+from telethon.errors import SessionPasswordNeededError, ApiIdInvalidError
+
 from src.config_handler import api_id, api_hash, folder_accounts
 from src.core.buttons import create_buttons
 from src.db_handler import DatabaseHandler
-from telethon import TelegramClient
-from telethon.errors import SessionPasswordNeededError, ApiIdInvalidError
 
 
 async def reading_proxy_data_from_the_database():

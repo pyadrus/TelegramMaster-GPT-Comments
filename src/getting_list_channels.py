@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import flet as ft
 from loguru import logger
+from telethon.helpers import TotalList
+
 from src.core.buttons import create_buttons
 from src.core.views import program_title, view_with_elements
 from src.db_handler import creating_a_channel_list
 from src.telegram_client import connect_telegram_account
-from telethon.helpers import TotalList
 
 
 async def handle_getting_list_channels(page: ft.Page):

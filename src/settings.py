@@ -7,6 +7,7 @@ import sys
 
 import flet as ft  # Импортируем библиотеку flet
 from loguru import logger
+
 from src.core.buttons import create_buttons
 from src.core.notification import show_notification
 from src.db_handler import DatabaseHandler
