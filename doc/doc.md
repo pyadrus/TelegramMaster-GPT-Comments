@@ -1,4 +1,4 @@
-Документация по работе с программой **TelegramMaster Commentator 🚀**
+Документация по работе с программой **TelegramMaster-GPT-Comments 🚀**
 
 * [🔗 Подключение аккаунтов](https://github.com/pyadrus/TelegramMaster_Commentator/blob/master/doc/Подключение_аккаунтов_в_программе.md)
 * [📋 Получение списка каналов](https://github.com/pyadrus/TelegramMaster_Commentator/blob/master/doc/Получение_списка_каналов.md)

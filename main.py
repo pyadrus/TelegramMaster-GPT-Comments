@@ -104,7 +104,7 @@ class Application:
         """Добавляет стартовое сообщение в ListView."""
         self.info_list.controls.append(
             ft.Text(
-                "TelegramMaster Commentator 🚀\n\nTelegramMaster Commentator - это программа для автоматической "
+                "TelegramMaster-GPT-Comments 🚀\n\nTelegramMaster-GPT-Comments - это программа для автоматической "
                 "расставления комментариев в каналах Telegram, а также для работы с аккаунтами. 💬\n\n"
                 "📂 Проект доступен на GitHub: https://github.com/pyadrus/TelegramMaster_Commentator \n"
                 "📲 Контакт с разработчиком в Telegram: https://t.me/PyAdminRU\n"
