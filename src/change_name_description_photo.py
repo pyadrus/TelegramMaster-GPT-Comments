@@ -11,8 +11,6 @@ from src.telegram_client import connect_telegram_account
 
 async def handle_change_name_description_photo(page: ft.Page):
     """Создает страницу 🖼️ Смена имени, описания"""
-
-    logger.info("Пользователь перешел на страницу Смена имени, описания")
     page.views.clear()  # Очищаем страницу и добавляем новый View
     lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
     page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
@@ -36,8 +34,7 @@ async def handle_change_name_description_photo(page: ft.Page):
         try:
             lv.controls.append(ft.Text("🖼️ Смена имени, описания"))  # отображаем сообщение в ListView
             page.update()  # Обновляем страницу
-            client = await connect_telegram_account()
-            await change_profile_descriptions(client, lv, about_field.value)
+            await change_profile_descriptions(await connect_telegram_account(), lv, about_field.value)
             page.update()  # Обновляем страницу
         except Exception as e:
             logger.error(e)
@@ -47,8 +44,7 @@ async def handle_change_name_description_photo(page: ft.Page):
     await view_with_elements_input_field(page=page,
                                          title=await program_title(title="🖼️ Смена имени, описания"),
                                          buttons=[
-                                             await create_buttons(text="🖼️ Смена имени, описания",
-                                                                  on_click=action_1),
+                                             await create_buttons(text="🖼️ Смена имени, описания", on_click=action_1),
                                              await create_buttons(text="Назад", on_click=lambda _: page.go("/"))
                                          ],
                                          route_page="change_name_description_photo",
@@ -80,8 +76,6 @@ async def change_profile_descriptions(client, lv: ft.ListView, about) -> None:
                 about=about  # Устанавливаем новое описание
             )
         )
-        logger.info(result)
-
         # Форматируем результат для пользователя
         user_info = (
             f"🆔 ID: {result.id}\n"
@@ -91,7 +85,6 @@ async def change_profile_descriptions(client, lv: ft.ListView, about) -> None:
             f"📞 Телефон: {result.phone}\n"
             f"📝 Описание профиля обновлено: {about}"
         )
-
         # Добавляем отформатированные данные в ListView
         lv.controls.append(ft.Text(user_info))
         lv.controls.append(ft.Text("✅ Профиль успешно обновлен!"))  # отображаем сообщение в ListView

@@ -16,7 +16,7 @@ from src.core.views import program_title, view_with_elements, message_output_pro
 from src.db_handler import reading_from_the_channel_list_database, check_message_exists, record_bottom_messages_database
 from src.subscribe import SUBSCRIBE
 from src.telegram_client import connect_telegram_account
-from src.working_with_files import reading_json_file
+# from src.working_with_files import reading_json_file
 
 
 class TelegramCommentator:
@@ -44,8 +44,7 @@ class TelegramCommentator:
             async def action_1(_):
                 lv.controls.append(ft.Text("Отправка комментариев"))  # отображаем сообщение в ListView
                 page.update()  # Обновляем страницу
-                client = await connect_telegram_account()
-                await self.write_comments_in_telegram(client, page, lv)
+                await self.write_comments_in_telegram(await connect_telegram_account(), page, lv)
 
             await view_with_elements(page=page, title=await program_title(title="Отправка комментариев"),
                                      buttons=[
@@ -67,7 +66,6 @@ class TelegramCommentator:
         :return: None.
         """
         channels = await reading_from_the_channel_list_database()
-        logger.info(channels)
         last_message_ids = {name: 0 for name in channels}
         for name in channels:
             logger.info(name)

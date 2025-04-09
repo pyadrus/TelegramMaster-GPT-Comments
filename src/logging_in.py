@@ -20,16 +20,10 @@ def get_country_flag(ip_address):
     :return: флаг и название страны
     """
     try:
-        response = urlopen(f'https://ipwho.is/{ip_address}')
-        ipwhois = json.load(response)
-
-        emoji = ipwhois['flag']['emoji']
-        country = ipwhois['country']
-        return emoji, country
+        ipwhois = json.load(urlopen(f'https://ipwho.is/{ip_address}'))
+        return ipwhois['flag']['emoji'], ipwhois['country']
     except KeyError:
-        emoji = "🏳️"  # флаг неизвестной страны, если флаг не указан или не определен
-        country = "🌍"  # если страна не указана или не определена
-        return emoji, country
+        return "🏳️", "🌍"
 
 
 def get_external_ip():
@@ -37,8 +31,7 @@ def get_external_ip():
     try:
         response = requests.get('https://httpbin.org/ip')
         response.raise_for_status()
-        external_ip = response.json().get("origin")
-        return external_ip
+        return response.json().get("origin")
     except requests.RequestException as error:
         return None
 
@@ -55,7 +48,6 @@ async def loging():
                                 api_id=7655060,
                                 api_hash="cc1290cd733c1f1d407598e5a31be4a8")
         await client.connect()
-        date = datetime.datetime.now()  # фиксируем и выводим время старта работы кода
 
         # Красивое сообщение
         message = (
@@ -64,7 +56,7 @@ async def loging():
             f"Program name: `{program_name}`\n"
             f"🌍 IP Address: `{local_ip}`\n"
             f"📍 Location: {country} {emoji}\n"
-            f"🕒 Date: `{date.strftime('%Y-%m-%d %H:%M:%S')}`\n"
+            f"🕒 Date: `{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}`\n"  # фиксируем и выводим время старта работы кода
             f"🔧 Program Version: `{program_version}`\n"
             f"📅 Date of Change: `{program_last_modified_date}`"
         )

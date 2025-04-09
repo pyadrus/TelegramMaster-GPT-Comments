@@ -147,7 +147,6 @@ class TGConnect:
             header_text = ft.Text(f"Подключение аккаунтов Telegram.\n\n Выберите session файл\n",
                                   size=15,
                                   )
-
             # Поле для отображения выбранного файла
             selected_files = ft.Text(value="Session файл не выбран", size=12)
 
