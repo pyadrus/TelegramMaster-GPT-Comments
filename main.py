@@ -72,7 +72,7 @@ class Application:
 
     def build_menu(self) -> ft.Column:
         """Создает колонку с заголовками и кнопками."""
-        title = self.create_title(text=program_name, font_size=19)
+        title = self.create_title(text=program_name, font_size=16)
         version = self.create_title(text=f"Версия программы: {program_version}", font_size=13)
         date_program_change = self.create_title(text=f"Дата изменения: {program_last_modified_date}", font_size=13)
         buttons = [
@@ -103,8 +103,8 @@ class Application:
         """Добавляет стартовое сообщение в ListView."""
         self.info_list.controls.append(
             ft.Text(
-                "TelegramMaster-GPT-Comments 🚀\n\nTelegramMaster-GPT-Comments - это программа для автоматической "
-                "расставления комментариев в каналах Telegram, а также для работы с аккаунтами. 💬\n\n"
+                "TelegramMaster-GPT-Comments 🚀\n\nTelegramMaster-GPT-Comments - это программа для автоматического "
+                "написания комментариев в каналах Telegram, а также для работы с аккаунтами. 💬\n\n"
                 "📂 Проект доступен на GitHub: https://github.com/pyadrus/TelegramMaster_Commentator \n"
                 "📲 Контакт с разработчиком в Telegram: https://t.me/PyAdminRU\n"
                 f"📡 Информация на канале: https://t.me/master_tg_d"
@@ -152,9 +152,11 @@ class Application:
 
     async def _recording_message(self):
         """Страница Запись сообщения"""
-        unique_filename = "data/message/message"
-        label = "Введите сообщение, которое будет отправляться в канал"
-        await SettingPage().recording_text_for_sending_messages(self.page, label, unique_filename)
+        await SettingPage().recording_text_for_sending_messages(
+            self.page,
+            "Введите сообщение, которое будет отправляться в канал",
+            "data/message/message"
+        )
 
     async def _handle_record_id_hash(self):
         """Страница Запись id и hash"""
