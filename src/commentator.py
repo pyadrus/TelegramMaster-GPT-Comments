@@ -91,7 +91,7 @@ class TelegramCommentator:
                             try:
                                 if isinstance(message_peer_id, PeerChannel):
                                     channel_id = message_peer_id.channel_id
-
+                                    data = await get_groq_response(message_text)
                                     # Проверяем существование записи в БД
                                     if not await check_message_exists(message_id, channel_id):
                                         # Если записи нет, отправляем комментарий и записываем его в БД
@@ -99,7 +99,6 @@ class TelegramCommentator:
                                         # Заранее заготовленное сообщение
                                         # data = await reading_json_file()
                                         # Получаем текст сообщения от ИИ
-                                        data = await get_groq_response(message_text)
 
                                         await client.send_message(entity=name[0], message=f'{data}',
                                                                   comment_to=post.id)

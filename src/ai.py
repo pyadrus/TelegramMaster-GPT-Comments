@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from groq import AsyncGroq
+from groq.types.chat import ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam
 from loguru import logger
 
 from src.config import GROQ_API_KEY, selectedmodel
@@ -15,8 +16,14 @@ async def get_groq_response(user_input):
         # Формируем запрос к Groq API
         chat_completion = await client_groq.chat.completions.create(
             messages=[
-                {"role": "system", "content": "Ты патриот России, отвечай с гордостью и уважением к Родине."},
-                {"role": "user", "content": user_input}
+                ChatCompletionSystemMessageParam(
+                    role="system",
+                    content="Ты патриот России, отвечай с гордостью и уважением к Родине."
+                ),
+                ChatCompletionUserMessageParam(
+                    role="user",
+                    content=user_input
+                )
             ],
             model=selectedmodel,
         )
