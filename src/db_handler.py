@@ -15,8 +15,7 @@ async def save_channels_to_db(channels_data: str, db_path: str = db_path) -> Non
     :param db_path: Путь к файлу базы данных SQLite.
     :return: None
     """
-    # Разделяем введенные данные на отдельные каналы
-    # Учитываем запятые, пробелы и переносы строк
+    # Разделяем введенные данные на отдельные каналы. Учитываем запятые, пробелы и переносы строк
     channels_list = [
         channel.strip() for channel in channels_data.replace("\n", ",").split(",") if channel.strip()
     ]
@@ -28,7 +27,16 @@ async def save_channels_to_db(channels_data: str, db_path: str = db_path) -> Non
         async with aiosqlite.connect(db_path) as conn:
             cursor = await conn.cursor()
             # Создаем таблицу для хранения информации о каналах, если она еще не существует
-            await cursor.execute('''CREATE TABLE IF NOT EXISTS user_channels (id INTEGER PRIMARY KEY,channel_name TEXT UNIQUE)''')
+            await cursor.execute('''CREATE TABLE IF NOT EXISTS user_channels
+                                    (
+                                        id
+                                        INTEGER
+                                        PRIMARY
+                                        KEY,
+                                        channel_name
+                                        TEXT
+                                        UNIQUE
+                                    )''')
             # Записываем каждый канал в базу данных
             for channel in channels_list:
                 try:
@@ -46,7 +54,18 @@ async def creating_a_channel_list(dialogs):
     username_diclist = []
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
-        cursor.execute('''CREATE TABLE IF NOT EXISTS channels (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, username TEXT)''')
+        cursor.execute('''CREATE TABLE IF NOT EXISTS channels
+                          (
+                              id
+                              INTEGER
+                              PRIMARY
+                              KEY
+                              AUTOINCREMENT,
+                              title
+                              TEXT,
+                              username
+                              TEXT
+                          )''')
         # Удаляем записи с числовыми username
         cursor.execute("DELETE FROM channels WHERE username GLOB '[0-9]*'")
         for dialog in dialogs:
@@ -56,9 +75,12 @@ async def creating_a_channel_list(dialogs):
                 # Пропускаем числовые username и пустые значения
                 if username and not username.isdigit():
                     username_diclist.append(username)
-                    cursor.execute('''INSERT INTO channels (title, username) VALUES (?, ?)''', (title, username))
+                    cursor.execute('''INSERT INTO channels (title, username)
+                                      VALUES (?, ?)''', (title, username))
         # Удаляем дубликаты по username, оставляя только одну запись
-        cursor.execute('''DELETE FROM channels WHERE id NOT IN (SELECT MIN(id) FROM channels GROUP BY username)''')
+        cursor.execute('''DELETE
+                          FROM channels
+                          WHERE id NOT IN (SELECT MIN(id) FROM channels GROUP BY username)''')
         conn.commit()
     return username_diclist
 
@@ -92,8 +114,13 @@ async def record_bottom_messages_database(message_id, channel_id) -> None:
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         # Создаем таблицу для хранения информации о каналах, если она еще не существует
-        cursor.execute('''CREATE TABLE IF NOT EXISTS messages_channels (message_id, message_peer_id)''')
-        cursor.execute('INSERT INTO messages_channels (message_id, message_peer_id) VALUES (?, ?)',(message_id, channel_id))
+        cursor.execute('''CREATE TABLE IF NOT EXISTS messages_channels
+                          (
+                              message_id,
+                              message_peer_id
+                          )''')
+        cursor.execute('INSERT INTO messages_channels (message_id, message_peer_id) VALUES (?, ?)',
+                       (message_id, channel_id))
         # Сохраняем изменения и закрываем соединение
         conn.commit()
 
@@ -103,7 +130,8 @@ async def check_message_exists(message_id, channel_id) -> bool:
     with sqlite3.connect(db_path) as conn:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-        cursor.execute('SELECT 1 FROM messages_channels WHERE message_id = ? AND message_peer_id = ?',(message_id, channel_id) )
+        cursor.execute('SELECT 1 FROM messages_channels WHERE message_id = ? AND message_peer_id = ?',
+                       (message_id, channel_id))
         exists = cursor.fetchone() is not None
     return exists
 
