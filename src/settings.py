@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import configparser
 import io
-import json  # TODO Использовать работу с json только в одной файле.
+import json
 import os
 import sys
+from pathlib import Path
 
 import flet as ft  # Импортируем библиотеку flet
 from loguru import logger
@@ -208,6 +209,33 @@ class SettingPage:
                 ]
             )
         )
+
+    async def choosing_an_ai_model(self):
+        """Выбор модели AI"""
+
+        # Загружаем список моделей из JSON
+        models_file = Path("data/config/models.json")
+        with open(models_file, "r", encoding="utf-8") as f:
+            models = json.load(f)["models"]
+
+        lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
+        self.page.controls.append(lv)  # добавляем ListView на страницу для отображения логов 📝
+
+        lv.controls.append(ft.Text("Выберите ИИ модель"))  # отображаем сообщение в ListView
+
+        dropdown = ft.Dropdown(
+            width=400,
+            options=[ft.dropdown.Option(model) for model in models],
+        )
+
+        # обработчик выбора
+        def on_change(e):
+            lv.controls.append(ft.Text(f"✅ Вы выбрали модель: {e.control.value}"))
+            self.page.update()
+
+        dropdown.on_change = on_change
+        lv.controls.append(dropdown)
+        self.page.update()
 
 
 def writing_settings_to_a_file(config) -> None:

@@ -153,6 +153,7 @@ class Application:
     async def _handle_choosing_an_ai_model(self):
         """Страница Выбор модели AI"""
         logger.info("Пользователь перешел на выбор модели AI")
+        await SettingPage(self.page).choosing_an_ai_model()
 
     async def _handle_record_time(self):
         """Страница Запись времени"""
