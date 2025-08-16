@@ -76,7 +76,7 @@ class Application:
         )
 
     def build_menu(self) -> ft.Column:
-        """Создает колонку с заголовками и кнопками."""
+        """Создает колонку с заголовками и кнопками для главного меню программы"""
         title = self.create_title(text=program_name, font_size=16)
         version = self.create_title(text=f"Версия программы: {program_version}", font_size=13)
         date_program_change = self.create_title(text=f"Дата изменения: {program_last_modified_date}", font_size=13)
@@ -142,12 +142,17 @@ class Application:
             "/settings_proxy": self._handle_settings_proxy,
             "/record_id_hash": self._handle_record_id_hash,
             "/recording_message": self._recording_message,
+            "/choosing_an_ai_model": self._handle_choosing_an_ai_model,
             "/record_time": self._handle_record_time,
         }
         handler = route_handlers.get(self.page.route)
         if handler:
             await handler()
         self.page.update()
+
+    async def _handle_choosing_an_ai_model(self):
+        """Страница Выбор модели AI"""
+        logger.info("Пользователь перешел на выбор модели AI")
 
     async def _handle_record_time(self):
         """Страница Запись времени"""

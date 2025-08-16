@@ -9,6 +9,7 @@ from src.db_handler import save_channels_to_db
 
 
 async def handle_settings(page: ft.Page):
+    """Формирует страницу ⚙️ Настройки с надписями и кнопками"""
     logger.info("Пользователь перешел на страницу Настройки")
     page.views.clear()
     lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
@@ -40,12 +41,17 @@ async def handle_settings(page: ft.Page):
         """✉️ Запись сообщения"""
         page.go("/recording_message")
 
+    async def choosing_an_ai_model(_):
+        """Выбор ИИ модели"""
+        page.go("/choosing_an_ai_model")
+
     await view_with_elements(page=page, title=await program_title(title="⚙️ Настройки"),
                              buttons=[
                                  await create_buttons(text="🔗 Подключение прокси", on_click=connection_proxy),
                                  await create_buttons(text="⏳ Запись времени", on_click=record_time),
                                  await create_buttons(text="🆔 Запись ID и Hash", on_click=record_id_hash),
                                  await create_buttons(text="✉️ Запись сообщения", on_click=recording_message),
+                                 await create_buttons(text="Выбор ИИ модели", on_click=choosing_an_ai_model),
                                  await create_buttons(text="⬅️ Назад", on_click=lambda _: page.go("/"))
                              ],
                              route_page="change_name_description_photo",
