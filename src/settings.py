@@ -20,17 +20,21 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 class SettingPage:
 
-    def __init__(self):
-        self.db_handler = DatabaseHandler()
-
-    async def creating_the_main_window_for_proxy_data_entry(self, page: ft.Page) -> None:
+    def __init__(self, page: ft.Page):
         """
-        Создание главного окна для ввода дынных proxy
+        Инициализация страницы настроек
 
         :param page: Страница интерфейса Flet для отображения элементов управления.
         """
+        self.page = page
+        self.db_handler = DatabaseHandler()
+
+    async def creating_the_main_window_for_proxy_data_entry(self) -> None:
+        """
+        Создание главного окна для ввода дынных proxy
+        """
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
-        page.controls.append(lv)  # добавляем ListView на страницу для отображения логов 📝
+        self.page.controls.append(lv)  # добавляем ListView на страницу для отображения логов 📝
 
         lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
 
@@ -46,26 +50,24 @@ class SettingPage:
                      rdns_types]
             await self.db_handler.save_proxy_data_to_db(proxy=proxy)
 
-            await show_notification(page, "Данные успешно записаны!")
+            await show_notification(self.page, "Данные успешно записаны!")
 
-            page.go("/settings")  # Изменение маршрута в представлении существующих настроек
-            page.update()
+            self.page.go("/settings")  # Изменение маршрута в представлении существующих настроек
+            self.page.update()
 
-        await self.add_view_with_fields_and_button(page,
-                                                   [proxy_type, addr_type, port_type, username_type, password_type],
+        await self.add_view_with_fields_and_button([proxy_type, addr_type, port_type, username_type, password_type],
                                                    btn_click, lv)
 
-    async def recording_text_for_sending_messages(self, page: ft.Page, label, unique_filename) -> None:
+    async def recording_text_for_sending_messages(self, label, unique_filename) -> None:
         """
         Запись текста в файл для отправки сообщений в Telegram в формате JSON. Данные записываются в файл с именем
         <имя файла>.json и сохраняются в формате JSON.
 
-        :param page: Страница интерфейса Flet для отображения элементов управления.
         :param label: Текст для отображения в поле ввода.
         :param unique_filename: Имя файла для записи данных.
         """
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
-        page.controls.append(lv)  # добавляем ListView на страницу для отображения логов 📝
+        self.page.controls.append(lv)  # добавляем ListView на страницу для отображения логов 📝
 
         lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
 
@@ -75,23 +77,22 @@ class SettingPage:
             write_data_to_json_file(reactions=text_to_send.value,
                                     path_to_the_file=unique_filename)  # Сохраняем данные в файл
 
-            await show_notification(page, "Данные успешно записаны!")
+            await show_notification(self.page, "Данные успешно записаны!")
 
-            page.go("/settings")  # Изменение маршрута в представлении существующих настроек
-            page.update()
+            self.page.go("/settings")  # Изменение маршрута в представлении существующих настроек
+            self.page.update()
 
-        await self.add_view_with_fields_and_button(page, [text_to_send], btn_click, lv)
+        await self.add_view_with_fields_and_button([text_to_send], btn_click, lv)
 
-    async def record_setting(self, page: ft.Page, limit_type: str, label: str):
+    async def record_setting(self, limit_type: str, label: str):
         """
         Запись лимитов на аккаунт или сообщение
 
-        :param page: Страница интерфейса Flet для отображения элементов управления.
         :param limit_type: Тип лимита.
         :param label: Текст для отображения в поле ввода.
         """
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
-        page.controls.append(lv)  # добавляем ListView на страницу для отображения логов 📝
+        self.page.controls.append(lv)  # добавляем ListView на страницу для отображения логов 📝
 
         lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
 
@@ -103,27 +104,26 @@ class SettingPage:
                 config.set(limit_type, limit_type, limits.value)
                 writing_settings_to_a_file(config)
 
-                await show_notification(page, "Данные успешно записаны!")
+                await show_notification(self.page, "Данные успешно записаны!")
 
             except configparser.NoSectionError as error:
-                await show_notification(page, "⚠️ Поврежден файл data/config/config.ini")
+                await show_notification(self.page, "⚠️ Поврежден файл data/config/config.ini")
                 logger.error(f"Ошибка: {error}")
 
-            page.go("/settings")  # Изменение маршрута в представлении существующих настроек
-            page.update()
+            self.page.go("/settings")  # Изменение маршрута в представлении существующих настроек
+            self.page.update()
 
-        await self.add_view_with_fields_and_button(page, [limits], btn_click, lv)
+        await self.add_view_with_fields_and_button([limits], btn_click, lv)
 
-    async def create_main_window(self, page: ft.Page, variable, time_range) -> None:
+    async def create_main_window(self, variable, time_range) -> None:
         """
-        :param page: Страница интерфейса Flet для отображения элементов управления.
         :param variable: Название переменной в файле config.ini
         :param time_range: Имя файла, в который будут записаны данные
         :return: None
         """
 
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
-        page.controls.append(lv)  # добавляем ListView на страницу для отображения логов 📝
+        self.page.controls.append(lv)  # добавляем ListView на страницу для отображения логов 📝
 
         for time_range_message in time_range:
             lv.controls.append(
@@ -145,25 +145,23 @@ class SettingPage:
                     writing_settings_to_a_file(config)
 
                     lv.controls.append(ft.Text("Данные успешно записаны!"))  # отображаем сообщение в ListView
-                    await show_notification(page, "Данные успешно записаны!")
-                    page.go("/settings")  # Изменение маршрута в представлении существующих настроек
+                    await show_notification(self.page, "Данные успешно записаны!")
+                    self.page.go("/settings")  # Изменение маршрута в представлении существующих настроек
                 else:
                     lv.controls.append(ft.Text("Ошибка: первое время должно быть меньше второго!"))
             except ValueError:
                 lv.controls.append(ft.Text("Ошибка: введите числовые значения!"))
 
-            page.update()  # обновляем страницу
+            self.page.update()  # обновляем страницу
 
-        await self.add_view_with_fields_and_button(page, [smaller_timex, larger_timex], btn_click, lv)
+        await self.add_view_with_fields_and_button([smaller_timex, larger_timex], btn_click, lv)
 
-    async def writing_api_id_api_hash(self, page: ft.Page):
+    async def writing_api_id_api_hash(self):
         """
         Записываем api, hash полученный с помощью регистрации приложения на сайте https://my.telegram.org/auth
-
-        :param page: Страница интерфейса Flet для отображения элементов управления.
         """
         lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
-        page.controls.append(lv)  # добавляем ListView на страницу для отображения логов 📝
+        self.page.controls.append(lv)  # добавляем ListView на страницу для отображения логов 📝
 
         lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
 
@@ -176,17 +174,15 @@ class SettingPage:
             config.get("telegram_settings", "hash")
             config.set("telegram_settings", "hash", api_hash_data.value)
             writing_settings_to_a_file(config)
-            page.go("/settings")  # Изменение маршрута в представлении существующих настроек
-            page.update()
+            self.page.go("/settings")  # Изменение маршрута в представлении существующих настроек
+            self.page.update()
 
-        await self.add_view_with_fields_and_button(page, [api_id_data, api_hash_data], btn_click, lv)
+        await self.add_view_with_fields_and_button([api_id_data, api_hash_data], btn_click, lv)
 
-    @staticmethod
-    async def add_view_with_fields_and_button(page: ft.Page, fields: list, btn_click, lv) -> None:
+    async def add_view_with_fields_and_button(self, fields: list, btn_click, lv) -> None:
         """
         Добавляет представление с заданными текстовыми полями и кнопкой.
 
-        :param page: Страница интерфейса Flet для отображения элементов управления.
         :param fields: Список текстовых полей для добавления
         :param btn_click: Кнопка для добавления
         :param lv: ListView для отображения логов 📝
@@ -195,10 +191,10 @@ class SettingPage:
 
         def back_button_clicked(e) -> None:
             """Кнопка возврата в меню настроек"""
-            page.go("/settings")
+            self.page.go("/settings")
 
         # Создание View с элементами
-        page.views.append(
+        self.page.views.append(
             ft.View(
                 "/settings",
                 controls=[
@@ -220,7 +216,7 @@ def writing_settings_to_a_file(config) -> None:
         config.write(setup)  # Записываем данные в файл
 
 
-def recording_limits_file(time_1, time_2, variable: str) -> configparser.ConfigParser:
+def recording_limits_file(time_1, time_2, variable: str):
     """
     Запись данных в файл TelegramMaster/user_data/config.ini
 

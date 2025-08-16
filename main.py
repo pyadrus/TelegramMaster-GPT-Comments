@@ -151,13 +151,14 @@ class Application:
 
     async def _handle_record_time(self):
         """Страница Запись времени"""
-        limit_type = "time_config"
-        label = "Введите время в секундах, в цифрах"  # Подпись в поле ввода
-        await SettingPage().record_setting(self.page, limit_type, label)
+        await SettingPage(self.page).record_setting(
+            limit_type="time_config",
+            label="Введите время в секундах, в цифрах",  # Подпись в поле ввода
+        )
 
     async def _recording_message(self):
         """Страница Запись сообщения"""
-        await SettingPage().recording_text_for_sending_messages(
+        await SettingPage(self.page).recording_text_for_sending_messages(
             self.page,
             "Введите сообщение, которое будет отправляться в канал",
             "data/message/message"
@@ -165,11 +166,11 @@ class Application:
 
     async def _handle_record_id_hash(self):
         """Страница Запись id и hash"""
-        await SettingPage().writing_api_id_api_hash(self.page)
+        await SettingPage(self.page).writing_api_id_api_hash(self.page)
 
     async def _handle_settings_proxy(self):
         """Страница ⚙️ Настройки прокси"""
-        await SettingPage().creating_the_main_window_for_proxy_data_entry(self.page)
+        await SettingPage(self.page).creating_the_main_window_for_proxy_data_entry(self.page)
 
     async def _handle_connect_accounts(self):
         """Страница 🔗 Подключение аккаунтов"""
