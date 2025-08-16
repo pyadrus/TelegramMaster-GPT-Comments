@@ -67,24 +67,24 @@ class SUBSCRIBE:
         :return: None.
         """
         if not channel_name or channel_name.isdigit():
-            lv.controls.append(ft.Text(f"Неверный username канала: {channel_name}", color=ft.colors.RED))
+            lv.controls.append(ft.Text(f"Неверный username канала: {channel_name}", color=ft.Colors.RED))
             page.update()
             return
 
         try:
             await client(JoinChannelRequest(channel_name))
-            lv.controls.append(ft.Text(f"Успешная подписка на {channel_name}", color=ft.colors.RED))
+            lv.controls.append(ft.Text(f"Успешная подписка на {channel_name}", color=ft.Colors.RED))
             page.update()
             await asyncio.sleep(int(time_config))
 
         except ChannelPrivateError:
             lv.controls.append(ft.Text(f"Канал {channel_name} закрыт",
-                                       color=ft.colors.RED))  # отображаем сообщение в ListView
+                                       color=ft.Colors.RED))  # отображаем сообщение в ListView
             page.update()  # Обновляем страницу
 
 
         except FloodWaitError as e:
             lv.controls.append(ft.Text(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}',
-                                       color=ft.colors.RED))  # отображаем сообщение в ListView
+                                       color=ft.Colors.RED))  # отображаем сообщение в ListView
             page.update()  # Обновляем страницу
             time.sleep(e.seconds)

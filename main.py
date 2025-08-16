@@ -28,7 +28,7 @@ class Application:
         self.WINDOW_HEIGHT = 600
         self.SPACING = 5
         self.RADIUS = 5
-        self.LINE_COLOR = ft.colors.GREY
+        self.LINE_COLOR = ft.Colors.GREY
         self.BUTTON_HEIGHT = 40
         self.LINE_WIDTH = 1
         self.PADDING = 10

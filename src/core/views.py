@@ -2,7 +2,7 @@
 import flet as ft
 
 TITLE_FONT_WEIGHT = ft.FontWeight.BOLD
-PRIMARY_COLOR = ft.colors.CYAN_600
+PRIMARY_COLOR = ft.Colors.CYAN_600
 
 
 async def message_output_program_window(lv: ft.ListView, page: ft.Page, message_program):
@@ -12,7 +12,7 @@ async def message_output_program_window(lv: ft.ListView, page: ft.Page, message_
     :param page: Страница приложения.
     :param message_program: Сообщение.
     """
-    lv.controls.append(ft.Text(f"{message_program}", color=ft.colors.RED))  # отображаем сообщение в ListView
+    lv.controls.append(ft.Text(f"{message_program}", color=ft.Colors.RED))  # отображаем сообщение в ListView
     page.update()  # Обновляем страницу
 
 
