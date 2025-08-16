@@ -73,7 +73,3 @@ async def loging():
             await client.disconnect()
     except Exception as error:
         logger.exception(error)
-
-
-if __name__ == "__main__":
-    get_external_ip()

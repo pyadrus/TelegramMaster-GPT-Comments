@@ -47,7 +47,12 @@ class Application:
         page.window.max_height = self.WINDOW_HEIGHT
 
     def create_title(self, text: str, font_size) -> ft.Text:
-        """Создает заголовок с градиентом."""
+        """
+        Создает заголовок с градиентом.
+
+        :param text: Текст заголовка.
+        :param font_size: Размер шрифта.
+        """
         return ft.Text(
             spans=[
                 ft.TextSpan(
