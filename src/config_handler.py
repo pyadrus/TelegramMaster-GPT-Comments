@@ -93,11 +93,21 @@ class ConfigReader:
     def get_program_window_width(self) -> int | None:
         """
         Извлекает ширину окна программы из конфигурационного файла.
+
         :return: Ширина окна программы. Если значение отсутствует, возвращает None.
         """
         return self.config_gui.get("WINDOW_WIDTH", "WINDOW_WIDTH", fallback=None)
 
+    def get_program_window_height(self) -> int | None:
+        """
+        Извлекает высоту окна программы из конфигурационного файла.
+
+        :return: Высота окна программы. Если значение отсутствует, возвращает None.
+        """
+        return self.config_gui.get("WINDOW_HEIGHT", "WINDOW_HEIGHT", fallback=None)
+
 WINDOW_WIDTH = ConfigReader().get_program_window_width()  # Извлечение ширины окна из конфигурационного файла
+WINDOW_HEIGHT = ConfigReader().get_program_window_height()  # Извлечение высоты окна из конфигурационного файла
 
 # Инициализация глобальных переменных с настройками
 program_version = ConfigReader().get_program_version()

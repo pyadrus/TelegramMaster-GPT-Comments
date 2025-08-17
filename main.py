@@ -5,7 +5,7 @@ from loguru import logger
 from src.change_name_description_photo import handle_change_name_description_photo
 from src.commentator import TelegramCommentator
 from src.config_handler import (program_version, program_last_modified_date, program_name, app_log, errors_log,
-    WINDOW_WIDTH)
+                                WINDOW_WIDTH, WINDOW_HEIGHT)
 from src.core.handle_connect_accounts import handle_connect_accounts
 from src.core.handlers import handle_documentation, handle_creating_list_of_channels, handle_settings
 from src.core.views import PRIMARY_COLOR, TITLE_FONT_WEIGHT
@@ -25,7 +25,6 @@ class Application:
     def __init__(self):
         self.page = None
         self.info_list = None
-        self.WINDOW_HEIGHT = 600
         self.SPACING = 5
         self.RADIUS = 5
         self.LINE_COLOR = ft.Colors.GREY
@@ -39,12 +38,12 @@ class Application:
         """Изменение на изменение главного окна программы."""
         page.title = f"Версия {program_version}. Дата изменения {program_last_modified_date}"
         page.window.width = WINDOW_WIDTH  # Устанавливаем ширину окна
-        page.window.height = self.WINDOW_HEIGHT
+        page.window.height = WINDOW_HEIGHT  # Устанавливаем высоту окна
         page.window.resizable = False
         page.window.min_width = WINDOW_WIDTH  # Устанавливаем минимальную ширину окна
         page.window.max_width = WINDOW_WIDTH  # Устанавливаем максимальную ширину окна
-        page.window.min_height = self.WINDOW_HEIGHT
-        page.window.max_height = self.WINDOW_HEIGHT
+        page.window.min_height = WINDOW_HEIGHT  # Устанавливаем минимальную высоту окна
+        page.window.max_height = WINDOW_HEIGHT  # Устанавливаем максимальную высоту окна
 
     def create_title(self, text: str, font_size) -> ft.Text:
         """
