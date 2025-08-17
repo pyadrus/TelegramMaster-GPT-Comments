@@ -9,7 +9,7 @@ from pathlib import Path
 import flet as ft  # Импортируем библиотеку flet
 from loguru import logger
 
-from src.config_handler import WINDOW_WIDTH
+from src.config_handler import WINDOW_WIDTH, max_lines
 from src.core.buttons import create_buttons
 from src.core.notification import show_notification
 from src.db_handler import DatabaseHandler
@@ -217,13 +217,13 @@ class SettingPage:
         entering_token = ft.TextField(
             label="Введите токен https://groq.com",
             width=self.width_elements, # Ширина поля ввода,
-            max_lines=19
+            max_lines=max_lines
         )
 
         entering_promt = ft.TextField(
             label="Введите промт",
             width=self.width_elements, # Ширина поля ввода,
-            max_lines=19
+            max_lines=max_lines
         )
 
         dropdown = ft.Dropdown(
