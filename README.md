@@ -1,6 +1,8 @@
 # TelegramMaster-GPT-Comments 🚀
 
-English README • Русский README • Lengua española README • [O‘zbek README](README.UZ.md)
+English README • [Русский README](README.md) • Lengua española README • [O‘zbek README](README.UZ.md)
+
+---
 
 ![alt text](doc/images/TelegramMaster_Commentator.png "TelegramMaster_Commentator")
 
