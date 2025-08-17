@@ -219,6 +219,13 @@ class SettingPage:
             width=width_elements, # Ширина поля ввода,
             max_lines=19
         )
+
+        entering_promt = ft.TextField(
+            label="Введите промт",
+            width=width_elements, # Ширина поля ввода,
+            max_lines=19
+        )
+
         dropdown = ft.Dropdown(
             width=width_elements, # Ширина выпадающего списка
             options=[ft.dropdown.Option(model) for model in models], # Список моделей из json файла
@@ -234,6 +241,9 @@ class SettingPage:
                         [
                             ft.Text("Введите токен для работы с https://groq.com/", size=18, weight=ft.FontWeight.BOLD),
                             entering_token,  # Ввод токена
+                            ft.Text("Введите промт для ИИ", size=18, weight=ft.FontWeight.BOLD),
+                            entering_promt,  # Ввод промта
+
                             ft.Text("Выбор ИИ модели", size=18, weight=ft.FontWeight.BOLD),
                             dropdown,
                             result_text,
