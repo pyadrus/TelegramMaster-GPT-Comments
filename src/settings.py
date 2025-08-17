@@ -239,11 +239,10 @@ class SettingPage:
                 controls=[
                     ft.Column(
                         [
-                            ft.Text("Введите токен для работы с https://groq.com/", size=18, weight=ft.FontWeight.BOLD),
+                            ft.Text("Введите токен для работы с https://groq.com", size=18, weight=ft.FontWeight.BOLD),
                             entering_token,  # Ввод токена
                             ft.Text("Введите промт для ИИ", size=18, weight=ft.FontWeight.BOLD),
                             entering_promt,  # Ввод промта
-
                             ft.Text("Выбор ИИ модели", size=18, weight=ft.FontWeight.BOLD),
                             dropdown,
                             result_text,
