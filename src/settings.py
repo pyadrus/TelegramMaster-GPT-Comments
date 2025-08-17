@@ -31,6 +31,7 @@ class SettingPage:
         self.lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
         self.page = page
         self.db_handler = DatabaseHandler()
+        self.width_elements = int(WINDOW_WIDTH) - 10  # Ширина элементов (поля ввода, выпадающего списка и кнопок)
 
     async def creating_the_main_window_for_proxy_data_entry(self) -> None:
         """
@@ -213,22 +214,20 @@ class SettingPage:
                 result_text.value = "⚠️ Сначала выберите модель!"
             self.page.update()
 
-        width_elements = int(WINDOW_WIDTH) - 10 # Ширина элементов (поля ввода, выпадающего списка и кнопок)
-
         entering_token = ft.TextField(
             label="Введите токен https://groq.com",
-            width=width_elements, # Ширина поля ввода,
+            width=self.width_elements, # Ширина поля ввода,
             max_lines=19
         )
 
         entering_promt = ft.TextField(
             label="Введите промт",
-            width=width_elements, # Ширина поля ввода,
+            width=self.width_elements, # Ширина поля ввода,
             max_lines=19
         )
 
         dropdown = ft.Dropdown(
-            width=width_elements, # Ширина выпадающего списка
+            width=self.width_elements, # Ширина выпадающего списка
             options=[ft.dropdown.Option(model) for model in models], # Список моделей из json файла
         )
         dropdown.on_change = on_change
@@ -249,12 +248,12 @@ class SettingPage:
                             result_text,
                             ft.ElevatedButton(
                                 text= "✅ Готово", # Кнопка "Готово"
-                                width=width_elements, # Ширина кнопки
+                                width=self.width_elements, # Ширина кнопки
                                 on_click=done_button_clicked # Обработчик клика
                             ),
                             ft.ElevatedButton(
                                 text= "⬅️ Назад", # Кнопка "Назад"
-                                width=width_elements, # Ширина кнопки
+                                width=self.width_elements, # Ширина кнопки
                                 on_click=back_button_clicked # Обработчик клика
                             ),
                         ],
