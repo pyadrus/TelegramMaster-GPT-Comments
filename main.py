@@ -38,11 +38,11 @@ class Application:
     async def actions_with_the_program_window(self, page: ft.Page):
         """Изменение на изменение главного окна программы."""
         page.title = f"Версия {program_version}. Дата изменения {program_last_modified_date}"
-        page.window.width = WINDOW_WIDTH
+        page.window.width = WINDOW_WIDTH  # Устанавливаем ширину окна
         page.window.height = self.WINDOW_HEIGHT
         page.window.resizable = False
-        page.window.min_width = WINDOW_WIDTH
-        page.window.max_width = WINDOW_WIDTH
+        page.window.min_width = WINDOW_WIDTH  # Устанавливаем минимальную ширину окна
+        page.window.max_width = WINDOW_WIDTH  # Устанавливаем максимальную ширину окна
         page.window.min_height = self.WINDOW_HEIGHT
         page.window.max_height = self.WINDOW_HEIGHT
 

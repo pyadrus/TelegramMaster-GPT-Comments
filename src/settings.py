@@ -9,6 +9,7 @@ from pathlib import Path
 import flet as ft  # Импортируем библиотеку flet
 from loguru import logger
 
+from src.config_handler import WINDOW_WIDTH
 from src.core.buttons import create_buttons
 from src.core.notification import show_notification
 from src.db_handler import DatabaseHandler
@@ -212,7 +213,7 @@ class SettingPage:
                 result_text.value = "⚠️ Сначала выберите модель!"
             self.page.update()
 
-        width_elements = 600 # Ширина элементов (поля ввода, выпадающего списка и кнопок)
+        width_elements = int(WINDOW_WIDTH) - 10 # Ширина элементов (поля ввода, выпадающего списка и кнопок)
 
         entering_token = ft.TextField(
             label="Введите токен https://groq.com",
