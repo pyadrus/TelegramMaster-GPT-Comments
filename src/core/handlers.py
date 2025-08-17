@@ -51,7 +51,7 @@ async def handle_settings(page: ft.Page):
                                  await create_buttons(text="⏳ Запись времени", on_click=record_time),
                                  await create_buttons(text="🆔 Запись ID и Hash", on_click=record_id_hash),
                                  await create_buttons(text="✉️ Запись сообщения", on_click=recording_message),
-                                 await create_buttons(text="Выбор ИИ модели", on_click=choosing_an_ai_model),
+                                 await create_buttons(text="⚙️ Настройка ИИ", on_click=choosing_an_ai_model),
                                  await create_buttons(text="⬅️ Назад", on_click=lambda _: page.go("/"))
                              ],
                              route_page="change_name_description_photo",

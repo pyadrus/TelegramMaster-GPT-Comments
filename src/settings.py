@@ -186,6 +186,7 @@ class SettingPage:
 
     async def choosing_an_ai_model(self):
         """Выбор модели AI"""
+        entering_token = ft.TextField(label="Введите токен https://groq.com/", multiline=True, max_lines=19)
 
         # Загружаем список моделей из JSON
         models_file = Path("data/config/models.json")
@@ -210,6 +211,17 @@ class SettingPage:
             """Кнопка возврата в меню настроек"""
             self.page.go("/settings")
 
+        def done_button_clicked(e) -> None:
+            """Кнопка подтверждения выбора"""
+            if dropdown.value:
+                result_text.value = f"🎯 Вы подтвердили выбор: {dropdown.value}"
+                # Здесь можно сохранить выбранную модель и токен в конфиг
+                # например:
+                # save_config({"token": entering_token.value, "model": dropdown.value})
+            else:
+                result_text.value = "⚠️ Сначала выберите модель!"
+            self.page.update()
+
         # создаём отдельный View для выбора модели
         self.page.views.append(
             ft.View(
@@ -217,15 +229,13 @@ class SettingPage:
                 controls=[
                     ft.Column(
                         [
+                            ft.Text("Введите токен для работы с https://groq.com/", size=18, weight=ft.FontWeight.BOLD),
+                            entering_token,  # Ввод токена
                             ft.Text("Выбор ИИ модели", size=18, weight=ft.FontWeight.BOLD),
                             dropdown,
                             result_text,
-                            ft.Row(
-                                [
-                                    ft.ElevatedButton("⬅️ Назад", on_click=back_button_clicked),
-                                ],
-                                alignment=ft.MainAxisAlignment.CENTER,
-                            )
+                            ft.ElevatedButton("⬅️ Назад", on_click=back_button_clicked),
+                            ft.ElevatedButton("✅ Готово", on_click=done_button_clicked),
                         ],
                         alignment=ft.MainAxisAlignment.START,
                         spacing=10,
