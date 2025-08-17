@@ -27,6 +27,7 @@ class SettingPage:
 
         :param page: Страница интерфейса Flet для отображения элементов управления.
         """
+        self.lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
         self.page = page
         self.db_handler = DatabaseHandler()
 
@@ -34,10 +35,10 @@ class SettingPage:
         """
         Создание главного окна для ввода дынных proxy
         """
-        lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
-        self.page.controls.append(lv)  # добавляем ListView на страницу для отображения логов 📝
 
-        lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
+        self.page.controls.append(self.lv)  # добавляем ListView на страницу для отображения логов 📝
+
+        self.lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
 
         proxy_type = ft.TextField(label="Введите тип прокси, например SOCKS5: ", multiline=True, max_lines=19)
         addr_type = ft.TextField(label="Введите ip адрес, например 194.67.248.9: ", multiline=True, max_lines=19)
@@ -57,7 +58,7 @@ class SettingPage:
             self.page.update()
 
         await self.add_view_with_fields_and_button([proxy_type, addr_type, port_type, username_type, password_type],
-                                                   btn_click, lv)
+                                                   btn_click, self.lv)
 
     async def recording_text_for_sending_messages(self, label, unique_filename) -> None:
         """
@@ -67,10 +68,9 @@ class SettingPage:
         :param label: Текст для отображения в поле ввода.
         :param unique_filename: Имя файла для записи данных.
         """
-        lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
-        self.page.controls.append(lv)  # добавляем ListView на страницу для отображения логов 📝
+        self.page.controls.append(self.lv)  # добавляем ListView на страницу для отображения логов 📝
 
-        lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
+        self.lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
 
         text_to_send = ft.TextField(label=label, multiline=True, max_lines=19)
 
@@ -83,7 +83,7 @@ class SettingPage:
             self.page.go("/settings")  # Изменение маршрута в представлении существующих настроек
             self.page.update()
 
-        await self.add_view_with_fields_and_button([text_to_send], btn_click, lv)
+        await self.add_view_with_fields_and_button([text_to_send], btn_click, self.lv)
 
     async def record_setting(self, limit_type: str, label: str):
         """
@@ -92,10 +92,9 @@ class SettingPage:
         :param limit_type: Тип лимита.
         :param label: Текст для отображения в поле ввода.
         """
-        lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
-        self.page.controls.append(lv)  # добавляем ListView на страницу для отображения логов 📝
+        self.page.controls.append(self.lv)  # добавляем ListView на страницу для отображения логов 📝
 
-        lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
+        self.lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
 
         limits = ft.TextField(label=label, multiline=True, max_lines=19)
 
@@ -114,7 +113,7 @@ class SettingPage:
             self.page.go("/settings")  # Изменение маршрута в представлении существующих настроек
             self.page.update()
 
-        await self.add_view_with_fields_and_button([limits], btn_click, lv)
+        await self.add_view_with_fields_and_button([limits], btn_click, self.lv)
 
     async def create_main_window(self, variable, time_range) -> None:
         """
@@ -122,12 +121,10 @@ class SettingPage:
         :param time_range: Имя файла, в который будут записаны данные
         :return: None
         """
-
-        lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
-        self.page.controls.append(lv)  # добавляем ListView на страницу для отображения логов 📝
+        self.page.controls.append(self.lv)  # добавляем ListView на страницу для отображения логов 📝
 
         for time_range_message in time_range:
-            lv.controls.append(
+            self.lv.controls.append(
                 ft.Text(f"Записанные данные в файле {time_range_message}"))  # отображаем сообщение в ListView
 
         smaller_timex = ft.TextField(label="Время в секундах (меньшее)", autofocus=True)
@@ -145,26 +142,25 @@ class SettingPage:
                     config = recording_limits_file(str(smaller_times), str(larger_times), variable=variable)
                     writing_settings_to_a_file(config)
 
-                    lv.controls.append(ft.Text("Данные успешно записаны!"))  # отображаем сообщение в ListView
+                    self.lv.controls.append(ft.Text("Данные успешно записаны!"))  # отображаем сообщение в ListView
                     await show_notification(self.page, "Данные успешно записаны!")
                     self.page.go("/settings")  # Изменение маршрута в представлении существующих настроек
                 else:
-                    lv.controls.append(ft.Text("Ошибка: первое время должно быть меньше второго!"))
+                    self.lv.controls.append(ft.Text("Ошибка: первое время должно быть меньше второго!"))
             except ValueError:
-                lv.controls.append(ft.Text("Ошибка: введите числовые значения!"))
+                self.lv.controls.append(ft.Text("Ошибка: введите числовые значения!"))
 
             self.page.update()  # обновляем страницу
 
-        await self.add_view_with_fields_and_button([smaller_timex, larger_timex], btn_click, lv)
+        await self.add_view_with_fields_and_button([smaller_timex, larger_timex], btn_click, self.lv)
 
     async def writing_api_id_api_hash(self):
         """
         Записываем api, hash полученный с помощью регистрации приложения на сайте https://my.telegram.org/auth
         """
-        lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
-        self.page.controls.append(lv)  # добавляем ListView на страницу для отображения логов 📝
+        self.page.controls.append(self.lv)  # добавляем ListView на страницу для отображения логов 📝
 
-        lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
+        self.lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
 
         api_id_data = ft.TextField(label="Введите api_id", multiline=True, max_lines=19)
         api_hash_data = ft.TextField(label="Введите api_hash", multiline=True, max_lines=19)
@@ -178,7 +174,7 @@ class SettingPage:
             self.page.go("/settings")  # Изменение маршрута в представлении существующих настроек
             self.page.update()
 
-        await self.add_view_with_fields_and_button([api_id_data, api_hash_data], btn_click, lv)
+        await self.add_view_with_fields_and_button([api_id_data, api_hash_data], btn_click, self.lv)
 
     async def add_view_with_fields_and_button(self, fields: list, btn_click, lv) -> None:
         """
@@ -218,10 +214,9 @@ class SettingPage:
         with open(models_file, "r", encoding="utf-8") as f:
             models = json.load(f)["models"]
 
-        lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
-        self.page.controls.append(lv)  # добавляем ListView на страницу для отображения логов 📝
+        self.page.controls.append(self.lv)  # добавляем ListView на страницу для отображения логов 📝
 
-        lv.controls.append(ft.Text("Выберите ИИ модель"))  # отображаем сообщение в ListView
+        self.lv.controls.append(ft.Text("Выберите ИИ модель"))  # отображаем сообщение в ListView
 
         dropdown = ft.Dropdown(
             width=400,
@@ -230,11 +225,11 @@ class SettingPage:
 
         # обработчик выбора
         def on_change(e):
-            lv.controls.append(ft.Text(f"✅ Вы выбрали модель: {e.control.value}"))
+            self.lv.controls.append(ft.Text(f"✅ Вы выбрали модель: {e.control.value}"))
             self.page.update()
 
         dropdown.on_change = on_change
-        lv.controls.append(dropdown)
+        self.lv.controls.append(dropdown)
         self.page.update()
 
 
