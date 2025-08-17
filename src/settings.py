@@ -35,11 +35,8 @@ class SettingPage:
         """
         Создание главного окна для ввода дынных proxy
         """
-
         self.page.controls.append(self.lv)  # добавляем ListView на страницу для отображения логов 📝
-
         self.lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
-
         proxy_type = ft.TextField(label="Введите тип прокси, например SOCKS5: ", multiline=True, max_lines=19)
         addr_type = ft.TextField(label="Введите ip адрес, например 194.67.248.9: ", multiline=True, max_lines=19)
         port_type = ft.TextField(label="Введите порт прокси, например 9795: ", multiline=True, max_lines=19)
@@ -69,9 +66,7 @@ class SettingPage:
         :param unique_filename: Имя файла для записи данных.
         """
         self.page.controls.append(self.lv)  # добавляем ListView на страницу для отображения логов 📝
-
         self.lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
-
         text_to_send = ft.TextField(label=label, multiline=True, max_lines=19)
 
         async def btn_click(e) -> None:
@@ -93,9 +88,7 @@ class SettingPage:
         :param label: Текст для отображения в поле ввода.
         """
         self.page.controls.append(self.lv)  # добавляем ListView на страницу для отображения логов 📝
-
         self.lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
-
         limits = ft.TextField(label=label, multiline=True, max_lines=19)
 
         async def btn_click(e) -> None:
@@ -159,9 +152,7 @@ class SettingPage:
         Записываем api, hash полученный с помощью регистрации приложения на сайте https://my.telegram.org/auth
         """
         self.page.controls.append(self.lv)  # добавляем ListView на страницу для отображения логов 📝
-
         self.lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
-
         api_id_data = ft.TextField(label="Введите api_id", multiline=True, max_lines=19)
         api_hash_data = ft.TextField(label="Введите api_hash", multiline=True, max_lines=19)
 
