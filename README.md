@@ -1,5 +1,7 @@
 # TelegramMaster-GPT-Comments 🚀
 
+English README • Русский README • Lengua española README • [O‘zbek README](README.UZ.md)
+
 ![alt text](doc/images/TelegramMaster_Commentator.png "TelegramMaster_Commentator")
 
 **TelegramMaster-GPT-Comments** — это мощный инструмент для автоматизации работы с Telegram каналами, группами и
