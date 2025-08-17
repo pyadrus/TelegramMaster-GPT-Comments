@@ -44,16 +44,13 @@ class SettingPage:
         password_type = ft.TextField(label="Введите пароль, например ySfCfk: ", multiline=True, max_lines=19)
 
         async def btn_click(e) -> None:
-            rdns_types = "True"
-            proxy = [proxy_type.value, addr_type.value, port_type.value, username_type.value, password_type.value,
-                     rdns_types]
-            await self.db_handler.save_proxy_data_to_db(proxy=proxy)
-
+            await self.db_handler.save_proxy_data_to_db(
+                proxy=[proxy_type.value, addr_type.value, port_type.value, username_type.value, password_type.value,
+                     "True"]
+            )
             await show_notification(self.page, "Данные успешно записаны!")
-
             self.page.go("/settings")  # Изменение маршрута в представлении существующих настроек
             self.page.update()
-
         await self.add_view_with_fields_and_button([proxy_type, addr_type, port_type, username_type, password_type],
                                                    btn_click, self.lv)
 
@@ -72,9 +69,7 @@ class SettingPage:
         async def btn_click(e) -> None:
             write_data_to_json_file(reactions=text_to_send.value,
                                     path_to_the_file=unique_filename)  # Сохраняем данные в файл
-
             await show_notification(self.page, "Данные успешно записаны!")
-
             self.page.go("/settings")  # Изменение маршрута в представлении существующих настроек
             self.page.update()
 
@@ -96,13 +91,10 @@ class SettingPage:
                 config.get(limit_type, limit_type)
                 config.set(limit_type, limit_type, limits.value)
                 writing_settings_to_a_file(config)
-
                 await show_notification(self.page, "Данные успешно записаны!")
-
             except configparser.NoSectionError as error:
                 await show_notification(self.page, "⚠️ Поврежден файл data/config/config.ini")
                 logger.error(f"Ошибка: {error}")
-
             self.page.go("/settings")  # Изменение маршрута в представлении существующих настроек
             self.page.update()
 
@@ -115,26 +107,21 @@ class SettingPage:
         :return: None
         """
         self.page.controls.append(self.lv)  # добавляем ListView на страницу для отображения логов 📝
-
         for time_range_message in time_range:
             self.lv.controls.append(
                 ft.Text(f"Записанные данные в файле {time_range_message}"))  # отображаем сообщение в ListView
-
         smaller_timex = ft.TextField(label="Время в секундах (меньшее)", autofocus=True)
         larger_timex = ft.TextField(label="Время в секундах (большее)")
 
         async def btn_click(e) -> None:
             """Обработчик клика по кнопке"""
-
             try:
                 smaller_times = int(smaller_timex.value)
                 larger_times = int(larger_timex.value)
-
                 if smaller_times < larger_times:  # Проверяем, что первое время меньше второго
                     # Если условие прошло проверку, то возвращаем первое и второе время
                     config = recording_limits_file(str(smaller_times), str(larger_times), variable=variable)
                     writing_settings_to_a_file(config)
-
                     self.lv.controls.append(ft.Text("Данные успешно записаны!"))  # отображаем сообщение в ListView
                     await show_notification(self.page, "Данные успешно записаны!")
                     self.page.go("/settings")  # Изменение маршрута в представлении существующих настроек
@@ -205,22 +192,47 @@ class SettingPage:
         with open(models_file, "r", encoding="utf-8") as f:
             models = json.load(f)["models"]
 
-        self.page.controls.append(self.lv)  # добавляем ListView на страницу для отображения логов 📝
-
-        self.lv.controls.append(ft.Text("Выберите ИИ модель"))  # отображаем сообщение в ListView
-
         dropdown = ft.Dropdown(
             width=400,
             options=[ft.dropdown.Option(model) for model in models],
         )
 
+        result_text = ft.Text("Выберите модель...")
+
         # обработчик выбора
         def on_change(e):
-            self.lv.controls.append(ft.Text(f"✅ Вы выбрали модель: {e.control.value}"))
+            result_text.value = f"✅ Вы выбрали модель: {e.control.value}"
             self.page.update()
 
         dropdown.on_change = on_change
-        self.lv.controls.append(dropdown)
+
+        def back_button_clicked(e) -> None:
+            """Кнопка возврата в меню настроек"""
+            self.page.go("/settings")
+
+        # создаём отдельный View для выбора модели
+        self.page.views.append(
+            ft.View(
+                "/choosing_an_ai_model",
+                controls=[
+                    ft.Column(
+                        [
+                            ft.Text("Выбор ИИ модели", size=18, weight=ft.FontWeight.BOLD),
+                            dropdown,
+                            result_text,
+                            ft.Row(
+                                [
+                                    ft.ElevatedButton("⬅️ Назад", on_click=back_button_clicked),
+                                ],
+                                alignment=ft.MainAxisAlignment.CENTER,
+                            )
+                        ],
+                        alignment=ft.MainAxisAlignment.START,
+                        spacing=10,
+                    )
+                ]
+            )
+        )
         self.page.update()
 
 

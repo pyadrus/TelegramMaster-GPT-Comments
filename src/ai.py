@@ -8,7 +8,11 @@ from src.proxy_config import setup_proxy
 
 
 async def get_groq_response(user_input):
-    """Получение ответа от Groq API."""
+    """
+    Получение ответа от Groq API.
+
+    :param user_input: Ввод пользователя
+    """
     setup_proxy()  # Установка прокси
     # Инициализация Groq клиента
     client_groq = AsyncGroq(api_key=GROQ_API_KEY)
