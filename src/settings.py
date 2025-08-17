@@ -186,26 +186,16 @@ class SettingPage:
 
     async def choosing_an_ai_model(self):
         """Выбор модели AI"""
-        entering_token = ft.TextField(label="Введите токен https://groq.com/", multiline=True, max_lines=19)
-
         # Загружаем список моделей из JSON
         models_file = Path("data/config/models.json")
         with open(models_file, "r", encoding="utf-8") as f:
             models = json.load(f)["models"]
-
-        dropdown = ft.Dropdown(
-            width=400,
-            options=[ft.dropdown.Option(model) for model in models],
-        )
-
         result_text = ft.Text("Выберите модель...")
 
         # обработчик выбора
         def on_change(e):
             result_text.value = f"✅ Вы выбрали модель: {e.control.value}"
             self.page.update()
-
-        dropdown.on_change = on_change
 
         def back_button_clicked(e) -> None:
             """Кнопка возврата в меню настроек"""
@@ -222,6 +212,19 @@ class SettingPage:
                 result_text.value = "⚠️ Сначала выберите модель!"
             self.page.update()
 
+        width_elements = 600 # Ширина элементов (поля ввода, выпадающего списка и кнопок)
+
+        entering_token = ft.TextField(
+            label="Введите токен https://groq.com",
+            width=width_elements, # Ширина поля ввода,
+            max_lines=19
+        )
+        dropdown = ft.Dropdown(
+            width=width_elements, # Ширина выпадающего списка
+            options=[ft.dropdown.Option(model) for model in models], # Список моделей из json файла
+        )
+        dropdown.on_change = on_change
+
         # создаём отдельный View для выбора модели
         self.page.views.append(
             ft.View(
@@ -234,15 +237,20 @@ class SettingPage:
                             ft.Text("Выбор ИИ модели", size=18, weight=ft.FontWeight.BOLD),
                             dropdown,
                             result_text,
-                            ft.ElevatedButton("✅ Готово", width=400, on_click=done_button_clicked),
-                            ft.ElevatedButton("⬅️ Назад", width=400, on_click=back_button_clicked),
+                            ft.ElevatedButton(
+                                text= "✅ Готово", # Кнопка "Готово"
+                                width=width_elements, # Ширина кнопки
+                                on_click=done_button_clicked # Обработчик клика
+                            ),
+                            ft.ElevatedButton(
+                                text= "⬅️ Назад", # Кнопка "Назад"
+                                width=width_elements, # Ширина кнопки
+                                on_click=back_button_clicked # Обработчик клика
+                            ),
                         ],
                         alignment=ft.MainAxisAlignment.START,
                         spacing=10,
-                    )
-                ]
-            )
-        )
+                    )]))
         self.page.update()
 
 
