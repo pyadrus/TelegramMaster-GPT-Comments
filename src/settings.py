@@ -216,14 +216,14 @@ class SettingPage:
 
         entering_token = ft.TextField(
             label="Введите токен https://groq.com",
-            width=self.width_elements, # Ширина поля ввода,
-            max_lines=max_lines
+            width=self.width_elements, # Ширина поля ввода
+            max_lines=int(max_lines)
         )
 
         entering_promt = ft.TextField(
             label="Введите промт",
-            width=self.width_elements, # Ширина поля ввода,
-            max_lines=max_lines
+            width=self.width_elements, # Ширина поля ввода
+            max_lines=int(max_lines)
         )
 
         dropdown = ft.Dropdown(
