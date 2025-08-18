@@ -190,6 +190,8 @@ class SettingPage:
         """Выбор модели AI"""
         # Загружаем список моделей из JSON
         models_file = Path("data/config/models.json")
+        promt_file = Path("data/config/promt.json")
+
         with open(models_file, "r", encoding="utf-8") as f:
             models = json.load(f)["models"]
         result_text = ft.Text("Выберите модель...")
@@ -207,9 +209,20 @@ class SettingPage:
             """Кнопка подтверждения выбора"""
             if dropdown.value:
                 result_text.value = f"🎯 Вы подтвердили выбор: {dropdown.value}"
-                # Здесь можно сохранить выбранную модель и токен в конфиг
-                # например:
-                # save_config({"token": entering_token.value, "model": dropdown.value})
+
+                # Данные для сохранения
+                data = {
+                    "token": entering_token.value.strip(),
+                    "model": dropdown.value,
+                    "promt": entering_promt.value.strip()
+                }
+
+                # Сохраняем в JSON
+                promt_file.parent.mkdir(parents=True, exist_ok=True)  # создаем папку при необходимости
+                with open(promt_file, "w", encoding="utf-8") as f:
+                    json.dump(data, f, indent=4, ensure_ascii=False)
+
+                result_text.value += "\n💾 Настройки сохранены!"
             else:
                 result_text.value = "⚠️ Сначала выберите модель!"
             self.page.update()
