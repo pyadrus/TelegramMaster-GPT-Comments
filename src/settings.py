@@ -207,24 +207,37 @@ class SettingPage:
 
         def done_button_clicked(e) -> None:
             """Кнопка подтверждения выбора"""
-            if dropdown.value:
-                result_text.value = f"🎯 Вы подтвердили выбор: {dropdown.value}"
-
-                # Данные для сохранения
-                data = {
-                    "token": entering_token.value.strip(),
-                    "model": dropdown.value,
-                    "promt": entering_promt.value.strip()
-                }
-
-                # Сохраняем в JSON
-                promt_file.parent.mkdir(parents=True, exist_ok=True)  # создаем папку при необходимости
-                with open(promt_file, "w", encoding="utf-8") as f:
-                    json.dump(data, f, indent=4, ensure_ascii=False)
-
-                result_text.value += "\n💾 Настройки сохранены!"
+            # Загружаем старые данные (если файл существует)
+            if promt_file.exists():
+                with open(promt_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
             else:
-                result_text.value = "⚠️ Сначала выберите модель!"
+                data = {}
+
+            # Обновляем только введённые значения
+            if entering_token.value.strip():
+                data["token"] = entering_token.value.strip()
+
+            if dropdown.value:  # Если выбрана модель
+                data["model"] = dropdown.value
+
+            if entering_promt.value.strip():
+                data["promt"] = entering_promt.value.strip()
+
+            # Если ничего не введено/не выбрано
+            if not data.get("token") and not data.get("model") and not data.get("promt"):
+                result_text.value = "⚠️ Вы ничего не ввели!"
+                self.page.update()
+                return
+
+            # Сохраняем в JSON
+            promt_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(promt_file, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=4, ensure_ascii=False)
+
+            result_text.value = "💾 Настройки обновлены!"
+            if dropdown.value:
+                result_text.value += f"\n🎯 Вы подтвердили выбор: {dropdown.value}"
             self.page.update()
 
         entering_token = ft.TextField(

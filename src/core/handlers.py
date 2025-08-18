@@ -143,7 +143,7 @@ async def handle_documentation(page: ft.Page):
     markdown_widget = ft.Markdown(
         markdown_content,
         selectable=True,
-        code_style=ft.TextStyle(font_family="Roboto Mono"),
+        # code_style=ft.TextStyle(font_family="Roboto Mono"),
         on_tap_link=lambda e: page.launch_url(e.data),  # Открываем ссылки в браузере
     )
 
