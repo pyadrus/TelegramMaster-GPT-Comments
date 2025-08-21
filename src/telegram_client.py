@@ -61,6 +61,11 @@ async def connect_telegram_account() -> TelegramClient:
             else:
                 logger.warning(f'❌ Аккаунт {session_file} не авторизован.')
                 await client.disconnect()  # ` Если аккаунт не авторизован, выходим
+
+                os.remove(
+                    session_file
+                )
+
         except Exception as e:
             logger.error(f'❌ Ошибка при подключении к {session_file}: {e}')
             if client.is_connected():

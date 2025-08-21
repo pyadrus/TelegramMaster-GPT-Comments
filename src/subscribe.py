@@ -35,8 +35,7 @@ async def handle_channel_subscription(page: ft.Page):
         client = await connect_telegram_account()
 
         channel_name = await read_channel_list_from_database()
-        lv.controls.append(
-            ft.Text(f"Группы и каналы из базы данных {channel_name}"))  # отображаем сообщение в ListView
+        lv.controls.append(ft.Text(f"Группы и каналы из базы данных {channel_name}"))  # отображаем сообщение в ListView
         page.update()  # Обновляем страницу
         for channel in channel_name:
             lv.controls.append(ft.Text(f"Подписка на: {channel[0]}"))  # отображаем сообщение в ListView
@@ -76,13 +75,10 @@ class SUBSCRIBE:
             lv.controls.append(ft.Text(f"Успешная подписка на {channel_name}", color=ft.Colors.RED))
             page.update()
             await asyncio.sleep(int(time_config))
-
         except ChannelPrivateError:
             lv.controls.append(ft.Text(f"Канал {channel_name} закрыт",
                                        color=ft.Colors.RED))  # отображаем сообщение в ListView
             page.update()  # Обновляем страницу
-
-
         except FloodWaitError as e:
             lv.controls.append(ft.Text(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}',
                                        color=ft.Colors.RED))  # отображаем сообщение в ListView
