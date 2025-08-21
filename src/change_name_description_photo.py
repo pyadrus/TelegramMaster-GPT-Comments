@@ -6,7 +6,7 @@ from telethon import functions
 
 from src.core.buttons import create_buttons
 from src.core.views import program_title, view_with_elements_input_field
-from src.telegram_client import connect_client
+from src.telegram_client import connect_telegram_account
 
 
 async def handle_change_name_description_photo(page: ft.Page):
@@ -34,7 +34,7 @@ async def handle_change_name_description_photo(page: ft.Page):
         try:
             lv.controls.append(ft.Text("🖼️ Смена имени, описания"))  # отображаем сообщение в ListView
             page.update()  # Обновляем страницу
-            await change_profile_descriptions(await connect_client(), lv, about_field.value)
+            await change_profile_descriptions(await connect_telegram_account(), lv, about_field.value)
             page.update()  # Обновляем страницу
         except Exception as e:
             logger.error(e)

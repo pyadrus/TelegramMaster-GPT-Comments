@@ -31,7 +31,7 @@ def find_files(directory_path: str, extension: str) -> list:
         return []  # Возвращаем пустой список, если директория не найдена
 
 
-async def connect_client() -> TelegramClient:
+async def connect_telegram_account() -> TelegramClient:
     """
     Подключается к Telegram аккаунту, используя api_id и api_hash.
 
