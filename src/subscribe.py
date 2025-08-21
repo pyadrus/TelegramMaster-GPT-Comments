@@ -12,7 +12,7 @@ from src.config_handler import time_config
 from src.core.buttons import create_buttons
 from src.core.views import program_title, view_with_elements
 from src.db_handler import read_channel_list_from_database
-from src.telegram_client import connect_telegram_account
+from src.telegram_client import connect_client
 
 
 async def handle_channel_subscription(page: ft.Page):
@@ -32,7 +32,7 @@ async def handle_channel_subscription(page: ft.Page):
     async def action_1(_):
         lv.controls.append(ft.Text("Подписка на каналы / группы"))  # отображаем сообщение в ListView
         page.update()  # Обновляем страницу
-        client = await connect_telegram_account()
+        client = await connect_client()
 
         channel_name = await read_channel_list_from_database()
         lv.controls.append(ft.Text(f"Группы и каналы из базы данных {channel_name}"))  # отображаем сообщение в ListView

@@ -3,6 +3,7 @@ import os
 
 from loguru import logger
 from telethon import TelegramClient
+from telethon.sessions import StringSession
 
 from src.config_handler import api_id, api_hash
 from src.connect import reading_proxy_data_from_the_database
@@ -30,7 +31,7 @@ def find_files(directory_path: str, extension: str) -> list:
         return []  # Возвращаем пустой список, если директория не найдена
 
 
-async def connect_telegram_account() -> TelegramClient:
+async def connect_client() -> TelegramClient:
     """
     Подключается к Telegram аккаунту, используя api_id и api_hash.
 
@@ -42,8 +43,21 @@ async def connect_telegram_account() -> TelegramClient:
         raise Exception("❌ Не найдено ни одного файла сессии в директории data/accounts/.")
 
     for session_file in session_files:
+
         client = TelegramClient(
-            session=session_file,  # Полный путь к файлу сессии
+            session=session_file,
+            api_id=api_id,
+            api_hash=api_hash,
+            system_version="4.16.30-vxCUSTOM",
+        )
+        await client.connect()
+
+        logger.info(f"✨ STRING SESSION: {StringSession.save(client.session)}")
+        session_string = StringSession.save(client.session)
+
+
+        client = TelegramClient(
+            StringSession(session_string),  # <-- Используем StringSession
             api_id=api_id,  # Идентификатор API Telegram
             api_hash=api_hash,  # Ключ API Telegram
             system_version="4.16.30-vxCUSTOM",
