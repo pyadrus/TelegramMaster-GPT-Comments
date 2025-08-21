@@ -57,8 +57,7 @@ async def creating_a_channel_list(dialogs):
                 # Пропускаем числовые username и пустые значения
                 if username and not username.isdigit():
                     username_diclist.append(username)
-                    cursor.execute('''INSERT INTO channels (title, username)
-                                      VALUES (?, ?)''', (title, username))
+                    cursor.execute('''INSERT INTO channels (title, username) VALUES (?, ?)''', (title, username))
         # Удаляем дубликаты по username, оставляя только одну запись
         cursor.execute('''DELETE
                           FROM channels
