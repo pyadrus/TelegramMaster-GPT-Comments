@@ -28,15 +28,7 @@ async def save_channels_to_db(channels_data: str, db_path: str = db_path) -> Non
             cursor = await conn.cursor()
             # Создаем таблицу для хранения информации о каналах, если она еще не существует
             await cursor.execute('''CREATE TABLE IF NOT EXISTS user_channels
-                                    (
-                                        id
-                                        INTEGER
-                                        PRIMARY
-                                        KEY,
-                                        channel_name
-                                        TEXT
-                                        UNIQUE
-                                    )''')
+                                    (id INTEGER PRIMARY KEY, channel_name TEXT UNIQUE)''')
             # Записываем каждый канал в базу данных
             for channel in channels_list:
                 try:
