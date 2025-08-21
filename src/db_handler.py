@@ -47,17 +47,7 @@ async def creating_a_channel_list(dialogs):
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute('''CREATE TABLE IF NOT EXISTS channels
-                          (
-                              id
-                              INTEGER
-                              PRIMARY
-                              KEY
-                              AUTOINCREMENT,
-                              title
-                              TEXT,
-                              username
-                              TEXT
-                          )''')
+                          (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, username TEXT)''')
         # Удаляем записи с числовыми username
         cursor.execute("DELETE FROM channels WHERE username GLOB '[0-9]*'")
         for dialog in dialogs:
