@@ -84,3 +84,6 @@ class SUBSCRIBE:
                                        color=ft.Colors.RED))  # отображаем сообщение в ListView
             page.update()  # Обновляем страницу
             time.sleep(e.seconds)
+
+        except ValueError:
+            logger.error(f"Ошибка при подписке на канал. Не верный username канала: {channel_name}")

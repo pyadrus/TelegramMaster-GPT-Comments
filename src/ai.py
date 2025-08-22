@@ -2,7 +2,7 @@
 from groq import AsyncGroq
 from groq.types.chat import ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam
 from loguru import logger
-
+from groq import BadRequestError
 from src.config import GROQ_API_KEY, selectedmodel
 from src.proxy_config import setup_proxy
 
@@ -33,5 +33,8 @@ async def get_groq_response(user_input):
         )
         # Возвращаем ответ от ИИ
         return chat_completion.choices[0].message.content
+
+    except BadRequestError:
+        logger.error("Ошибка запроса к Groq API. Проверьте ключ API или выбранный модель или попробуйте позже.")
     except Exception as e:
         logger.exception(e)
