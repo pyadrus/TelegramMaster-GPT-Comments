@@ -5,7 +5,7 @@ import time
 
 import flet as ft
 from loguru import logger
-from telethon.errors import FloodWaitError, ChannelPrivateError
+from telethon.errors import FloodWaitError, ChannelPrivateError, UsernameInvalidError
 from telethon.tl.functions.channels import JoinChannelRequest
 
 from src.config_handler import time_config
@@ -71,7 +71,6 @@ class SUBSCRIBE:
             lv.controls.append(ft.Text(f"Неверный username канала: {channel_name}", color=ft.Colors.RED))
             self.page.update()
             return
-
         try:
             await client(JoinChannelRequest(channel_name))
             lv.controls.append(ft.Text(f"Успешная подписка на {channel_name}", color=ft.Colors.RED))
@@ -86,7 +85,9 @@ class SUBSCRIBE:
                                        color=ft.Colors.RED))  # отображаем сообщение в ListView
             self.page.update()  # Обновляем страницу
             time.sleep(e.seconds)
-
+        except UsernameInvalidError:
+            logger.error(f"Ошибка при подписке на канал. Не верный username канала: {channel_name}")
+            delete_username_from_database(channel_name)
         except ValueError:
             logger.error(f"Ошибка при подписке на канал. Не верный username канала: {channel_name}")
             delete_username_from_database(channel_name)

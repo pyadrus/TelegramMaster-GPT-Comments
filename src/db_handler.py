@@ -7,6 +7,7 @@ from loguru import logger
 from src.config_handler import db_path
 
 from peewee import *
+from peewee import DoesNotExist
 
 db = SqliteDatabase(db_path)
 
@@ -24,12 +25,14 @@ class Channels(Model):
 
 def delete_username_from_database(username):
     """Удаляет пользователя из базы данных по username."""
+    try:
+        db.connect()  # Подключаемся к базе данных.
+        delete_username = Channels.get(username=username)
+        delete_username.delete_instance()
 
-    db.connect()  # Подключаемся к базе данных.
-    delete_username = Channels.get(username=username)
-    delete_username.delete_instance()
+    except DoesNotExist:
+        pass
     db.close()
-
 
 
 
