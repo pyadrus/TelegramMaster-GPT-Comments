@@ -40,7 +40,7 @@ async def handle_channel_subscription(page: ft.Page):
         for channel in channel_name:
             lv.controls.append(ft.Text(f"Подписка на: {channel[0]}"))  # отображаем сообщение в ListView
             page.update()  # Обновляем страницу
-            await SUBSCRIBE().subscribe_to_channel(client, channel[0], page, lv)
+            await SUBSCRIBE(page).subscribe_to_channel(client, channel[0], lv)
         lv.controls.append(ft.Text(f"Подписка завершена"))  # отображаем сообщение в ListView
         page.update()  # Обновляем страницу
 
@@ -56,33 +56,35 @@ async def handle_channel_subscription(page: ft.Page):
 class SUBSCRIBE:
     """Класс подписки на группы и каналы Telegram"""
 
-    async def subscribe_to_channel(self, client, channel_name, page: ft.Page, lv: ft.ListView) -> None:
+    def __init__(self, page: ft.Page):
+        self.page = page
+
+    async def subscribe_to_channel(self, client, channel_name, lv: ft.ListView) -> None:
         """
         Подписывается на Telegram-канал.
         :param channel_name: Имя канала Telegram.
         :param client: TelegramClient объект.
-        :param page: Страница приложения.
         :param lv: ListView.
         :return: None.
         """
         if not channel_name or channel_name.isdigit():
             lv.controls.append(ft.Text(f"Неверный username канала: {channel_name}", color=ft.Colors.RED))
-            page.update()
+            self.page.update()
             return
 
         try:
             await client(JoinChannelRequest(channel_name))
             lv.controls.append(ft.Text(f"Успешная подписка на {channel_name}", color=ft.Colors.RED))
-            page.update()
+            self.page.update()
             await asyncio.sleep(int(time_config))
         except ChannelPrivateError:
             lv.controls.append(ft.Text(f"Канал {channel_name} закрыт",
                                        color=ft.Colors.RED))  # отображаем сообщение в ListView
-            page.update()  # Обновляем страницу
+            self.page.update()  # Обновляем страницу
         except FloodWaitError as e:
             lv.controls.append(ft.Text(f'Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}',
                                        color=ft.Colors.RED))  # отображаем сообщение в ListView
-            page.update()  # Обновляем страницу
+            self.page.update()  # Обновляем страницу
             time.sleep(e.seconds)
 
         except ValueError:

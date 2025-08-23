@@ -70,7 +70,7 @@ class TelegramCommentator:
         last_message_ids = {name: 0 for name in channels}
         for name in channels:
             logger.info(name[0])
-            await SUBSCRIBE().subscribe_to_channel(client, name[0], page, lv)  # Подписываемся на канал перед отправкой комментария
+            await SUBSCRIBE(page).subscribe_to_channel(client, name[0], lv)  # Подписываемся на канал перед отправкой комментария
             try:
                 messages = await client.get_messages(await client.get_entity(name[0]), limit=1)
                 for message in messages:
