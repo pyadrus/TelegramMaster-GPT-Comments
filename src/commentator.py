@@ -18,18 +18,19 @@ from src.subscribe import SUBSCRIBE
 from src.telegram_client import connect_telegram_account
 
 
-
-
 class TelegramCommentator:
     """
     Класс для автоматизированной работы с комментариями в Telegram-каналах.
     """
 
-    async def handle_submitting_comments(self, page: ft.Page):
+    def __init__(self, page: ft.Page):
+        self.page = page
+
+    async def handle_submitting_comments(self):
         """Создает страницу Отправка комментариев"""
         try:
             logger.info("Пользователь перешел на страницу Отправка комментариев")
-            page.views.clear()  # Очищаем страницу и добавляем новый View
+            self.page.views.clear()  # Очищаем страницу и добавляем новый View
 
             lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
 
@@ -40,29 +41,28 @@ class TelegramCommentator:
                 "💾 Обработанные сообщения автоматически сохраняются в базе данных: `data/database/app.db`\n",
             ))
 
-            page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
+            self.page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
 
             async def action_1(_):
                 lv.controls.append(ft.Text("Отправка комментариев"))  # отображаем сообщение в ListView
-                page.update()  # Обновляем страницу
-                await self.write_comments_in_telegram(await connect_telegram_account(), page, lv)
+                self.page.update()  # Обновляем страницу
+                await self.write_comments_in_telegram(await connect_telegram_account(), lv)
 
-            await view_with_elements(page=page, title=await program_title(title="Отправка комментариев"),
+            await view_with_elements(page=self.page, title=await program_title(title="Отправка комментариев"),
                                      buttons=[
                                          await create_buttons(text="Отправка комментариев", on_click=action_1),
-                                         await create_buttons(text="Назад", on_click=lambda _: page.go("/"))
+                                         await create_buttons(text="Назад", on_click=lambda _: self.page.go("/"))
                                      ],
                                      route_page="submitting_comments", lv=lv)
-            page.update()  # Обновляем страницу
+            self.page.update()  # Обновляем страницу
         except Exception as e:
             logger.exception(e)
 
-    async def write_comments_in_telegram(self, client, page: ft.Page, lv: ft.ListView) -> None:
+    async def write_comments_in_telegram(self, client, lv: ft.ListView) -> None:
         """
         Пишет комментарии в указанных Telegram-каналах.
 
         :param client: TelegramClient объект.
-        :param page: Номер страницы.
         :param lv: Номер уровня.
         :return: None.
         """
@@ -70,7 +70,7 @@ class TelegramCommentator:
         last_message_ids = {name: 0 for name in channels}
         for name in channels:
             logger.info(name[0])
-            await SUBSCRIBE(page).subscribe_to_channel(client, name[0], lv)  # Подписываемся на канал перед отправкой комментария
+            await SUBSCRIBE(self.page).subscribe_to_channel(client, name[0], lv)  # Подписываемся на канал перед отправкой комментария
             try:
                 messages = await client.get_messages(await client.get_entity(name[0]), limit=1)
                 for message in messages:
@@ -79,7 +79,7 @@ class TelegramCommentator:
                     message_id = message.id
                     message_peer_id = message.peer_id
                     message_text = message.text
-                    await message_output_program_window(lv=lv, page=page, message_program=f"ID сообщения: {message.id} ID: {message.peer_id} Дата: {message.date}")
+                    await message_output_program_window(lv=lv, page=self.page, message_program=f"ID сообщения: {message.id} ID: {message.peer_id} Дата: {message.date}")
                     if messages:
                         post = messages[0]
                         if post.id != last_message_ids.get(name[0], None):
@@ -99,15 +99,15 @@ class TelegramCommentator:
 
                                         await client.send_message(entity=name[0], message=f'{data}',
                                                                   comment_to=post.id)
-                                        await message_output_program_window(lv=lv, page=page,
+                                        await message_output_program_window(lv=lv, page=self.page,
                                                                             message_program=f"Наш комментарий: {data}")
-                                        await message_output_program_window(lv=lv, page=page,
+                                        await message_output_program_window(lv=lv, page=self.page,
                                                                             message_program=f"Спим {time_config} секунд")
                                         await asyncio.sleep(int(time_config))
                                     else:
-                                        await message_output_program_window(lv=lv, page=page,
+                                        await message_output_program_window(lv=lv, page=self.page,
                                                                             message_program=f"Комментарий к сообщению {message_id} уже был отправлен")
-                                        await message_output_program_window(lv=lv, page=page,
+                                        await message_output_program_window(lv=lv, page=self.page,
                                                                             message_program=f"Спим {time_config} секунд")
                                         await asyncio.sleep(int(time_config))
 
@@ -118,45 +118,45 @@ class TelegramCommentator:
                                     await record_bottom_messages_database(message_id, channel_id)
 
                             except ChatWriteForbiddenError:
-                                await message_output_program_window(lv=lv, page=page,
+                                await message_output_program_window(lv=lv, page=self.page,
                                                                     message_program=f"Вы не можете отправлять сообщения в: {name[0]}")
                             except MsgIdInvalidError:
-                                await message_output_program_window(lv=lv, page=page,
+                                await message_output_program_window(lv=lv, page=self.page,
                                                                     message_program=f"Возможно пост был изменен или удален")
                             except UserBannedInChannelError:
-                                await message_output_program_window(lv=lv, page=page,
+                                await message_output_program_window(lv=lv, page=self.page,
                                                                     message_program=f"Вам запрещено отправлять сообщения в супергруппы/каналы")
                             except SlowModeWaitError as e:
-                                await message_output_program_window(lv=lv, page=page,
+                                await message_output_program_window(lv=lv, page=self.page,
                                                                     message_program=f"Вы не можете отправлять сообщения в супергруппы/каналы. Попробуйте позже через {str(datetime.timedelta(seconds=e.seconds))}")
-                                await message_output_program_window(lv=lv, page=page,
+                                await message_output_program_window(lv=lv, page=self.page,
                                                                     message_program=f"Спим {str(datetime.timedelta(seconds=e.seconds))}")
                                 await asyncio.sleep(e.seconds)
                             except FloodWaitError as e:
-                                await message_output_program_window(lv=lv, page=page,
+                                await message_output_program_window(lv=lv, page=self.page,
                                                                     message_program=f"Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}")
-                                await message_output_program_window(lv=lv, page=page,
+                                await message_output_program_window(lv=lv, page=self.page,
                                                                     message_program=f"Спим {str(datetime.timedelta(seconds=e.seconds))}")
                                 await asyncio.sleep(int(time_config))
                             except ChatGuestSendForbiddenError:
-                                await message_output_program_window(lv=lv, page=page,
+                                await message_output_program_window(lv=lv, page=self.page,
                                                                     message_program=f"Вы не можете отправлять сообщения в супергруппы/каналы")
                             except ChannelPrivateError:
-                                await message_output_program_window(lv=lv, page=page,
+                                await message_output_program_window(lv=lv, page=self.page,
                                                                     message_program=f"Канал {name[0]} закрыт")
                             except PeerIdInvalidError:
-                                await message_output_program_window(lv=lv, page=page,
+                                await message_output_program_window(lv=lv, page=self.page,
                                                                     message_program=f"Неверный ID канала: {name[0]}")
             except FloodWaitError as e:  # Если ошибка при подписке
-                await message_output_program_window(lv=lv, page=page,
+                await message_output_program_window(lv=lv, page=self.page,
                                                     message_program=f"Flood! wait for {str(datetime.timedelta(seconds=e.seconds))}")
-                await message_output_program_window(lv=lv, page=page,
+                await message_output_program_window(lv=lv, page=self.page,
                                                     message_program=f"Спим {str(datetime.timedelta(seconds=e.seconds))}")
                 await asyncio.sleep(int(time_config))
             except AuthKeyUnregisteredError:  # Если аккаунт заблочен
-                await message_output_program_window(lv=lv, page=page,
+                await message_output_program_window(lv=lv, page=self.page,
                                                     message_program=f"Аккаунт заблокирован")
                 break
 
             except ChannelPrivateError:
-                await message_output_program_window(lv=lv, page=page, message_program=f"Канал {name[0]} закрыт")
+                await message_output_program_window(lv=lv, page=self.page, message_program=f"Канал {name[0]} закрыт")
