@@ -6,6 +6,32 @@ from loguru import logger
 
 from src.config_handler import db_path
 
+from peewee import *
+
+db = SqliteDatabase(db_path)
+
+class Channels(Model):
+
+    id = IntegerField(primary_key=True)
+    title = CharField()
+    username = CharField()
+
+    class Meta:
+        database = db
+        table_name = 'channels'
+
+
+
+def delete_username_from_database(username):
+    """Удаляет пользователя из базы данных по username."""
+
+    db.connect()  # Подключаемся к базе данных.
+    delete_username = Channels.get(username=username)
+    delete_username.delete_instance()
+    db.close()
+
+
+
 
 async def save_channels_to_db(channels_data: str, db_path: str = db_path) -> None:
     """

@@ -11,7 +11,7 @@ from telethon.tl.functions.channels import JoinChannelRequest
 from src.config_handler import time_config
 from src.core.buttons import create_buttons
 from src.core.views import program_title, view_with_elements
-from src.db_handler import read_channel_list_from_database
+from src.db_handler import read_channel_list_from_database, delete_username_from_database
 from src.telegram_client import connect_telegram_account
 
 
@@ -89,3 +89,4 @@ class SUBSCRIBE:
 
         except ValueError:
             logger.error(f"Ошибка при подписке на канал. Не верный username канала: {channel_name}")
+            delete_username_from_database(channel_name)

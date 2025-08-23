@@ -13,7 +13,8 @@ from src.ai import get_groq_response
 from src.config_handler import time_config
 from src.core.buttons import create_buttons
 from src.core.views import program_title, view_with_elements, message_output_program_window
-from src.db_handler import reading_from_the_channel_list_database, check_message_exists, record_bottom_messages_database
+from src.db_handler import (reading_from_the_channel_list_database, check_message_exists,
+    record_bottom_messages_database, delete_username_from_database)
 from src.subscribe import SUBSCRIBE
 from src.telegram_client import connect_telegram_account
 
@@ -157,6 +158,8 @@ class TelegramCommentator:
                 await message_output_program_window(lv=lv, page=self.page,
                                                     message_program=f"Аккаунт заблокирован")
                 break
-
             except ChannelPrivateError:
                 await message_output_program_window(lv=lv, page=self.page, message_program=f"Канал {name[0]} закрыт")
+            except ValueError:
+                logger.error(f"Ошибка при подписке на канал. Не верный username канала: {name[0]}")
+                delete_username_from_database(name[0])

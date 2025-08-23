@@ -190,7 +190,7 @@ class Application:
 
     async def _handle_submitting_comments(self):
         """Страница 💬 Отправка комментариев"""
-        await TelegramCommentator().handle_submitting_comments(self.page)
+        await TelegramCommentator(self.page).handle_submitting_comments()
 
     async def _handle_change_name_description_photo(self):
         """Страница 🖼️ Смена имени, описания"""
