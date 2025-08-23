@@ -6,7 +6,7 @@ import flet as ft
 from loguru import logger
 from telethon.errors import (UserBannedInChannelError, PeerIdInvalidError, MsgIdInvalidError, SlowModeWaitError,
                              ChatWriteForbiddenError, ChatGuestSendForbiddenError, FloodWaitError, ChannelPrivateError,
-                             AuthKeyUnregisteredError)
+                             AuthKeyUnregisteredError, UsernameInvalidError)
 from telethon.tl.types import PeerChannel
 
 from src.ai import get_groq_response
@@ -160,6 +160,9 @@ class TelegramCommentator:
                 break
             except ChannelPrivateError:
                 await message_output_program_window(lv=lv, page=self.page, message_program=f"Канал {name[0]} закрыт")
+            except UsernameInvalidError:
+                logger.error(f"Ошибка при подписке на канал. Не верный username канала: {name[0]}")
+                delete_username_from_database(name[0])
             except ValueError:
                 logger.error(f"Ошибка при подписке на канал. Не верный username канала: {name[0]}")
                 delete_username_from_database(name[0])
