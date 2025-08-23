@@ -18,7 +18,6 @@ from src.subscribe import SUBSCRIBE
 from src.telegram_client import connect_telegram_account
 
 
-# from src.working_with_files import reading_json_file
 
 
 class TelegramCommentator:
