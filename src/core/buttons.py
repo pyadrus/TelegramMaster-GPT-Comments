@@ -12,4 +12,4 @@ async def create_buttons(text: str, on_click, width: int = 850, height: int = 35
     :param height: Высота кнопки (по умолчанию 35).
     :return: Объект кнопки ft.ElevatedButton.
     """
-    return ft.ElevatedButton(text=text, on_click=on_click, width=width, height=height, )
+    return ft.ElevatedButton(text=text, on_click=on_click, width=width, height=height)

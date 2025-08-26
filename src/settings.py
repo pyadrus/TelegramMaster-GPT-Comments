@@ -48,11 +48,12 @@ class SettingPage:
         async def btn_click(e) -> None:
             await self.db_handler.save_proxy_data_to_db(
                 proxy=[proxy_type.value, addr_type.value, port_type.value, username_type.value, password_type.value,
-                     "True"]
+                       "True"]
             )
             await show_notification(self.page, "Данные успешно записаны!")
             self.page.go("/settings")  # Изменение маршрута в представлении существующих настроек
             self.page.update()
+
         await self.add_view_with_fields_and_button([proxy_type, addr_type, port_type, username_type, password_type],
                                                    btn_click, self.lv)
 
@@ -242,19 +243,19 @@ class SettingPage:
 
         entering_token = ft.TextField(
             label="Введите токен https://groq.com",
-            width=self.width_elements, # Ширина поля ввода
+            width=self.width_elements,  # Ширина поля ввода
             max_lines=int(max_lines)
         )
 
         entering_promt = ft.TextField(
             label="Введите промт",
-            width=self.width_elements, # Ширина поля ввода
+            width=self.width_elements,  # Ширина поля ввода
             max_lines=int(max_lines)
         )
 
         dropdown = ft.Dropdown(
-            width=self.width_elements, # Ширина выпадающего списка
-            options=[ft.dropdown.Option(model) for model in models], # Список моделей из json файла
+            width=self.width_elements,  # Ширина выпадающего списка
+            options=[ft.dropdown.Option(model) for model in models],  # Список моделей из json файла
         )
         dropdown.on_change = on_change
 
@@ -273,14 +274,14 @@ class SettingPage:
                             dropdown,
                             result_text,
                             ft.ElevatedButton(
-                                text= "✅ Готово", # Кнопка "Готово"
-                                width=self.width_elements, # Ширина кнопки
-                                on_click=done_button_clicked # Обработчик клика
+                                text="✅ Готово",  # Кнопка "Готово"
+                                width=self.width_elements,  # Ширина кнопки
+                                on_click=done_button_clicked  # Обработчик клика
                             ),
                             ft.ElevatedButton(
-                                text= "⬅️ Назад", # Кнопка "Назад"
-                                width=self.width_elements, # Ширина кнопки
-                                on_click=back_button_clicked # Обработчик клика
+                                text="⬅️ Назад",  # Кнопка "Назад"
+                                width=self.width_elements,  # Ширина кнопки
+                                on_click=back_button_clicked  # Обработчик клика
                             ),
                         ],
                         alignment=ft.MainAxisAlignment.START,

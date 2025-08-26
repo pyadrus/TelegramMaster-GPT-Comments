@@ -11,8 +11,8 @@ from peewee import DoesNotExist
 
 db = SqliteDatabase(db_path)
 
-class Channels(Model):
 
+class Channels(Model):
     id = IntegerField(primary_key=True)
     title = CharField()
     username = CharField()
@@ -20,7 +20,6 @@ class Channels(Model):
     class Meta:
         database = db
         table_name = 'channels'
-
 
 
 def delete_username_from_database(username):
@@ -33,7 +32,6 @@ def delete_username_from_database(username):
     except DoesNotExist:
         pass
     db.close()
-
 
 
 async def save_channels_to_db(channels_data: str, db_path: str = db_path) -> None:

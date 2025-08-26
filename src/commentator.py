@@ -14,7 +14,7 @@ from src.config_handler import time_config
 from src.core.buttons import create_buttons
 from src.core.views import program_title, view_with_elements, message_output_program_window
 from src.db_handler import (reading_from_the_channel_list_database, check_message_exists,
-    record_bottom_messages_database, delete_username_from_database)
+                            record_bottom_messages_database, delete_username_from_database)
 from src.subscribe import SUBSCRIBE
 from src.telegram_client import connect_telegram_account
 
@@ -71,7 +71,8 @@ class TelegramCommentator:
         last_message_ids = {name: 0 for name in channels}
         for name in channels:
             logger.info(name[0])
-            await SUBSCRIBE(self.page).subscribe_to_channel(client, name[0], lv)  # Подписываемся на канал перед отправкой комментария
+            await SUBSCRIBE(self.page).subscribe_to_channel(client, name[0],
+                                                            lv)  # Подписываемся на канал перед отправкой комментария
             try:
                 messages = await client.get_messages(await client.get_entity(name[0]), limit=1)
                 for message in messages:
@@ -80,7 +81,8 @@ class TelegramCommentator:
                     message_id = message.id
                     message_peer_id = message.peer_id
                     message_text = message.text
-                    await message_output_program_window(lv=lv, page=self.page, message_program=f"ID сообщения: {message.id} ID: {message.peer_id} Дата: {message.date}")
+                    await message_output_program_window(lv=lv, page=self.page,
+                                                        message_program=f"ID сообщения: {message.id} ID: {message.peer_id} Дата: {message.date}")
                     if messages:
                         post = messages[0]
                         if post.id != last_message_ids.get(name[0], None):

@@ -113,6 +113,7 @@ class ConfigReader:
         """
         return self.config_gui.get("max_lines", "max_lines", fallback=None)
 
+
 max_lines = ConfigReader().get_program_max_lines()  # Извлечение максимального количества строк из конфигурационного файла
 WINDOW_WIDTH = ConfigReader().get_program_window_width()  # Извлечение ширины окна из конфигурационного файла
 WINDOW_HEIGHT = ConfigReader().get_program_window_height()  # Извлечение высоты окна из конфигурационного файла
