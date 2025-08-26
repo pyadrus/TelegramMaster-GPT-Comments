@@ -21,6 +21,8 @@ selectedmodel = config['Settings']['selectedmodel']
 
 GROQ_API_KEY = config['API_Groq']['GROQ_API_KEY']
 
+# Прокси для ИИ
+
 proxy_user = config['proxy_data']['user']
 proxy_password = config['proxy_data']['password']
 proxy_port = config['proxy_data']['port']

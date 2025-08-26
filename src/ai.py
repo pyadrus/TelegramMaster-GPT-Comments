@@ -5,6 +5,7 @@ from loguru import logger
 from groq import BadRequestError
 from src.config import GROQ_API_KEY, selectedmodel
 from src.proxy.proxy_config import setup_proxy
+from src.config import proxy_user, proxy_password, proxy_ip, proxy_port
 
 
 async def get_groq_response(user_input):
@@ -13,7 +14,7 @@ async def get_groq_response(user_input):
 
     :param user_input: Ввод пользователя
     """
-    setup_proxy()  # Установка прокси
+    setup_proxy(proxy_user, proxy_password, proxy_ip, proxy_port)  # Установка прокси
     # Инициализация Groq клиента
     client_groq = AsyncGroq(api_key=GROQ_API_KEY)
     try:
