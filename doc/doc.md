@@ -13,3 +13,4 @@
     * [Запись id и hash](https://github.com/pyadrus/TelegramMaster_Commentator/blob/master/doc/Настройки/Запись_id_и_hash.md)
     * [📝 Запись сообщения](https://github.com/pyadrus/TelegramMaster_Commentator/blob/master/doc/Настройки/Запись_сообщения.md)
     * [Настройка ИИ](https://github.com/pyadrus/TelegramMaster-GPT-Comments/blob/master/doc/Настройки/Работа_с_ИИ.md)
+    
