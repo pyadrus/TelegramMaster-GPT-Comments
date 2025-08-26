@@ -4,7 +4,7 @@ from groq.types.chat import ChatCompletionSystemMessageParam, ChatCompletionUser
 from loguru import logger
 from groq import BadRequestError
 from src.config import GROQ_API_KEY, selectedmodel
-from src.proxy_config import setup_proxy
+from src.proxy.proxy_config import setup_proxy
 
 
 async def get_groq_response(user_input):
