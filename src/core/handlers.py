@@ -2,7 +2,7 @@
 import flet as ft
 from loguru import logger
 
-from src.core.buttons import create_buttons
+from src.core.buttons import create_buttons, create_buttons_2
 from src.core.views import program_title, view_with_elements
 from src.core.views import view_with_elements_input_field
 from src.db_handler import save_channels_to_db
@@ -48,8 +48,12 @@ async def handle_settings(page: ft.Page):
     await view_with_elements(page=page, title=await program_title(title="⚙️ Настройки"),
                              buttons=[
                                  await create_buttons(text="🔗 Подключение прокси", on_click=connection_proxy),
-                                 await create_buttons(text="⏳ Запись времени", on_click=record_time),
-                                 await create_buttons(text="🆔 Запись ID и Hash", on_click=record_id_hash),
+                                 ft.Row(
+                                     controls=[
+                                         await create_buttons_2(text="⏳ Запись времени", on_click=record_time),
+                                         await create_buttons_2(text="🆔 Запись ID и Hash", on_click=record_id_hash),
+                                     ]
+                                 ),
                                  await create_buttons(text="✉️ Запись сообщения", on_click=recording_message),
                                  await create_buttons(text="⚙️ Настройка ИИ", on_click=choosing_an_ai_model),
                                  await create_buttons(text="⬅️ Назад", on_click=lambda _: page.go("/"))
