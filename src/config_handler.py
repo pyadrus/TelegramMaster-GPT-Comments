@@ -19,12 +19,18 @@ class ConfigReader:
         """
         Инициализирует объект ConfigReader и загружает конфигурационные файлы.
         """
-        self.config_gui = configparser.ConfigParser(empty_lines_in_values=False, allow_no_value=True)
-        self.config_gui.read('data/config/config_gui.ini')
-        self.config = configparser.ConfigParser(empty_lines_in_values=False, allow_no_value=True)
-        self.config.read('data/config/config.ini')
-        self.config_path = configparser.ConfigParser(empty_lines_in_values=False, allow_no_value=True)
-        self.config_path.read('data/config/config_path.ini')
+        self.config_gui = configparser.ConfigParser(
+            empty_lines_in_values=False, allow_no_value=True
+        )
+        self.config_gui.read("data/config/config_gui.ini")
+        self.config = configparser.ConfigParser(
+            empty_lines_in_values=False, allow_no_value=True
+        )
+        self.config.read("data/config/config.ini")
+        self.config_path = configparser.ConfigParser(
+            empty_lines_in_values=False, allow_no_value=True
+        )
+        self.config_path.read("data/config/config_path.ini")
 
     def get_time_config_settings(self):
         """
@@ -42,9 +48,7 @@ class ConfigReader:
         """
         Извлекает путь к папке с файлами из конфигурационного файла.
         """
-        return (
-            self.config_path.get("folder_accounts", "folder_accounts", fallback=None)
-        )
+        return self.config_path.get("folder_accounts", "folder_accounts", fallback=None)
 
     def get_path_log(self):
         """
@@ -52,7 +56,7 @@ class ConfigReader:
         """
         return (
             self.config_path.get("log_file", "app_log", fallback=None),
-            self.config_path.get("log_file", "errors_log", fallback=None)
+            self.config_path.get("log_file", "errors_log", fallback=None),
         )
 
     def get_telegram_credentials(self):
@@ -63,7 +67,7 @@ class ConfigReader:
         """
         return (
             self.config.get("telegram_settings", "id", fallback=None),
-            self.config.get("telegram_settings", "hash", fallback=None)
+            self.config.get("telegram_settings", "hash", fallback=None),
         )
 
     def get_program_version(self) -> str | None:
@@ -80,7 +84,9 @@ class ConfigReader:
 
         :return: Дата последнего изменения программы. Если значение отсутствует, возвращает None.
         """
-        return self.config_gui.get("date_of_program_change", "date_of_program_change", fallback=None)
+        return self.config_gui.get(
+            "date_of_program_change", "date_of_program_change", fallback=None
+        )
 
     def get_program_name(self) -> str | None:
         """
@@ -114,9 +120,15 @@ class ConfigReader:
         return self.config_gui.get("max_lines", "max_lines", fallback=None)
 
 
-max_lines = ConfigReader().get_program_max_lines()  # Извлечение максимального количества строк из конфигурационного файла
-WINDOW_WIDTH = ConfigReader().get_program_window_width()  # Извлечение ширины окна из конфигурационного файла
-WINDOW_HEIGHT = ConfigReader().get_program_window_height()  # Извлечение высоты окна из конфигурационного файла
+max_lines = (
+    ConfigReader().get_program_max_lines()
+)  # Извлечение максимального количества строк из конфигурационного файла
+WINDOW_WIDTH = (
+    ConfigReader().get_program_window_width()
+)  # Извлечение ширины окна из конфигурационного файла
+WINDOW_HEIGHT = (
+    ConfigReader().get_program_window_height()
+)  # Извлечение высоты окна из конфигурационного файла
 
 # Инициализация глобальных переменных с настройками
 program_version = ConfigReader().get_program_version()

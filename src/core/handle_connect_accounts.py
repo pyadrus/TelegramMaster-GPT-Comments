@@ -55,12 +55,17 @@ async def handle_connect_accounts(page: ft.Page):
             page=page,
             title=await program_title(title="🔗 Подключение аккаунтов"),
             buttons=[
-                await create_buttons(text="📂 Подключение session аккаунта", on_click=connection_session_account),
-                await create_buttons(text="📱 Подключение по номеру телефона", on_click=phone_connection),
-                await create_buttons(text="🔙 Назад", on_click=lambda _: page.go("/"))
+                await create_buttons(
+                    text="📂 Подключение session аккаунта",
+                    on_click=connection_session_account,
+                ),
+                await create_buttons(
+                    text="📱 Подключение по номеру телефона", on_click=phone_connection
+                ),
+                await create_buttons(text="🔙 Назад", on_click=lambda _: page.go("/")),
             ],
             route_page="change_name_description_photo",
-            lv=lv  # Передаем ListView для отображения
+            lv=lv,  # Передаем ListView для отображения
         )
         page.update()
     except Exception as e:

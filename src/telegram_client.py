@@ -20,8 +20,12 @@ def find_files(directory_path: str, extension: str) -> list:
     entities = []  # Список для хранения имен найденных файлов
     try:
         for file_name in os.listdir(directory_path):
-            if file_name.endswith(f".{extension}"):  # Проверяем, заканчивается ли имя файла на заданное расширение
-                file_path = os.path.join(directory_path, file_name)  # Полный путь к файлу
+            if file_name.endswith(
+                f".{extension}"
+            ):  # Проверяем, заканчивается ли имя файла на заданное расширение
+                file_path = os.path.join(
+                    directory_path, file_name
+                )  # Полный путь к файлу
                 entities.append(file_path)  # Добавляем путь к файлу в список
 
         logger.info(f"🔍 Найденные файлы: {entities}")  # Выводим имена найденных файлов
@@ -38,10 +42,10 @@ async def connect_client(session_path: str) -> TelegramClient | None:
     """
     try:
         async with TelegramClient(
-                session=session_path,
-                api_id=api_id,
-                api_hash=api_hash,
-                system_version="4.16.30-vxCUSTOM",
+            session=session_path,
+            api_id=api_id,
+            api_hash=api_hash,
+            system_version="4.16.30-vxCUSTOM",
         ) as tmp_client:
             # Сохраняем как StringSession (удобно для прокси)
             session_string = StringSession.save(tmp_client.session)
@@ -83,7 +87,9 @@ async def connect_telegram_account() -> TelegramClient:
     """
     session_files = find_files("data/accounts/", extension="session")
     if not session_files:
-        raise Exception("❌ Не найдено ни одного файла сессии в директории data/accounts/.")
+        raise Exception(
+            "❌ Не найдено ни одного файла сессии в директории data/accounts/."
+        )
 
     for session_file in session_files:
         client = await connect_client(session_file)

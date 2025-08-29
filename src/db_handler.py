@@ -19,7 +19,7 @@ class Channels(Model):
 
     class Meta:
         database = db
-        table_name = 'channels'
+        table_name = "channels"
 
 
 def delete_username_from_database(username):
@@ -44,7 +44,9 @@ async def save_channels_to_db(channels_data: str, db_path: str = db_path) -> Non
     """
     # Разделяем введенные данные на отдельные каналы. Учитываем запятые, пробелы и переносы строк
     channels_list = [
-        channel.strip() for channel in channels_data.replace("\n", ",").split(",") if channel.strip()
+        channel.strip()
+        for channel in channels_data.replace("\n", ",").split(",")
+        if channel.strip()
     ]
     if not channels_list:
         logger.warning("❌ Список каналов пуст.")
@@ -54,12 +56,17 @@ async def save_channels_to_db(channels_data: str, db_path: str = db_path) -> Non
         async with aiosqlite.connect(db_path) as conn:
             cursor = await conn.cursor()
             # Создаем таблицу для хранения информации о каналах, если она еще не существует
-            await cursor.execute('''CREATE TABLE IF NOT EXISTS user_channels
-                                    (id INTEGER PRIMARY KEY, channel_name TEXT UNIQUE)''')
+            await cursor.execute(
+                """CREATE TABLE IF NOT EXISTS user_channels
+                                    (id INTEGER PRIMARY KEY, channel_name TEXT UNIQUE)"""
+            )
             # Записываем каждый канал в базу данных
             for channel in channels_list:
                 try:
-                    await cursor.execute('INSERT OR IGNORE INTO user_channels (channel_name) VALUES (?)', (channel,))
+                    await cursor.execute(
+                        "INSERT OR IGNORE INTO user_channels (channel_name) VALUES (?)",
+                        (channel,),
+                    )
                 except aiosqlite.Error as e:
                     logger.error(f"❌ Ошибка при добавлении канала {channel}: {e}")
             # Сохраняем изменения
@@ -73,22 +80,29 @@ async def creating_a_channel_list(dialogs):
     username_diclist = []
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
-        cursor.execute('''CREATE TABLE IF NOT EXISTS channels
-                          (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, username TEXT)''')
+        cursor.execute(
+            """CREATE TABLE IF NOT EXISTS channels
+                          (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, username TEXT)"""
+        )
         # Удаляем записи с числовыми username
         cursor.execute("DELETE FROM channels WHERE username GLOB '[0-9]*'")
         for dialog in dialogs:
             if dialog.is_channel:
                 title = dialog.title
-                username = getattr(dialog.entity, 'username', '')
+                username = getattr(dialog.entity, "username", "")
                 # Пропускаем числовые username и пустые значения
                 if username and not username.isdigit():
                     username_diclist.append(username)
-                    cursor.execute('''INSERT INTO channels (title, username) VALUES (?, ?)''', (title, username))
+                    cursor.execute(
+                        """INSERT INTO channels (title, username) VALUES (?, ?)""",
+                        (title, username),
+                    )
         # Удаляем дубликаты по username, оставляя только одну запись
-        cursor.execute('''DELETE
+        cursor.execute(
+            """DELETE
                           FROM channels
-                          WHERE id NOT IN (SELECT MIN(id) FROM channels GROUP BY username)''')
+                          WHERE id NOT IN (SELECT MIN(id) FROM channels GROUP BY username)"""
+        )
         conn.commit()
     return username_diclist
 
@@ -101,7 +115,7 @@ async def reading_from_the_channel_list_database():
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         # Выполняем SQL-запрос для извлечения username из таблицы channels
-        cursor.execute('SELECT username FROM channels')
+        cursor.execute("SELECT username FROM channels")
         results = cursor.fetchall()  # Получаем все строки результата запросах
     return results
 
@@ -112,7 +126,7 @@ async def read_channel_list_from_database():
     """
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
-        cursor.execute('SELECT channel_name FROM user_channels')
+        cursor.execute("SELECT channel_name FROM user_channels")
         results = cursor.fetchall()
     return results
 
@@ -122,13 +136,17 @@ async def record_bottom_messages_database(message_id, channel_id) -> None:
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         # Создаем таблицу для хранения информации о каналах, если она еще не существует
-        cursor.execute('''CREATE TABLE IF NOT EXISTS messages_channels
+        cursor.execute(
+            """CREATE TABLE IF NOT EXISTS messages_channels
                           (
                               message_id,
                               message_peer_id
-                          )''')
-        cursor.execute('INSERT INTO messages_channels (message_id, message_peer_id) VALUES (?, ?)',
-                       (message_id, channel_id))
+                          )"""
+        )
+        cursor.execute(
+            "INSERT INTO messages_channels (message_id, message_peer_id) VALUES (?, ?)",
+            (message_id, channel_id),
+        )
         # Сохраняем изменения и закрываем соединение
         conn.commit()
 
@@ -138,8 +156,10 @@ async def check_message_exists(message_id, channel_id) -> bool:
     with sqlite3.connect(db_path) as conn:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-        cursor.execute('SELECT 1 FROM messages_channels WHERE message_id = ? AND message_peer_id = ?',
-                       (message_id, channel_id))
+        cursor.execute(
+            "SELECT 1 FROM messages_channels WHERE message_id = ? AND message_peer_id = ?",
+            (message_id, channel_id),
+        )
         exists = cursor.fetchone() is not None
     return exists
 
@@ -176,7 +196,9 @@ class DatabaseHandler:
             self.close()
             return records
         except sqlite3.DatabaseError as error:  # Ошибка при открытии базы данных
-            logger.error(f"❌ Ошибка при открытии базы данных, возможно база данных повреждена: {error}")
+            logger.error(
+                f"❌ Ошибка при открытии базы данных, возможно база данных повреждена: {error}"
+            )
             return []
         except sqlite3.Error as error:  # Ошибка при открытии базы данных
             logger.error(f"❌ Ошибка при открытии базы данных: {error}")
@@ -184,7 +206,9 @@ class DatabaseHandler:
         finally:
             self.close()  # Закрываем соединение
 
-    async def deleting_an_invalid_proxy(self, proxy_type, addr, port, username, password, rdns) -> None:
+    async def deleting_an_invalid_proxy(
+        self, proxy_type, addr, port, username, password, rdns
+    ) -> None:
         """
         Удаляем не рабочий proxy с software_database.db, таблица proxy
 
@@ -207,8 +231,13 @@ class DatabaseHandler:
     async def save_proxy_data_to_db(self, proxy) -> None:
         """Запись данных proxy в базу данных"""
         await self.connect()
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS proxy(proxy_type, addr, port, username, password, rdns)")
-        self.cursor.executemany("INSERT INTO proxy(proxy_type, addr, port, username, password, rdns) "
-                                "VALUES (?, ?, ?, ?, ?, ?)", (proxy,), )
+        self.cursor.execute(
+            "CREATE TABLE IF NOT EXISTS proxy(proxy_type, addr, port, username, password, rdns)"
+        )
+        self.cursor.executemany(
+            "INSERT INTO proxy(proxy_type, addr, port, username, password, rdns) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            (proxy,),
+        )
         self.sqlite_connection.commit()
         self.close()  # cursor_members.close() – закрытие соединения с БД.

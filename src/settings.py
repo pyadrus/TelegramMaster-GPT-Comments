@@ -17,7 +17,7 @@ from src.db_handler import DatabaseHandler
 config = configparser.ConfigParser(empty_lines_in_values=False, allow_no_value=True)
 config.read("data/config/config.ini")
 
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 
 
 class SettingPage:
@@ -31,31 +31,60 @@ class SettingPage:
         self.lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
         self.page = page
         self.db_handler = DatabaseHandler()
-        self.width_elements = int(WINDOW_WIDTH) - 10  # Ширина элементов (поля ввода, выпадающего списка и кнопок)
+        self.width_elements = (
+            int(WINDOW_WIDTH) - 10
+        )  # Ширина элементов (поля ввода, выпадающего списка и кнопок)
 
     async def creating_the_main_window_for_proxy_data_entry(self) -> None:
         """
         Создание главного окна для ввода дынных proxy
         """
-        self.page.controls.append(self.lv)  # добавляем ListView на страницу для отображения логов 📝
-        self.lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
-        proxy_type = ft.TextField(label="Введите тип прокси, например SOCKS5: ", multiline=True, max_lines=19)
-        addr_type = ft.TextField(label="Введите ip адрес, например 194.67.248.9: ", multiline=True, max_lines=19)
-        port_type = ft.TextField(label="Введите порт прокси, например 9795: ", multiline=True, max_lines=19)
-        username_type = ft.TextField(label="Введите username, например NnbjvX: ", multiline=True, max_lines=19)
-        password_type = ft.TextField(label="Введите пароль, например ySfCfk: ", multiline=True, max_lines=19)
+        self.page.controls.append(
+            self.lv
+        )  # добавляем ListView на страницу для отображения логов 📝
+        self.lv.controls.append(
+            ft.Text(f"Введите данные для записи")
+        )  # отображаем сообщение в ListView
+        proxy_type = ft.TextField(
+            label="Введите тип прокси, например SOCKS5: ", multiline=True, max_lines=19
+        )
+        addr_type = ft.TextField(
+            label="Введите ip адрес, например 194.67.248.9: ",
+            multiline=True,
+            max_lines=19,
+        )
+        port_type = ft.TextField(
+            label="Введите порт прокси, например 9795: ", multiline=True, max_lines=19
+        )
+        username_type = ft.TextField(
+            label="Введите username, например NnbjvX: ", multiline=True, max_lines=19
+        )
+        password_type = ft.TextField(
+            label="Введите пароль, например ySfCfk: ", multiline=True, max_lines=19
+        )
 
         async def btn_click(e) -> None:
             await self.db_handler.save_proxy_data_to_db(
-                proxy=[proxy_type.value, addr_type.value, port_type.value, username_type.value, password_type.value,
-                       "True"]
+                proxy=[
+                    proxy_type.value,
+                    addr_type.value,
+                    port_type.value,
+                    username_type.value,
+                    password_type.value,
+                    "True",
+                ]
             )
             await show_notification(self.page, "Данные успешно записаны!")
-            self.page.go("/settings")  # Изменение маршрута в представлении существующих настроек
+            self.page.go(
+                "/settings"
+            )  # Изменение маршрута в представлении существующих настроек
             self.page.update()
 
-        await self.add_view_with_fields_and_button([proxy_type, addr_type, port_type, username_type, password_type],
-                                                   btn_click, self.lv)
+        await self.add_view_with_fields_and_button(
+            [proxy_type, addr_type, port_type, username_type, password_type],
+            btn_click,
+            self.lv,
+        )
 
     async def recording_text_for_sending_messages(self, label, unique_filename) -> None:
         """
@@ -65,15 +94,22 @@ class SettingPage:
         :param label: Текст для отображения в поле ввода.
         :param unique_filename: Имя файла для записи данных.
         """
-        self.page.controls.append(self.lv)  # добавляем ListView на страницу для отображения логов 📝
-        self.lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
+        self.page.controls.append(
+            self.lv
+        )  # добавляем ListView на страницу для отображения логов 📝
+        self.lv.controls.append(
+            ft.Text(f"Введите данные для записи")
+        )  # отображаем сообщение в ListView
         text_to_send = ft.TextField(label=label, multiline=True, max_lines=19)
 
         async def btn_click(e) -> None:
-            write_data_to_json_file(reactions=text_to_send.value,
-                                    path_to_the_file=unique_filename)  # Сохраняем данные в файл
+            write_data_to_json_file(
+                reactions=text_to_send.value, path_to_the_file=unique_filename
+            )  # Сохраняем данные в файл
             await show_notification(self.page, "Данные успешно записаны!")
-            self.page.go("/settings")  # Изменение маршрута в представлении существующих настроек
+            self.page.go(
+                "/settings"
+            )  # Изменение маршрута в представлении существующих настроек
             self.page.update()
 
         await self.add_view_with_fields_and_button([text_to_send], btn_click, self.lv)
@@ -85,8 +121,12 @@ class SettingPage:
         :param limit_type: Тип лимита.
         :param label: Текст для отображения в поле ввода.
         """
-        self.page.controls.append(self.lv)  # добавляем ListView на страницу для отображения логов 📝
-        self.lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
+        self.page.controls.append(
+            self.lv
+        )  # добавляем ListView на страницу для отображения логов 📝
+        self.lv.controls.append(
+            ft.Text(f"Введите данные для записи")
+        )  # отображаем сообщение в ListView
         limits = ft.TextField(label=label, multiline=True, max_lines=19)
 
         async def btn_click(e) -> None:
@@ -96,9 +136,13 @@ class SettingPage:
                 writing_settings_to_a_file(config)
                 await show_notification(self.page, "Данные успешно записаны!")
             except configparser.NoSectionError as error:
-                await show_notification(self.page, "⚠️ Поврежден файл data/config/config.ini")
+                await show_notification(
+                    self.page, "⚠️ Поврежден файл data/config/config.ini"
+                )
                 logger.error(f"Ошибка: {error}")
-            self.page.go("/settings")  # Изменение маршрута в представлении существующих настроек
+            self.page.go(
+                "/settings"
+            )  # Изменение маршрута в представлении существующих настроек
             self.page.update()
 
         await self.add_view_with_fields_and_button([limits], btn_click, self.lv)
@@ -109,10 +153,13 @@ class SettingPage:
         :param time_range: Имя файла, в который будут записаны данные
         :return: None
         """
-        self.page.controls.append(self.lv)  # добавляем ListView на страницу для отображения логов 📝
+        self.page.controls.append(
+            self.lv
+        )  # добавляем ListView на страницу для отображения логов 📝
         for time_range_message in time_range:
             self.lv.controls.append(
-                ft.Text(f"Записанные данные в файле {time_range_message}"))  # отображаем сообщение в ListView
+                ft.Text(f"Записанные данные в файле {time_range_message}")
+            )  # отображаем сообщение в ListView
         smaller_timex = ft.TextField(label="Время в секундах (меньшее)", autofocus=True)
         larger_timex = ft.TextField(label="Время в секундах (большее)")
 
@@ -121,30 +168,48 @@ class SettingPage:
             try:
                 smaller_times = int(smaller_timex.value)
                 larger_times = int(larger_timex.value)
-                if smaller_times < larger_times:  # Проверяем, что первое время меньше второго
+                if (
+                    smaller_times < larger_times
+                ):  # Проверяем, что первое время меньше второго
                     # Если условие прошло проверку, то возвращаем первое и второе время
-                    config = recording_limits_file(str(smaller_times), str(larger_times), variable=variable)
+                    config = recording_limits_file(
+                        str(smaller_times), str(larger_times), variable=variable
+                    )
                     writing_settings_to_a_file(config)
-                    self.lv.controls.append(ft.Text("Данные успешно записаны!"))  # отображаем сообщение в ListView
+                    self.lv.controls.append(
+                        ft.Text("Данные успешно записаны!")
+                    )  # отображаем сообщение в ListView
                     await show_notification(self.page, "Данные успешно записаны!")
-                    self.page.go("/settings")  # Изменение маршрута в представлении существующих настроек
+                    self.page.go(
+                        "/settings"
+                    )  # Изменение маршрута в представлении существующих настроек
                 else:
-                    self.lv.controls.append(ft.Text("Ошибка: первое время должно быть меньше второго!"))
+                    self.lv.controls.append(
+                        ft.Text("Ошибка: первое время должно быть меньше второго!")
+                    )
             except ValueError:
                 self.lv.controls.append(ft.Text("Ошибка: введите числовые значения!"))
 
             self.page.update()  # обновляем страницу
 
-        await self.add_view_with_fields_and_button([smaller_timex, larger_timex], btn_click, self.lv)
+        await self.add_view_with_fields_and_button(
+            [smaller_timex, larger_timex], btn_click, self.lv
+        )
 
     async def writing_api_id_api_hash(self):
         """
         Записываем api, hash полученный с помощью регистрации приложения на сайте https://my.telegram.org/auth
         """
-        self.page.controls.append(self.lv)  # добавляем ListView на страницу для отображения логов 📝
-        self.lv.controls.append(ft.Text(f"Введите данные для записи"))  # отображаем сообщение в ListView
+        self.page.controls.append(
+            self.lv
+        )  # добавляем ListView на страницу для отображения логов 📝
+        self.lv.controls.append(
+            ft.Text(f"Введите данные для записи")
+        )  # отображаем сообщение в ListView
         api_id_data = ft.TextField(label="Введите api_id", multiline=True, max_lines=19)
-        api_hash_data = ft.TextField(label="Введите api_hash", multiline=True, max_lines=19)
+        api_hash_data = ft.TextField(
+            label="Введите api_hash", multiline=True, max_lines=19
+        )
 
         def btn_click(e) -> None:
             config.get("telegram_settings", "id")
@@ -152,12 +217,18 @@ class SettingPage:
             config.get("telegram_settings", "hash")
             config.set("telegram_settings", "hash", api_hash_data.value)
             writing_settings_to_a_file(config)
-            self.page.go("/settings")  # Изменение маршрута в представлении существующих настроек
+            self.page.go(
+                "/settings"
+            )  # Изменение маршрута в представлении существующих настроек
             self.page.update()
 
-        await self.add_view_with_fields_and_button([api_id_data, api_hash_data], btn_click, self.lv)
+        await self.add_view_with_fields_and_button(
+            [api_id_data, api_hash_data], btn_click, self.lv
+        )
 
-    async def add_view_with_fields_and_button(self, fields: list, btn_click, lv) -> None:
+    async def add_view_with_fields_and_button(
+        self, fields: list, btn_click, lv
+    ) -> None:
         """
         Добавляет представление с заданными текстовыми полями и кнопкой.
 
@@ -178,12 +249,15 @@ class SettingPage:
                 controls=[
                     lv,  # отображение логов 📝
                     ft.Column(
-                        controls=fields + [
+                        controls=fields
+                        + [
                             await create_buttons(text="✅ Готово", on_click=btn_click),
-                            await create_buttons(text="⬅️ Назад", on_click=back_button_clicked),
+                            await create_buttons(
+                                text="⬅️ Назад", on_click=back_button_clicked
+                            ),
                         ]
-                    )
-                ]
+                    ),
+                ],
             )
         )
 
@@ -226,7 +300,11 @@ class SettingPage:
                 data["promt"] = entering_promt.value.strip()
 
             # Если ничего не введено/не выбрано
-            if not data.get("token") and not data.get("model") and not data.get("promt"):
+            if (
+                not data.get("token")
+                and not data.get("model")
+                and not data.get("promt")
+            ):
                 result_text.value = "⚠️ Вы ничего не ввели!"
                 self.page.update()
                 return
@@ -244,18 +322,20 @@ class SettingPage:
         entering_token = ft.TextField(
             label="Введите токен https://groq.com",
             width=self.width_elements,  # Ширина поля ввода
-            max_lines=int(max_lines)
+            max_lines=int(max_lines),
         )
 
         entering_promt = ft.TextField(
             label="Введите промт",
             width=self.width_elements,  # Ширина поля ввода
-            max_lines=int(max_lines)
+            max_lines=int(max_lines),
         )
 
         dropdown = ft.Dropdown(
             width=self.width_elements,  # Ширина выпадающего списка
-            options=[ft.dropdown.Option(model) for model in models],  # Список моделей из json файла
+            options=[
+                ft.dropdown.Option(model) for model in models
+            ],  # Список моделей из json файла
         )
         dropdown.on_change = on_change
 
@@ -266,27 +346,40 @@ class SettingPage:
                 controls=[
                     ft.Column(
                         [
-                            ft.Text("Введите токен для работы с https://groq.com", size=18, weight=ft.FontWeight.BOLD),
+                            ft.Text(
+                                "Введите токен для работы с https://groq.com",
+                                size=18,
+                                weight=ft.FontWeight.BOLD,
+                            ),
                             entering_token,  # Ввод токена
-                            ft.Text("Введите промт для ИИ", size=18, weight=ft.FontWeight.BOLD),
+                            ft.Text(
+                                "Введите промт для ИИ",
+                                size=18,
+                                weight=ft.FontWeight.BOLD,
+                            ),
                             entering_promt,  # Ввод промта
-                            ft.Text("Выбор ИИ модели", size=18, weight=ft.FontWeight.BOLD),
+                            ft.Text(
+                                "Выбор ИИ модели", size=18, weight=ft.FontWeight.BOLD
+                            ),
                             dropdown,
                             result_text,
                             ft.ElevatedButton(
                                 text="✅ Готово",  # Кнопка "Готово"
                                 width=self.width_elements,  # Ширина кнопки
-                                on_click=done_button_clicked  # Обработчик клика
+                                on_click=done_button_clicked,  # Обработчик клика
                             ),
                             ft.ElevatedButton(
                                 text="⬅️ Назад",  # Кнопка "Назад"
                                 width=self.width_elements,  # Ширина кнопки
-                                on_click=back_button_clicked  # Обработчик клика
+                                on_click=back_button_clicked,  # Обработчик клика
                             ),
                         ],
                         alignment=ft.MainAxisAlignment.START,
                         spacing=10,
-                    )]))
+                    )
+                ],
+            )
+        )
         self.page.update()
 
 
@@ -312,12 +405,13 @@ def recording_limits_file(time_1, time_2, variable: str):
         return config
     except configparser.NoSectionError as error:
         logger.error(
-            f"❌ Не удалось получить значение переменной: {error}. Проверьте TelegramMaster/data/config/config.ini")
+            f"❌ Не удалось получить значение переменной: {error}. Проверьте TelegramMaster/data/config/config.ini"
+        )
 
 
 def write_data_to_json_file(reactions, path_to_the_file):
     """Открываем файл для записи данных в формате JSON"""
-    with open(f"{path_to_the_file}.json", 'w', encoding='utf-8') as file:
+    with open(f"{path_to_the_file}.json", "w", encoding="utf-8") as file:
         json.dump(reactions, file, ensure_ascii=False, indent=4)
 
 

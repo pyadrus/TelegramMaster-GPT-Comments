@@ -4,10 +4,21 @@ from loguru import logger
 
 from src.change_name_description_photo import handle_change_name_description_photo
 from src.commentator import TelegramCommentator
-from src.config_handler import (program_version, program_last_modified_date, program_name, app_log, errors_log,
-                                WINDOW_WIDTH, WINDOW_HEIGHT)
+from src.config_handler import (
+    program_version,
+    program_last_modified_date,
+    program_name,
+    app_log,
+    errors_log,
+    WINDOW_WIDTH,
+    WINDOW_HEIGHT,
+)
 from src.core.handle_connect_accounts import handle_connect_accounts
-from src.core.handlers import handle_documentation, handle_creating_list_of_channels, handle_settings
+from src.core.handlers import (
+    handle_documentation,
+    handle_creating_list_of_channels,
+    handle_settings,
+)
 from src.core.views import PRIMARY_COLOR, TITLE_FONT_WEIGHT
 from src.getting_list_channels import handle_getting_list_channels
 from src.logging_in import loging
@@ -36,7 +47,9 @@ class Application:
 
     async def actions_with_the_program_window(self, page: ft.Page):
         """Изменение на изменение главного окна программы."""
-        page.title = f"Версия {program_version}. Дата изменения {program_last_modified_date}"
+        page.title = (
+            f"Версия {program_version}. Дата изменения {program_last_modified_date}"
+        )
         page.window.width = WINDOW_WIDTH  # Устанавливаем ширину окна
         page.window.height = WINDOW_HEIGHT  # Устанавливаем высоту окна
         page.window.resizable = False
@@ -62,7 +75,12 @@ class Application:
                         foreground=ft.Paint(
                             gradient=ft.PaintLinearGradient(
                                 (0, 20), (150, 20), [PRIMARY_COLOR, PRIMARY_COLOR]
-                            )), ), ), ], )
+                            )
+                        ),
+                    ),
+                ),
+            ],
+        )
 
     def create_button(self, text: str, route: str) -> ft.OutlinedButton:
         """Создает кнопку меню."""
@@ -77,14 +95,22 @@ class Application:
     def build_menu(self) -> ft.Column:
         """Создает колонку с заголовками и кнопками для главного меню программы"""
         title = self.create_title(text=program_name, font_size=16)
-        version = self.create_title(text=f"Версия программы: {program_version}", font_size=13)
-        date_program_change = self.create_title(text=f"Дата изменения: {program_last_modified_date}", font_size=13)
+        version = self.create_title(
+            text=f"Версия программы: {program_version}", font_size=13
+        )
+        date_program_change = self.create_title(
+            text=f"Дата изменения: {program_last_modified_date}", font_size=13
+        )
         buttons = [
             self.create_button("📋 Получение списка каналов", "/getting_list_channels"),
             self.create_button("💬 Отправка комментариев", "/submitting_comments"),
-            self.create_button("🖼️ Смена имени, описания", "/change_name_description_photo"),
+            self.create_button(
+                "🖼️ Смена имени, описания", "/change_name_description_photo"
+            ),
             self.create_button("🔗 Подписка на каналы", "/channel_subscription"),
-            self.create_button("📂 Формирование списка каналов", "/creating_list_of_channels"),
+            self.create_button(
+                "📂 Формирование списка каналов", "/creating_list_of_channels"
+            ),
             self.create_button("📖 Документация", "/documentation"),
             self.create_button("🔗 Подключение аккаунтов", "/connect_accounts"),
             self.create_button("⚙️ Настройки программы", "/settings"),
@@ -120,7 +146,11 @@ class Application:
         self.page.views.clear()
         layout = ft.Row(
             [
-                ft.Container(self.build_menu(), width=self.PROGRAM_MENU_WIDTH, padding=self.PADDING),
+                ft.Container(
+                    self.build_menu(),
+                    width=self.PROGRAM_MENU_WIDTH,
+                    padding=self.PADDING,
+                ),
                 ft.Container(width=self.LINE_WIDTH, bgcolor=self.LINE_COLOR),
                 ft.Container(self.info_list, expand=True, padding=self.PADDING),
             ],
@@ -165,7 +195,7 @@ class Application:
         """Страница Запись сообщения"""
         await SettingPage(self.page).recording_text_for_sending_messages(
             "Введите сообщение, которое будет отправляться в канал",
-            "data/message/message"
+            "data/message/message",
         )
 
     async def _handle_record_id_hash(self):
@@ -211,7 +241,9 @@ class Application:
     async def main(self, page: ft.Page):
         """Точка входа в приложение."""
         self.page = page
-        self.info_list = ft.ListView(expand=True, spacing=10, padding=self.PADDING, auto_scroll=True)
+        self.info_list = ft.ListView(
+            expand=True, spacing=10, padding=self.PADDING, auto_scroll=True
+        )
 
         await self.setup()
         await loging()

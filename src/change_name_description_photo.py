@@ -14,7 +14,9 @@ async def handle_change_name_description_photo(page: ft.Page):
 
     page.views.clear()  # Очищаем страницу и добавляем новый View
     lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
-    page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
+    page.controls.append(
+        lv
+    )  # добавляем ListView на страницу для отображения информации
 
     lv.controls.append(
         ft.Text(
@@ -29,29 +31,38 @@ async def handle_change_name_description_photo(page: ft.Page):
         )
     )
 
-    about_field = ft.TextField(label="Введите описание профиля", multiline=True, max_lines=19)
+    about_field = ft.TextField(
+        label="Введите описание профиля", multiline=True, max_lines=19
+    )
 
     async def action_1(_):
         try:
-            lv.controls.append(ft.Text("🖼️ Смена имени, описания"))  # отображаем сообщение в ListView
+            lv.controls.append(
+                ft.Text("🖼️ Смена имени, описания")
+            )  # отображаем сообщение в ListView
             page.update()  # Обновляем страницу
-            await change_profile_descriptions(await connect_telegram_account(), lv, about_field.value)
+            await change_profile_descriptions(
+                await connect_telegram_account(), lv, about_field.value
+            )
             page.update()  # Обновляем страницу
         except Exception as e:
             logger.error(e)
-            lv.controls.append(ft.Text(f"Ошибка: {str(e)}"))  # отображаем ошибку в ListView
+            lv.controls.append(
+                ft.Text(f"Ошибка: {str(e)}")
+            )  # отображаем ошибку в ListView
             page.update()  # Обновляем страницу
 
-    await view_with_elements_input_field(page=page,
-                                         title=await program_title(title="🖼️ Смена имени, описания"),
-                                         buttons=[
-                                             await create_buttons(text="🖼️ Смена имени, описания", on_click=action_1),
-                                             await create_buttons(text="Назад", on_click=lambda _: page.go("/"))
-                                         ],
-                                         route_page="change_name_description_photo",
-                                         lv=lv,
-                                         text_field=about_field  # Создаем TextField поле ввода
-                                         )
+    await view_with_elements_input_field(
+        page=page,
+        title=await program_title(title="🖼️ Смена имени, описания"),
+        buttons=[
+            await create_buttons(text="🖼️ Смена имени, описания", on_click=action_1),
+            await create_buttons(text="Назад", on_click=lambda _: page.go("/")),
+        ],
+        route_page="change_name_description_photo",
+        lv=lv,
+        text_field=about_field,  # Создаем TextField поле ввода
+    )
     page.update()  # Обновляем страницу
 
 
@@ -64,9 +75,11 @@ async def change_profile_descriptions(client, lv: ft.ListView, about) -> None:
     :param about: Описание профиля.
     :return: None
     """
-    fake = Faker('ru_RU')  # Устанавливаем локаль для генерации русских имен
+    fake = Faker("ru_RU")  # Устанавливаем локаль для генерации русских имен
     fake_name = fake.first_name_female()  # Генерируем женское имя
-    lv.controls.append(ft.Text(f"🎭 Сгенерированное имя: {fake_name}"))  # отображаем сообщение в ListView
+    lv.controls.append(
+        ft.Text(f"🎭 Сгенерированное имя: {fake_name}")
+    )  # отображаем сообщение в ListView
 
     # Вводим данные для телеги
     async with client:  # Используем асинхронный контекстный менеджер
@@ -74,7 +87,7 @@ async def change_profile_descriptions(client, lv: ft.ListView, about) -> None:
         result = await client(
             functions.account.UpdateProfileRequest(
                 first_name=fake_name,  # Устанавливаем новое имя
-                about=about  # Устанавливаем новое описание
+                about=about,  # Устанавливаем новое описание
             )
         )
         # Форматируем результат для пользователя
@@ -88,4 +101,6 @@ async def change_profile_descriptions(client, lv: ft.ListView, about) -> None:
         )
         # Добавляем отформатированные данные в ListView
         lv.controls.append(ft.Text(user_info))
-        lv.controls.append(ft.Text("✅ Профиль успешно обновлен!"))  # отображаем сообщение в ListView
+        lv.controls.append(
+            ft.Text("✅ Профиль успешно обновлен!")
+        )  # отображаем сообщение в ListView

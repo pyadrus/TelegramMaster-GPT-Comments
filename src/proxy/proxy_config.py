@@ -16,7 +16,11 @@ def setup_proxy(proxy_user, proxy_password, proxy_ip, proxy_port) -> None:
     """
     try:
         # Указываем прокси для HTTP и HTTPS
-        os.environ['http_proxy'] = f"http://{proxy_user}:{proxy_password}@{proxy_ip}:{proxy_port}"
-        os.environ['https_proxy'] = f"http://{proxy_user}:{proxy_password}@{proxy_ip}:{proxy_port}"
+        os.environ["http_proxy"] = (
+            f"http://{proxy_user}:{proxy_password}@{proxy_ip}:{proxy_port}"
+        )
+        os.environ["https_proxy"] = (
+            f"http://{proxy_user}:{proxy_password}@{proxy_ip}:{proxy_port}"
+        )
     except Exception as e:
         logger.exception(e)

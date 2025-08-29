@@ -5,19 +5,29 @@ TITLE_FONT_WEIGHT = ft.FontWeight.BOLD
 PRIMARY_COLOR = ft.Colors.CYAN_600
 
 
-async def message_output_program_window(lv: ft.ListView, page: ft.Page, message_program):
+async def message_output_program_window(
+    lv: ft.ListView, page: ft.Page, message_program
+):
     """
     Вывод сообщений в окно программы.
     :param lv: ListView
     :param page: Страница приложения.
     :param message_program: Сообщение.
     """
-    lv.controls.append(ft.Text(f"{message_program}", color=ft.Colors.RED))  # отображаем сообщение в ListView
+    lv.controls.append(
+        ft.Text(f"{message_program}", color=ft.Colors.RED)
+    )  # отображаем сообщение в ListView
     page.update()  # Обновляем страницу
 
 
-async def view_with_elements_input_field(page: ft.Page, title: ft.Text, buttons: list[ft.ElevatedButton], route_page,
-                                         lv: ft.ListView, text_field: ft.TextField):
+async def view_with_elements_input_field(
+    page: ft.Page,
+    title: ft.Text,
+    buttons: list[ft.ElevatedButton],
+    route_page,
+    lv: ft.ListView,
+    text_field: ft.TextField,
+):
     """
     Создаем View с элементами и добавляем в него элементы
     :param title: Текст заголовка
@@ -35,13 +45,15 @@ async def view_with_elements_input_field(page: ft.Page, title: ft.Text, buttons:
                 ft.Column(
                     controls=[title, lv, text_field, *buttons],
                     expand=True,  # Растягиваем Column на всю доступную область
-                )],
+                )
+            ],
             padding=20,  # Добавляем отступы вокруг содержимого
-        ))
+        )
+    )
 
 
 async def program_title(title):
-    """"Заголовок страниц программы"""
+    """ "Заголовок страниц программы"""
     # Создаем заголовок
     title = ft.Text(
         spans=[
@@ -53,13 +65,23 @@ async def program_title(title):
                     foreground=ft.Paint(
                         gradient=ft.PaintLinearGradient(
                             (0, 20), (150, 20), [PRIMARY_COLOR, PRIMARY_COLOR]
-                        )), ), ), ], )
+                        )
+                    ),
+                ),
+            ),
+        ],
+    )
     return title
 
 
-async def view_with_elements(page: ft.Page, title: ft.Text, buttons: list[ft.ElevatedButton], route_page,
-                             lv: ft.ListView,
-                             content: list[ft.Control] = None):
+async def view_with_elements(
+    page: ft.Page,
+    title: ft.Text,
+    buttons: list[ft.ElevatedButton],
+    route_page,
+    lv: ft.ListView,
+    content: list[ft.Control] = None,
+):
     # Создаем View с элементами
 
     if content:
@@ -72,6 +94,8 @@ async def view_with_elements(page: ft.Page, title: ft.Text, buttons: list[ft.Ele
                 ft.Column(
                     controls=[title, lv, *buttons],
                     expand=True,  # Растягиваем Column на всю доступную область
-                )],
+                )
+            ],
             padding=20,  # Добавляем отступы вокруг содержимого
-        ))
+        )
+    )
