@@ -8,9 +8,6 @@ from src.core.views import view_with_elements_input_field
 from src.db_handler import save_channels_to_db
 
 
-
-
-
 async def handle_settings(page: ft.Page):
     """Формирует страницу ⚙️ Настройки с надписями и кнопками"""
     logger.info("Пользователь перешел на страницу Настройки")
@@ -67,7 +64,6 @@ async def handle_settings(page: ft.Page):
             ),
             await create_buttons(text="✉️ Запись сообщения", on_click=recording_message),
             await create_buttons(text="⚙️ Настройка ИИ", on_click=choosing_an_ai_model),
-            await create_buttons(text="⬅️ Назад", on_click=lambda _: page.go("/")),
         ],
         route_page="change_name_description_photo",
         lv=lv,

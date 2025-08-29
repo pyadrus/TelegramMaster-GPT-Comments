@@ -105,7 +105,7 @@ async def view_with_elements(
     page.views.append(
         ft.View(
             f"/{route_page}",
-            appbar = await key_app_bar(page),  # теперь передаем page в AppBar
+            appbar=await key_app_bar(page),  # теперь передаем page в AppBar
             controls=[
                 ft.Column(
                     controls=[title, lv, *buttons],
