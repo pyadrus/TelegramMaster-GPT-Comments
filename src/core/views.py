@@ -74,6 +74,22 @@ async def program_title(title):
     return title
 
 
+async def key_app_bar(page: ft.Page):
+    """
+    Кнопка в верхней панели приложения (возврат в главное меню).
+    """
+    return ft.AppBar(
+        leading=ft.IconButton(
+            icon=ft.Icons.ARROW_BACK,  # ✅ правильно — ft.Icons
+            tooltip="На главную",
+            on_click=lambda _: page.go("/"),  # переход на главную страницу
+        ),
+        title=ft.Text("На главную"),
+        toolbar_height=40,
+        bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,
+    )
+
+
 async def view_with_elements(
     page: ft.Page,
     title: ft.Text,
@@ -83,19 +99,19 @@ async def view_with_elements(
     content: list[ft.Control] = None,
 ):
     # Создаем View с элементами
-
     if content:
         lv.controls.extend(content)
 
     page.views.append(
         ft.View(
             f"/{route_page}",
+            appbar = await key_app_bar(page),  # теперь передаем page в AppBar
             controls=[
                 ft.Column(
                     controls=[title, lv, *buttons],
-                    expand=True,  # Растягиваем Column на всю доступную область
+                    expand=True,
                 )
             ],
-            padding=20,  # Добавляем отступы вокруг содержимого
+            padding=20,
         )
     )

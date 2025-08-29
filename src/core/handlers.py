@@ -8,6 +8,9 @@ from src.core.views import view_with_elements_input_field
 from src.db_handler import save_channels_to_db
 
 
+
+
+
 async def handle_settings(page: ft.Page):
     """Формирует страницу ⚙️ Настройки с надписями и кнопками"""
     logger.info("Пользователь перешел на страницу Настройки")
@@ -45,21 +48,30 @@ async def handle_settings(page: ft.Page):
         """Выбор ИИ модели"""
         page.go("/choosing_an_ai_model")
 
-    await view_with_elements(page=page, title=await program_title(title="⚙️ Настройки"),
-                             buttons=[
-                                 await create_buttons(text="🔗 Подключение прокси", on_click=connection_proxy),
-                                 ft.Row(
-                                     controls=[
-                                         await create_buttons_2(text="⏳ Запись времени", on_click=record_time),
-                                         await create_buttons_2(text="🆔 Запись ID и Hash", on_click=record_id_hash),
-                                     ]
-                                 ),
-                                 await create_buttons(text="✉️ Запись сообщения", on_click=recording_message),
-                                 await create_buttons(text="⚙️ Настройка ИИ", on_click=choosing_an_ai_model),
-                                 await create_buttons(text="⬅️ Назад", on_click=lambda _: page.go("/"))
-                             ],
-                             route_page="change_name_description_photo",
-                             lv=lv)
+    await view_with_elements(
+        page=page,
+        title=await program_title(title="⚙️ Настройки"),
+        buttons=[
+            await create_buttons(
+                text="🔗 Подключение прокси", on_click=connection_proxy
+            ),
+            ft.Row(
+                controls=[
+                    await create_buttons_2(
+                        text="⏳ Запись времени", on_click=record_time
+                    ),
+                    await create_buttons_2(
+                        text="🆔 Запись ID и Hash", on_click=record_id_hash
+                    ),
+                ]
+            ),
+            await create_buttons(text="✉️ Запись сообщения", on_click=recording_message),
+            await create_buttons(text="⚙️ Настройка ИИ", on_click=choosing_an_ai_model),
+            await create_buttons(text="⬅️ Назад", on_click=lambda _: page.go("/")),
+        ],
+        route_page="change_name_description_photo",
+        lv=lv,
+    )
     page.update()  # Обновляем страницу
 
 
@@ -70,44 +82,58 @@ async def handle_creating_list_of_channels(page: ft.Page):
     lv = ft.ListView(expand=10, spacing=1, padding=2, auto_scroll=True)
 
     # Добавляем пояснительный текст
-    lv.controls.append(ft.Text(
-        "Перед тем как приступить к подписке, необходимо создать список каналов, на которые будет подписываться ваш аккаунт.\n\n"
-        "🔹 Как добавить каналы?\n\n"
-        "1. Введите список каналов в поле ввода (каждый канал с новой строки или через запятую).\n"
-        "2. Нажмите кнопку 'Готово' для сохранения списка.\n"
-    ))
+    lv.controls.append(
+        ft.Text(
+            "Перед тем как приступить к подписке, необходимо создать список каналов, на которые будет подписываться ваш аккаунт.\n\n"
+            "🔹 Как добавить каналы?\n\n"
+            "1. Введите список каналов в поле ввода (каждый канал с новой строки или через запятую).\n"
+            "2. Нажмите кнопку 'Готово' для сохранения списка.\n"
+        )
+    )
 
-    page.controls.append(lv)  # добавляем ListView на страницу для отображения информации
+    page.controls.append(
+        lv
+    )  # добавляем ListView на страницу для отображения информации
 
-    list_of_channels = ft.TextField(label="Введите список каналов", multiline=True, max_lines=19)
+    list_of_channels = ft.TextField(
+        label="Введите список каналов", multiline=True, max_lines=19
+    )
 
     async def action_1(_):
         try:
             lv.controls.append(
-                ft.Text("📝 Запись данных, введенных пользователем..."))  # отображаем сообщение в ListView
-            lv.controls.append(ft.Text(
-                f"📋 Пользователь ввел список каналов: {list_of_channels.value}"))  # отображаем сообщение в ListView
+                ft.Text("📝 Запись данных, введенных пользователем...")
+            )  # отображаем сообщение в ListView
+            lv.controls.append(
+                ft.Text(
+                    f"📋 Пользователь ввел список каналов: {list_of_channels.value}"
+                )
+            )  # отображаем сообщение в ListView
             page.update()  # Обновляем страницу
             # Вызываем функцию для сохранения данных в базу данных
             await save_channels_to_db(list_of_channels.value)
             lv.controls.append(
-                ft.Text("✅ Данные успешно записаны в базу данных!"))  # отображаем сообщение в ListView
+                ft.Text("✅ Данные успешно записаны в базу данных!")
+            )  # отображаем сообщение в ListView
             page.update()  # Обновляем страницу
         except Exception as e:
             logger.error(e)
-            lv.controls.append(ft.Text(f"❌ Ошибка: {str(e)}"))  # отображаем ошибку в ListView
+            lv.controls.append(
+                ft.Text(f"❌ Ошибка: {str(e)}")
+            )  # отображаем ошибку в ListView
             page.update()  # Обновляем страницу
 
-    await view_with_elements_input_field(page=page,
-                                         title=await program_title(title="📂 Формирование списка каналов"),
-                                         buttons=[
-                                             await create_buttons(text="✅ Готово", on_click=action_1),
-                                             await create_buttons(text="Назад", on_click=lambda _: page.go("/"))
-                                         ],
-                                         route_page="creating_list_of_channels",
-                                         lv=lv,
-                                         text_field=list_of_channels  # Создаем TextField поле ввода
-                                         )
+    await view_with_elements_input_field(
+        page=page,
+        title=await program_title(title="📂 Формирование списка каналов"),
+        buttons=[
+            await create_buttons(text="✅ Готово", on_click=action_1),
+            await create_buttons(text="Назад", on_click=lambda _: page.go("/")),
+        ],
+        route_page="creating_list_of_channels",
+        lv=lv,
+        text_field=list_of_channels,  # Создаем TextField поле ввода
+    )
     page.update()  # Обновляем страницу
 
 
@@ -133,7 +159,7 @@ async def handle_documentation(page: ft.Page):
     # Функция для загрузки и отображения Markdown-файла
     def load_markdown(file_path: str):
         try:
-            with open(file_path, "r", encoding='utf-8') as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 markdown_content = f.read()
             return markdown_content
         except FileNotFoundError:
@@ -153,18 +179,21 @@ async def handle_documentation(page: ft.Page):
 
     async def open_website(_):
         """Открывает веб-версию документации"""
-        page.launch_url("https://github.com/pyadrus/TelegramMaster_Commentator/blob/master/doc/doc.md")
+        page.launch_url(
+            "https://github.com/pyadrus/TelegramMaster_Commentator/blob/master/doc/doc.md"
+        )
 
     # Добавляем элементы на страницу
-    await view_with_elements(page=page,
-                             title=await program_title(title="Документация"),  # Создаем заголовок страницы
-                             buttons=[
-                                 await create_buttons(text="🌐 Открыть сайт", on_click=open_website),
-                                 await create_buttons(text="Назад", on_click=lambda _: page.go("/"))
-                             ],
-                             route_page="documentation",
-                             lv=ft.ListView(controls=[markdown_widget], expand=True, spacing=10, padding=20),
-                             )
+    await view_with_elements(
+        page=page,
+        title=await program_title(title="Документация"),  # Создаем заголовок страницы
+        buttons=[
+            await create_buttons(text="🌐 Открыть сайт", on_click=open_website),
+            await create_buttons(text="Назад", on_click=lambda _: page.go("/")),
+        ],
+        route_page="documentation",
+        lv=ft.ListView(controls=[markdown_widget], expand=True, spacing=10, padding=20),
+    )
 
     # Обновляем страницу
     page.update()
